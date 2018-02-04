@@ -1,0 +1,309 @@
+AH00558: httpd.exe: Could not reliably determine the server's fully qualified domain name, using fe80::a500:e853:d02f:6b0d. Set the 'ServerName' directive globally to suppress this message
+[Sun Feb 04 19:27:37.250212 2018] [mpm_winnt:notice] [pid 44920:tid 724] AH00455: Apache/2.4.29 (Win64) configured -- resuming normal operations
+[Sun Feb 04 19:27:37.250717 2018] [mpm_winnt:notice] [pid 44920:tid 724] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 19:27:37.250717 2018] [core:notice] [pid 44920:tid 724] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 19:27:37.266712 2018] [mpm_winnt:notice] [pid 44920:tid 724] AH00418: Parent: Created child process 12392
+AH00558: httpd.exe: Could not reliably determine the server's fully qualified domain name, using fe80::a500:e853:d02f:6b0d. Set the 'ServerName' directive globally to suppress this message
+Apache server interrupted...
+ reliably determine the server's fully qualified domain name, using fe80::a500:e853:d02f:6b0d. Set the 'ServerName' directive globally to suppress this message
+[Sun Feb 04 19:27:41.359248 2018] [mpm_winnt:notice] [pid 12392:tid 764] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 19:27:59.712190 2018] [authz_core:error] [pid 12392:tid 1256] [client ::1:14779] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/
+[Sun Feb 04 19:28:16.654655 2018] [mpm_winnt:notice] [pid 44920:tid 724] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 19:28:18.656355 2018] [mpm_winnt:notice] [pid 12392:tid 764] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 19:28:18.679863 2018] [mpm_winnt:notice] [pid 44920:tid 724] AH00430: Parent: Child process 12392 exited successfully.
+[Sun Feb 04 19:28:20.168259 2018] [mpm_winnt:notice] [pid 20644:tid 564] AH00455: Apache/2.4.29 (Win64) configured -- resuming normal operations
+[Sun Feb 04 19:28:20.168764 2018] [mpm_winnt:notice] [pid 20644:tid 564] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 19:28:20.168764 2018] [core:notice] [pid 20644:tid 564] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 19:28:20.184189 2018] [mpm_winnt:notice] [pid 20644:tid 564] AH00418: Parent: Created child process 34092
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 34092:tid 564] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 19:28:24.713413 2018] [authz_core:error] [pid 34092:tid 1096] [client ::1:14783] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/
+[Sun Feb 04 19:28:50.806773 2018] [authz_core:error] [pid 34092:tid 1096] [client ::1:14785] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:06.546731 2018] [mpm_winnt:notice] [pid 20644:tid 564] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 34092:tid 564] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 19:30:08.570217 2018] [mpm_winnt:notice] [pid 20644:tid 564] AH00430: Parent: Child process 34092 exited successfully.
+[Sun Feb 04 19:30:35.409836 2018] [mpm_winnt:notice] [pid 55288:tid 120] AH00455: Apache/2.4.29 (Win64) configured -- resuming normal operations
+[Sun Feb 04 19:30:35.410341 2018] [mpm_winnt:notice] [pid 55288:tid 120] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 19:30:35.410341 2018] [core:notice] [pid 55288:tid 120] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 19:30:35.430265 2018] [mpm_winnt:notice] [pid 55288:tid 120] AH00418: Parent: Created child process 5136
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 5136:tid 4] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 19:30:39.145688 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:39.741703 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:39.955763 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:40.178921 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:40.394128 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:40.589553 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:40.809990 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:40.996683 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:41.195994 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/index.html
+[Sun Feb 04 19:30:42.841076 2018] [authz_core:error] [pid 5136:tid 1104] [client ::1:14788] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/apache2/htdocs/
+[Sun Feb 04 19:30:47.462514 2018] [mpm_winnt:notice] [pid 55288:tid 120] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 19:30:49.463440 2018] [mpm_winnt:notice] [pid 5136:tid 4] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 19:30:49.487281 2018] [mpm_winnt:notice] [pid 55288:tid 120] AH00430: Parent: Child process 5136 exited successfully.
+[Sun Feb 04 19:31:17.713948 2018] [mpm_winnt:notice] [pid 52340:tid 564] AH00455: Apache/2.4.29 (Win64) configured -- resuming normal operations
+[Sun Feb 04 19:31:17.714448 2018] [mpm_winnt:notice] [pid 52340:tid 564] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 19:31:17.714448 2018] [core:notice] [pid 52340:tid 564] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 19:31:17.729723 2018] [mpm_winnt:notice] [pid 52340:tid 564] AH00418: Parent: Created child process 45484
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 45484:tid 512] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 20:59:08.655491 2018] [mpm_winnt:notice] [pid 52340:tid 564] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 20:59:10.659660 2018] [mpm_winnt:notice] [pid 45484:tid 512] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 20:59:10.681608 2018] [mpm_winnt:notice] [pid 52340:tid 564] AH00430: Parent: Child process 45484 exited successfully.
+[Sun Feb 04 20:59:13.045779 2018] [mpm_winnt:notice] [pid 41564:tid 560] AH00455: Apache/2.4.29 (Win64) configured -- resuming normal operations
+[Sun Feb 04 20:59:13.047783 2018] [mpm_winnt:notice] [pid 41564:tid 560] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 20:59:13.047783 2018] [core:notice] [pid 41564:tid 560] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 20:59:13.061769 2018] [mpm_winnt:notice] [pid 41564:tid 560] AH00418: Parent: Created child process 9684
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 9684:tid 540] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:27:25.866785 2018] [mpm_winnt:notice] [pid 41564:tid 560] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 22:27:27.868399 2018] [mpm_winnt:notice] [pid 9684:tid 540] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:27:27.889390 2018] [mpm_winnt:notice] [pid 41564:tid 560] AH00430: Parent: Child process 9684 exited successfully.
+[Sun Feb 04 22:29:33.721766 2018] [mpm_winnt:notice] [pid 4980:tid 612] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:29:33.721766 2018] [mpm_winnt:notice] [pid 4980:tid 612] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:29:33.721766 2018] [core:notice] [pid 4980:tid 612] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:29:33.735766 2018] [mpm_winnt:notice] [pid 4980:tid 612] AH00418: Parent: Created child process 15932
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 15932:tid 596] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:31:31.509062 2018] [mpm_winnt:notice] [pid 4980:tid 612] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+[Sun Feb 04 22:31:33.513624 2018] [mpm_winnt:notice] [pid 15932:tid 596] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:31:33.537626 2018] [mpm_winnt:notice] [pid 4980:tid 612] AH00430: Parent: Child process 15932 exited successfully.
+[Sun Feb 04 22:31:35.039891 2018] [mpm_winnt:notice] [pid 57932:tid 536] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:31:35.039891 2018] [mpm_winnt:notice] [pid 57932:tid 536] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:31:35.039891 2018] [core:notice] [pid 57932:tid 536] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:31:35.053882 2018] [mpm_winnt:notice] [pid 57932:tid 536] AH00418: Parent: Created child process 42860
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 42860:tid 600] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:46:51.159035 2018] [mpm_winnt:notice] [pid 57932:tid 536] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 22:46:53.161222 2018] [mpm_winnt:notice] [pid 42860:tid 600] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:46:53.185172 2018] [mpm_winnt:notice] [pid 57932:tid 536] AH00430: Parent: Child process 42860 exited successfully.
+[Sun Feb 04 22:46:54.249259 2018] [mpm_winnt:notice] [pid 43732:tid 576] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:46:54.249259 2018] [mpm_winnt:notice] [pid 43732:tid 576] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:46:54.249259 2018] [core:notice] [pid 43732:tid 576] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:46:54.265243 2018] [mpm_winnt:notice] [pid 43732:tid 576] AH00418: Parent: Created child process 27624
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 27624:tid 604] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:53:11.948731 2018] [mpm_winnt:notice] [pid 43732:tid 576] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 22:53:13.952917 2018] [mpm_winnt:notice] [pid 27624:tid 604] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:53:13.976866 2018] [mpm_winnt:notice] [pid 43732:tid 576] AH00430: Parent: Child process 27624 exited successfully.
+[Sun Feb 04 22:53:15.534970 2018] [mpm_winnt:notice] [pid 30324:tid 624] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:53:15.534970 2018] [mpm_winnt:notice] [pid 30324:tid 624] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:53:15.534970 2018] [core:notice] [pid 30324:tid 624] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:53:15.546986 2018] [mpm_winnt:notice] [pid 30324:tid 624] AH00418: Parent: Created child process 10480
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 10480:tid 652] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:54:25.821711 2018] [mpm_winnt:notice] [pid 30324:tid 624] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 22:54:27.825793 2018] [mpm_winnt:notice] [pid 10480:tid 652] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:54:27.849807 2018] [mpm_winnt:notice] [pid 30324:tid 624] AH00430: Parent: Child process 10480 exited successfully.
+(OS 5)Accès refusé.  : AH10014: Failed to open the 'Apache2.4' service
+[Sun Feb 04 22:54:40.208102 2018] [mpm_winnt:notice] [pid 11260:tid 644] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:54:40.208102 2018] [mpm_winnt:notice] [pid 11260:tid 644] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:54:40.208102 2018] [core:notice] [pid 11260:tid 644] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:54:40.222105 2018] [mpm_winnt:notice] [pid 11260:tid 644] AH00418: Parent: Created child process 53168
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 53168:tid 620] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:54:50.756807 2018] [authz_core:error] [pid 53168:tid 1116] [client ::1:15979] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/.htaccess
+[Sun Feb 04 22:56:39.761379 2018] [authz_core:error] [pid 53168:tid 1116] [client ::1:16078] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/.htaccess
+[Sun Feb 04 22:57:01.868855 2018] [mpm_winnt:notice] [pid 11260:tid 644] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+[Sun Feb 04 22:57:03.873039 2018] [mpm_winnt:notice] [pid 53168:tid 620] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:57:03.896989 2018] [mpm_winnt:notice] [pid 11260:tid 644] AH00430: Parent: Child process 53168 exited successfully.
+[Sun Feb 04 22:57:05.119084 2018] [mpm_winnt:notice] [pid 60412:tid 584] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:57:05.119084 2018] [mpm_winnt:notice] [pid 60412:tid 584] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:57:05.119084 2018] [core:notice] [pid 60412:tid 584] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:57:05.135122 2018] [mpm_winnt:notice] [pid 60412:tid 584] AH00418: Parent: Created child process 45748
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 45748:tid 592] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 22:58:20.120897 2018] [mpm_winnt:notice] [pid 60412:tid 584] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+[Sun Feb 04 22:58:22.125070 2018] [mpm_winnt:notice] [pid 45748:tid 592] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 22:58:22.149018 2018] [mpm_winnt:notice] [pid 60412:tid 584] AH00430: Parent: Child process 45748 exited successfully.
+[Sun Feb 04 22:58:23.095080 2018] [mpm_winnt:notice] [pid 47940:tid 620] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Sun Feb 04 22:58:23.095080 2018] [mpm_winnt:notice] [pid 47940:tid 620] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sun Feb 04 22:58:23.095080 2018] [core:notice] [pid 47940:tid 620] AH00094: Command line: 'httpd.exe -d D:/Projets webs/AnnualProject/apache2'
+[Sun Feb 04 22:58:23.109083 2018] [mpm_winnt:notice] [pid 47940:tid 620] AH00418: Parent: Created child process 7636
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 7636:tid 4] AH00354: Child: Starting 64 worker threads.
+[Sun Feb 04 23:36:11.022720 2018] [mpm_winnt:notice] [pid 47940:tid 620] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Sun Feb 04 23:36:13.026901 2018] [mpm_winnt:notice] [pid 7636:tid 4] AH00364: Child: All worker threads have exited.
+[Sun Feb 04 23:36:13.050890 2018] [mpm_winnt:notice] [pid 47940:tid 620] AH00430: Parent: Child process 7636 exited successfully.
+Starting the 'Apache Server Main App' service
+The 'Apache Server Main App' service is running.
+Starting the 'Apache Server Main App' service
+The 'Apache Server Main App' service is running.
+Starting the 'Apache Server Sockets' service
+The 'Apache Server Sockets' service is running.
+Starting the 'Apache Server Main App' service
+The 'Apache Server Main App' service is running.
+Starting the 'Apache Server Sockets' service
+The 'Apache Server Sockets' service is running.
+Starting the 'Apache Server Sockets' service
+The 'Apache Server Sockets' service is running.
+e 'Apache Server Main App' service is running.
+[Mon Feb 05 00:23:08.043498 2018] [mpm_winnt:notice] [pid 10544:tid 548] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:23:08.043498 2018] [mpm_winnt:notice] [pid 10544:tid 548] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:23:08.043498 2018] [core:notice] [pid 10544:tid 548] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:23:08.059526 2018] [mpm_winnt:notice] [pid 10544:tid 548] AH00418: Parent: Created child process 28812
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 28812:tid 604] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:23:21.607436 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17397] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/
+[Mon Feb 05 00:24:22.487856 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17398] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:15.129149 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17399] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:15.679188 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17399] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:15.891202 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17399] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:16.063225 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17399] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:26.623925 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17400] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:27.491990 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17400] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:25:30.698209 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17400] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/index.php
+[Mon Feb 05 00:25:32.230298 2018] [authz_core:error] [pid 28812:tid 1104] [client ::1:17400] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/
+[Mon Feb 05 00:26:37.464556 2018] [mpm_winnt:notice] [pid 10544:tid 548] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:26:39.468652 2018] [mpm_winnt:notice] [pid 28812:tid 604] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:26:39.492649 2018] [mpm_winnt:notice] [pid 10544:tid 548] AH00430: Parent: Child process 28812 exited successfully.
+[Mon Feb 05 00:28:18.711725 2018] [core:warn] [pid 58352:tid 588] AH00098: pid file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon Feb 05 00:28:18.717730 2018] [mpm_winnt:notice] [pid 27844:tid 564] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:28:18.717730 2018] [mpm_winnt:notice] [pid 27844:tid 564] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:28:18.717730 2018] [core:notice] [pid 27844:tid 564] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:28:18.719732 2018] [mpm_winnt:notice] [pid 58352:tid 588] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:28:18.719732 2018] [mpm_winnt:notice] [pid 58352:tid 588] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:28:18.719732 2018] [core:notice] [pid 58352:tid 588] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/sockets.conf'
+[Mon Feb 05 00:28:18.733724 2018] [mpm_winnt:notice] [pid 58352:tid 588] AH00418: Parent: Created child process 44236
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 27844:tid 564] AH00418: Parent: Created child process 42356
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 42356:tid 596] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:28:19.003327 2018] [mpm_winnt:notice] [pid 44236:tid 596] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:28:23.171618 2018] [authz_core:error] [pid 42356:tid 1132] [client ::1:17434] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/index.php
+[Mon Feb 05 00:33:51.408890 2018] [mpm_winnt:notice] [pid 58352:tid 588] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:33:53.413065 2018] [mpm_winnt:notice] [pid 44236:tid 596] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:33:53.437026 2018] [mpm_winnt:notice] [pid 58352:tid 588] AH00430: Parent: Child process 44236 exited successfully.
+[Mon Feb 05 00:33:53.453014 2018] [mpm_winnt:notice] [pid 27844:tid 564] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:33:55.456614 2018] [mpm_winnt:notice] [pid 42356:tid 596] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:33:55.476565 2018] [mpm_winnt:notice] [pid 27844:tid 564] AH00430: Parent: Child process 42356 exited successfully.
+[Mon Feb 05 00:33:55.476565 2018] [core:error] [pid 27844:tid 564] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid
+[Mon Feb 05 00:33:58.043557 2018] [core:warn] [pid 10612:tid 488] AH00098: pid file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon Feb 05 00:33:58.049565 2018] [mpm_winnt:notice] [pid 26564:tid 588] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:33:58.049565 2018] [mpm_winnt:notice] [pid 26564:tid 588] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:33:58.049565 2018] [core:notice] [pid 26564:tid 588] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/sockets.conf'
+[Mon Feb 05 00:33:58.051547 2018] [mpm_winnt:notice] [pid 10612:tid 488] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:33:58.051547 2018] [mpm_winnt:notice] [pid 10612:tid 488] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:33:58.051547 2018] [core:notice] [pid 10612:tid 488] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:33:58.065561 2018] [mpm_winnt:notice] [pid 10612:tid 488] AH00418: Parent: Created child process 61288
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 26564:tid 588] AH00418: Parent: Created child process 5652
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 61288:tid 588] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:33:58.406253 2018] [mpm_winnt:notice] [pid 5652:tid 600] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:34:02.204497 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:34:03.342573 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:34:03.514593 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:34:03.696596 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:34:03.878616 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:34:05.934746 2018] [autoindex:error] [pid 61288:tid 1136] [client ::1:17469] AH01276: Cannot serve directory D:/Projets webs/AnnualProject/www/app/: No matching DirectoryIndex (index.html,index.php,index.html) found, and server-generated directory index forbidden by Options directive
+[Mon Feb 05 00:34:16.694005 2018] [php7:error] [pid 61288:tid 1136] [client ::1:17469] script 'D:/Projets webs/AnnualProject/www/app/index.php' not found or unable to stat
+[Mon Feb 05 00:35:36.828325 2018] [mpm_winnt:notice] [pid 10612:tid 488] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:35:38.832510 2018] [mpm_winnt:notice] [pid 61288:tid 588] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:35:38.856459 2018] [mpm_winnt:notice] [pid 10612:tid 488] AH00430: Parent: Child process 61288 exited successfully.
+[Mon Feb 05 00:35:38.870459 2018] [mpm_winnt:notice] [pid 26564:tid 588] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:35:40.874821 2018] [mpm_winnt:notice] [pid 5652:tid 600] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:35:40.894826 2018] [mpm_winnt:notice] [pid 26564:tid 588] AH00430: Parent: Child process 5652 exited successfully.
+[Mon Feb 05 00:35:40.894826 2018] [core:error] [pid 26564:tid 588] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid
+[Mon Feb 05 00:35:52.791158 2018] [mpm_winnt:notice] [pid 32652:tid 572] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:35:52.791158 2018] [mpm_winnt:notice] [pid 32652:tid 572] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:35:52.791158 2018] [core:notice] [pid 32652:tid 572] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:35:52.805186 2018] [mpm_winnt:notice] [pid 32652:tid 572] AH00418: Parent: Created child process 11152
+Apache server interrupted...
+018] [mpm_winnt:notice] [pid 11152:tid 624] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:35:57.387357 2018] [authz_core:error] [pid 11152:tid 1116] [client ::1:17474] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/server.php
+[Mon Feb 05 00:36:00.021532 2018] [authz_core:error] [pid 11152:tid 1116] [client ::1:17474] AH01630: client denied by server configuration: D:/Projets webs/AnnualProject/www/app/
+[Mon Feb 05 00:36:03.355757 2018] [mpm_winnt:notice] [pid 32652:tid 572] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+Apache server interrupted...
+Apache server interrupted...
+[Mon Feb 05 00:36:05.359888 2018] [mpm_winnt:notice] [pid 11152:tid 624] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:36:05.387891 2018] [mpm_winnt:notice] [pid 32652:tid 572] AH00430: Parent: Child process 11152 exited successfully.
+[Mon Feb 05 00:36:22.933278 2018] [mpm_winnt:notice] [pid 50172:tid 624] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:36:22.933278 2018] [mpm_winnt:notice] [pid 50172:tid 624] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:36:22.933278 2018] [core:notice] [pid 50172:tid 624] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:36:22.947295 2018] [mpm_winnt:notice] [pid 50172:tid 624] AH00418: Parent: Created child process 27900
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 27900:tid 604] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:36:46.502489 2018] [mpm_winnt:notice] [pid 50172:tid 624] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:36:48.506657 2018] [mpm_winnt:notice] [pid 27900:tid 604] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:36:48.532606 2018] [mpm_winnt:notice] [pid 50172:tid 624] AH00430: Parent: Child process 27900 exited successfully.
+[Mon Feb 05 00:36:59.237219 2018] [mpm_winnt:notice] [pid 4324:tid 564] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:36:59.237219 2018] [mpm_winnt:notice] [pid 4324:tid 564] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:36:59.237219 2018] [core:notice] [pid 4324:tid 564] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:36:59.249220 2018] [mpm_winnt:notice] [pid 4324:tid 564] AH00418: Parent: Created child process 5308
+Apache server shutdown initiated...
+ore:warn] [pid 56380:tid 560] AH00098: pid file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon Feb 05 00:36:59.333237 2018] [mpm_winnt:notice] [pid 56380:tid 560] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:36:59.333237 2018] [mpm_winnt:notice] [pid 56380:tid 560] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:36:59.333237 2018] [core:notice] [pid 56380:tid 560] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/sockets.conf'
+[Mon Feb 05 00:36:59.345224 2018] [mpm_winnt:notice] [pid 56380:tid 560] AH00418: Parent: Created child process 35240
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 5308:tid 636] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:36:59.701826 2018] [mpm_winnt:notice] [pid 35240:tid 600] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:39:10.371192 2018] [mpm_winnt:notice] [pid 4324:tid 564] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:39:12.373323 2018] [mpm_winnt:notice] [pid 5308:tid 636] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:39:12.397310 2018] [mpm_winnt:notice] [pid 4324:tid 564] AH00430: Parent: Child process 5308 exited successfully.
+[Mon Feb 05 00:39:12.411313 2018] [mpm_winnt:notice] [pid 56380:tid 560] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:39:14.414548 2018] [mpm_winnt:notice] [pid 35240:tid 600] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:39:14.434550 2018] [mpm_winnt:notice] [pid 56380:tid 560] AH00430: Parent: Child process 35240 exited successfully.
+[Mon Feb 05 00:39:14.434550 2018] [core:error] [pid 56380:tid 560] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid
+[Mon Feb 05 00:39:16.706607 2018] [core:warn] [pid 22928:tid 136] AH00098: pid file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon Feb 05 00:39:16.710608 2018] [mpm_winnt:notice] [pid 47692:tid 572] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:39:16.710608 2018] [mpm_winnt:notice] [pid 47692:tid 572] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:39:16.710608 2018] [core:notice] [pid 47692:tid 572] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/sockets.conf'
+[Mon Feb 05 00:39:16.712608 2018] [mpm_winnt:notice] [pid 22928:tid 136] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 configured -- resuming normal operations
+[Mon Feb 05 00:39:16.712608 2018] [mpm_winnt:notice] [pid 22928:tid 136] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Mon Feb 05 00:39:16.712608 2018] [core:notice] [pid 22928:tid 136] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/AnnualProject/apache2 -f ../servers-conf/mainapp.conf'
+[Mon Feb 05 00:39:16.726608 2018] [mpm_winnt:notice] [pid 47692:tid 572] AH00418: Parent: Created child process 32328
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 22928:tid 136] AH00418: Parent: Created child process 1944
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 32328:tid 592] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:39:17.046868 2018] [mpm_winnt:notice] [pid 1944:tid 600] AH00354: Child: Starting 64 worker threads.
+[Mon Feb 05 00:44:44.563195 2018] [mpm_winnt:notice] [pid 47692:tid 572] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:44:46.567111 2018] [mpm_winnt:notice] [pid 32328:tid 592] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:44:46.593114 2018] [mpm_winnt:notice] [pid 47692:tid 572] AH00430: Parent: Child process 32328 exited successfully.
+[Mon Feb 05 00:44:46.607112 2018] [mpm_winnt:notice] [pid 22928:tid 136] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Feb 05 00:44:48.609356 2018] [mpm_winnt:notice] [pid 1944:tid 600] AH00364: Child: All worker threads have exited.
+[Mon Feb 05 00:44:48.629308 2018] [mpm_winnt:notice] [pid 22928:tid 136] AH00430: Parent: Child process 1944 exited successfully.
+[Mon Feb 05 00:44:48.631307 2018] [core:error] [pid 22928:tid 136] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/AnnualProject/apache2/logs/httpd.pid
