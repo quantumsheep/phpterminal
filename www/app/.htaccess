@@ -4,4 +4,4 @@ RewriteEngine On
     Deny from all
 </Limit>
 
-RewriteRule ^.*$ server.php
+RewriteRule ^.*$ src/Server.php

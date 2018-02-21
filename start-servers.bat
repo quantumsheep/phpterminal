@@ -4,7 +4,7 @@
 net session >nul 2>&1
 if %errorLevel% == 0 (
 	start /b cmd /c apache2\bin\httpd.exe -f "../servers-conf/mainapp.conf"
-	start /b cmd /c apache2\bin\httpd.exe -f "../servers-conf/sockets.conf"
+	start /b cmd /c php ./www/sockets/server.php
 ) else (
 	echo You need admin rights to install Apache services
     pause
