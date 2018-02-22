@@ -4,6 +4,10 @@ namespace Alph\Services;
 class Route {
     /**
      * Try routing
+     * 
+     * @param array $methods
+     * @param string $route
+     * @param string|callable $action
      */
     public static function exec($methods, $route, $action) {
         // Check if a route is already validated
@@ -32,19 +36,45 @@ class Route {
         $client_uri_length = count($client_uri);
 
         // Check if the route and the client requested URI have not the same length
-        if($parts_length !== $client_uri_length) return false;
+        // if($parts_length !== $client_uri_length) return false;
 
+        // Create the array to store route variables
         $vars = [];
 
+        // Loop over the route string parts
         for($i = 0; $i < $parts_length; $i++) {
+            // If the first character of the part is '{', it must be a route variable
             if($parts[$i][0] == '{') {
-                $vars[preg_replace("/\{(.*?)\}/", "$1", $parts[$i])] = $client_uri[$i];
+                // If the pre-last character of the part is '*', it must be an infinite possibility route variable
+                if($parts[$i][strlen($parts[$i]) - 2] === '*') {
+                    // Get the route variable name
+                    $varname = preg_replace("/\{(.*?)\*\}/", "$1", $parts[$i]);
+                    
+                    // Loop over the keeping client uri length
+                    for($j = $i; $j < $client_uri_length; $j++) {
+                        // Add the client URI parts to the array
+                        $vars[$varname] .= '/' . $client_uri[$j];
+                    }
+
+                    // Break to avoid continuing the loop
+                    break;
+                } else {
+                    $vars[preg_replace("/\{(.*?)\}/", "$1", $parts[$i])] = $client_uri[$i];
+                }
+            // Check if the route part match the client uri part, if not stop the routing process for this route, else do nothing and continue
             } else if($parts[$i] !== $client_uri[$i]) {
                 return false;
             }
         }
         
-        echo call_user_func("\\Alph\\Controllers\\" . $action, $vars);
+        if(is_callable($action)) {
+            // Start the action's callable relative to the route
+            echo call_user_func_array($action, $vars);
+        } else {
+            // Start the controller's action relative to the route
+            echo call_user_func("\\Alph\\Controllers\\" . $action, $vars);
+        }
+        
         return $GLOBALS['ROUTED'] = true;
     }
 }
