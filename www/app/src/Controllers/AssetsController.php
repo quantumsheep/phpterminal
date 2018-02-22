@@ -3,7 +3,7 @@ namespace Alph\Controllers;
 
 class AssetsController {
     public static function find($params) {
-        if(file_exists(DIR_ASSETS . $params["filepath"])) {
+        if(is_file(DIR_ASSETS . $params["filepath"])) {
             $mimetypes = [
                 "ez" => "application/andrew-inset",
                 "hqx" => "application/mac-binhex40",

@@ -8,7 +8,7 @@
     <title>alPH - @yield('title')</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="/assets/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 
 <body>
@@ -18,7 +18,7 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
                         <a class="navbar-brand" href="#">
-                            <img src="/assets/alph-logo-xl.png" class="logo">
+                            <img src="/assets/img/alph-logo-xl.png" class="logo">
                         </a>
                     </li>
                 </ul>
