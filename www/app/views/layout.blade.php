@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/mick.css">
 </head>
 
 <body>
@@ -30,7 +31,7 @@
                         <a class="nav-link" href="/terminal">Terminal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/account">My account</a>
+                        <a class="nav-link" href="/connect">Connexion</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>
