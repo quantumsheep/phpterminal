@@ -1,18 +1,13 @@
 <?php
-use Ratchet\Server\IoServer;
+use Alph\Sockets\App;
 use Ratchet\Http\HttpServer;
+use Ratchet\Server\IoServer;
+use Ratchet\Session\SessionProvider;
 use Ratchet\WebSocket\WsServer;
-use Commands\Chat;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
-    require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-    $server = IoServer::factory(
-        new HttpServer(
-            new WsServer(
-                new Chat()
-            )
-        ),
-        810
-    );
+$server = IoServer::factory(new HttpServer(new WsServer(new App())), 810);
 
-    $server->run();
+$server->run();

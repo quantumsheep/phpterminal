@@ -1,8 +1,11 @@
 {
     "autoload": {
         "psr-4": {
-            "Commands\\": "commands"
-        }
+            "Alph\\Commands\\": "commands"
+        },
+        "files": [
+            "App.php"
+        ]
     },
     "require": {
         "cboden/ratchet": "^0.4.1"

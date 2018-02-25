@@ -22,7 +22,7 @@ class Route {
             echo call_user_func("\\Alph\\Controllers\\" . $action, []);
             return $GLOBALS['ROUTED'] = true;
         }
-
+        
         // Cut the route string to multiple parts
         $parts = explode('/', $route);
 

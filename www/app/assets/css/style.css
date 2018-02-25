@@ -12,6 +12,7 @@ body {
     display: flex;
     flex-direction: column;
     padding-bottom: 60px;
+    color: #ffffff;
 }
 
 header nav ul li {
@@ -48,4 +49,9 @@ footer {
     width: 100%;
     height: 60px;
     line-height: 60px;
+}
+
+.form-control:focus {
+    border-color: #555555 !important;
+    box-shadow: 0 0 0 .2rem #333333 !important;
 }

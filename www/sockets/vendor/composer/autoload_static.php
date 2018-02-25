@@ -13,6 +13,7 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'd64a81d7db4c397f50894b2e5cd69a72' => __DIR__ . '/../..' . '/App.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -43,9 +44,9 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         array (
             'GuzzleHttp\\Psr7\\' => 16,
         ),
-        'C' => 
+        'A' => 
         array (
-            'Commands\\' => 9,
+            'Alph\\Commands\\' => 14,
         ),
     );
 
@@ -110,7 +111,7 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'Commands\\' => 
+        'Alph\\Commands\\' => 
         array (
             0 => __DIR__ . '/../..' . '/commands',
         ),
