@@ -48,20 +48,3 @@ class App implements MessageComponentInterface {
         $conn->close();
     }
 }
-
-switch (truc) {
-    case 1:
-        set(1);
-        set(2);
-        set(3);
-        break;
-    case 2:
-        set(1);
-        set(2);
-        break;
-    case 3:
-        set(1);
-        set(2);
-        set(3);
-        break;
-}
