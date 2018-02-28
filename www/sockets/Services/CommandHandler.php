@@ -1,10 +1,10 @@
 <?php
-namespace Alph\Commands;
- 
+namespace Alph\Services;
+
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class Chat implements MessageComponentInterface {
+class CommandHandler implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
@@ -12,19 +12,18 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onOpen(ConnectionInterface $conn) {
+        session_id(\GuzzleHttp\Psr7\parse_header($conn->httpRequest->getHeader('Cookie'))[0]['alph_sess']);        
+        new \Alph\Services\SessionHandler;
+
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-
-        echo "New connection! ({$conn->resourceId})\n";
     }
-
+    
     public function onMessage(ConnectionInterface $from, $msg) {
-        session_start();
-
         $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
+        
         foreach ($this->clients as $client) {
             if ($from !== $client) {
                 // The sender is not the receiver, send to each client connected

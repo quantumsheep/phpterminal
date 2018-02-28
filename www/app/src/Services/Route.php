@@ -11,7 +11,7 @@ class Route {
      */
     public static function exec($methods, $route, $action) {
         // Check if a route is already validated
-        if($GLOBALS['ROUTED']) return;
+        if(isset($GLOBALS['ROUTED']) && $GLOBALS['ROUTED']) return;
 
         // Check if the client route is not the same as the route method(s)
         if(!in_array($_SERVER['REQUEST_METHOD'], $methods)) return false;
@@ -22,7 +22,7 @@ class Route {
             echo call_user_func("\\Alph\\Controllers\\" . $action, []);
             return $GLOBALS['ROUTED'] = true;
         }
-
+        
         // Cut the route string to multiple parts
         $parts = explode('/', $route);
 
@@ -44,12 +44,13 @@ class Route {
         // Loop over the route string parts
         for($i = 0; $i < $parts_length; $i++) {
             // If the first character of the part is '{', it must be a route variable
-            if($parts[$i][0] == '{') {
+            if(isset($parts[$i][0]) && $parts[$i][0] == '{') {
                 // If the pre-last character of the part is '*', it must be an infinite possibility route variable
                 if($parts[$i][strlen($parts[$i]) - 2] === '*') {
                     // Get the route variable name
                     $varname = preg_replace("/\{(.*?)\*\}/", "$1", $parts[$i]);
                     
+                    $vars[$varname] = "";
                     // Loop over the keeping client uri length
                     for($j = $i; $j < $client_uri_length; $j++) {
                         // Add the client URI parts to the array

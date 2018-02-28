@@ -16,3 +16,9 @@ define("DIR_VIEWS", DIR_ROOT . "views" . DS);
 
 // Define the DIR_BLADE_CACHE constant that define the cache to store Blade files
 define("DIR_BLADE_CACHE", DIR_ROOT . "cache" . DS);
+
+define("DB_HOST", "localhost");
+define("DB_PORT", "9956");
+define("DB_USER", "root");
+define("DB_PASS", "koala");
+define("DB_NAME", "alph");
