@@ -1,10 +1,10 @@
 <?php
-namespace Alph\Sockets;
+namespace Alph\Services;
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class App implements MessageComponentInterface {
+class CommandHandler implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
@@ -12,14 +12,11 @@ class App implements MessageComponentInterface {
     }
 
     public function onOpen(ConnectionInterface $conn) {
-        ini_set('session.save_path', "D:\\Projets webs\\phpterminal\\www\\session");
+        session_id(\GuzzleHttp\Psr7\parse_header($conn->httpRequest->getHeader('Cookie'))[0]['alph_sess']);        
+        new \Alph\Services\SessionHandler;
+
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-
-        session_id(\GuzzleHttp\Psr7\parse_header($conn->httpRequest->getHeader('Cookie'))[0]['PHPSESSID']);
-        session_start();
-
-        var_dump($_SESSION);
     }
     
     public function onMessage(ConnectionInterface $from, $msg) {

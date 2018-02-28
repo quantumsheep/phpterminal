@@ -21,5 +21,6 @@ return array(
     'Ratchet\\' => array($vendorDir . '/cboden/ratchet/src/Ratchet'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
-    'Alph\\Commands\\' => array($baseDir . '/commands'),
+    'Alph\\Services\\' => array($baseDir . '/Services'),
+    'Alph\\Commands\\' => array($baseDir . '/Commands'),
 );

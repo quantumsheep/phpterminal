@@ -50,6 +50,7 @@ class Route {
                     // Get the route variable name
                     $varname = preg_replace("/\{(.*?)\*\}/", "$1", $parts[$i]);
                     
+                    $vars[$varname] = "";
                     // Loop over the keeping client uri length
                     for($j = $i; $j < $client_uri_length; $j++) {
                         // Add the client URI parts to the array

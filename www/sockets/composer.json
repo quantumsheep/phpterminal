@@ -1,10 +1,11 @@
 {
     "autoload": {
         "psr-4": {
-            "Alph\\Commands\\": "commands"
+            "Alph\\Commands\\": "Commands",
+            "Alph\\Services\\": "Services"
         },
         "files": [
-            "App.php"
+            "Parameters.php"
         ]
     },
     "require": {

@@ -10,7 +10,7 @@ class SessionHandler
     public function __construct()
     {
         session_name("alph_sess");
-
+        
         // Instantiate new connection
         $this->db = Database::connect();
 
