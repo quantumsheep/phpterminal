@@ -43,6 +43,8 @@
     <footer>
         <div>Copyright alPH 2018</div>
     </footer>
+
+    @yield('script')
 </body>
 
 </html>

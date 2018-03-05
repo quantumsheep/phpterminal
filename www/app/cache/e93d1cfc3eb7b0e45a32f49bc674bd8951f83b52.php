@@ -43,6 +43,8 @@
     <footer>
         <div>Copyright alPH 2018</div>
     </footer>
+
+    <?php echo $__env->yieldContent('script'); ?>
 </body>
 
 </html>
