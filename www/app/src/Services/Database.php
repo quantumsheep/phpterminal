@@ -3,6 +3,10 @@ namespace Alph\Services;
 
 class Database {
     public static function connect() {
-        return new \PDO('mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+        try {
+            return new \PDO('mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
+        } catch(\PDOException $e) {
+            die("Database connexion failed.");
+        }
     }
 }

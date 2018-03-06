@@ -1,45 +1,60 @@
 <?php
 namespace Alph\Services;
 
-use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use Ratchet\MessageComponentInterface;
 
-class CommandHandler implements MessageComponentInterface {
+class CommandHandler implements MessageComponentInterface
+{
     protected $clients;
+    private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->clients = new \SplObjectStorage;
+        $this->db = \Alph\Services\Database::connect();
     }
 
-    public function onOpen(ConnectionInterface $conn) {
-        session_id(\GuzzleHttp\Psr7\parse_header($conn->httpRequest->getHeader('Cookie'))[0]['alph_sess']);        
-        new \Alph\Services\SessionHandler;
-
-        // Store the new connection to send messages to later
+    public function onOpen(ConnectionInterface $conn)
+    {
+        // Store the new connection to send messages later
         $this->clients->attach($conn);
     }
-    
-    public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-        
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($_SESSION["hi"]);
+
+    public function onMessage(ConnectionInterface $sender, $cmd)
+    {
+        // Get cookie HTTP header
+        $cookies = $sender->httpRequest->getHeader('Cookie');
+
+        // If there is no values in the cookie header, stop the process
+        if (!empty($cookies)) {
+            // Parse the cookies to obtain each cookies separately
+            $parsed_cookies = \GuzzleHttp\Psr7\parse_header($cookies);
+
+            // Check if alph_sess is defined in the sender's cookies
+            if (isset($parsed_cookies[0]["alph_sess"])) {
+                // Read the sender's session data
+                $sender_session = \Alph\Services\Session::read($this->db, $parsed_cookies[0]["alph_sess"]);
+
+                // Check if the command exists
+                if (method_exists('\\Alph\\Commands\\' . $cmd, 'call')) {
+                    // Call the command with arguments
+                    \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, $sender, $parsed_cookies[0]["alph_sess"], $cmd]);
+                }
             }
         }
     }
 
-    public function onClose(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn)
+    {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
 
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
         echo "An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
