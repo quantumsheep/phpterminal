@@ -2,7 +2,7 @@
 namespace Alph\Controllers;
 
 class AssetsController {
-    public static function find($params) {
+    public static function find(array $params) {
         if(is_file(DIR_ASSETS . $params["filepath"])) {
             $mimetypes = [
                 "ez" => "application/andrew-inset",

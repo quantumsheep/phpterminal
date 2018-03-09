@@ -9,7 +9,7 @@ class Route {
      * @param string $route
      * @param string|callable $action
      */
-    public static function exec($methods, $route, $action) {
+    public static function exec(array $methods, string $route, $action) {
         // Check if a route is already validated
         if(isset($GLOBALS['ROUTED']) && $GLOBALS['ROUTED']) return;
 

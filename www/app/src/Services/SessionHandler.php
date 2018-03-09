@@ -41,7 +41,7 @@ class SessionHandler
         return true;
     }
 
-    public function _read($id)
+    public function _read(string $id)
     {
         // Prapare the query
         $stmp = $this->db->prepare('SELECT data FROM session WHERE id = :id');
@@ -67,7 +67,7 @@ class SessionHandler
         }
     }
 
-    public function _write($id, $data)
+    public function _write(string $id, $data)
     {
         // Timestamp creation for session duration timeout
         $access = time();

@@ -3,7 +3,7 @@ namespace Alph\Services;
 
 class Session
 {
-    public static function read($db, $id)
+    public static function read(\PDO $db, string $id)
     {
         // Prapare the query
         $stmp = $db->prepare('SELECT data FROM session WHERE id = :id');
@@ -29,7 +29,7 @@ class Session
         }
     }
 
-    public static function write($db, $id, $data)
+    public static function write(\PDO $db, string $id, $data)
     {
         // Timestamp creation for session duration timeout
         $access = time();
@@ -46,7 +46,7 @@ class Session
         return $stmp->execute();
     }
 
-    public static function destroy($db, $id)
+    public static function destroy(\PDO $db, string $id)
     {
         // Prapare the query
         $stmp = $db->prepare('DELETE FROM session WHERE id = :id');
@@ -58,7 +58,7 @@ class Session
         return $stmp->execute();
     }
 
-    public static function unserialize($session_data)
+    public static function unserialize(string $session_data)
     {
         $method = ini_get("session.serialize_handler");
         switch ($method) {
@@ -73,7 +73,7 @@ class Session
         }
     }
 
-    private static function unserialize_php($session_data)
+    private static function unserialize_php(string $session_data)
     {
         $return_data = array();
         $offset = 0;
@@ -92,7 +92,7 @@ class Session
         return $return_data;
     }
 
-    private static function unserialize_phpbinary($session_data)
+    private static function unserialize_phpbinary(string $session_data)
     {
         $return_data = array();
         $offset = 0;
