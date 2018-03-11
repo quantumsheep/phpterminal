@@ -7,4 +7,7 @@ Route::exec(["GET"], "/assets/{filepath*}", "AssetsController::find");
 Route::exec(["GET"], "/terminal", "TerminalController::index");
 Route::exec(["GET"], "/terminal/{mac}", "TerminalController::index");
 
-Route::exec(["GET"], "/logon", "AccountController::logon");
+Route::exec(["GET"], "/signup", "AccountController::signup");
+Route::exec(["POST"], "/signup", "AccountController::signupaction");
+
+Route::exec(["GET"], "/about/tos", "AboutController::tos");

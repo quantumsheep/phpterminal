@@ -4,6 +4,7 @@
             "Alph\\": "src/"
         },
         "files": [
+            "src/Helpers.php",
             "src/Parameters.php"
         ]
     },

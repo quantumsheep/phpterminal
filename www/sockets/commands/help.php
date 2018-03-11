@@ -40,30 +40,44 @@ class help implements CommandInterface
         $option_usageonly = false;
         $empty_topics = false;
 
+        // Check if there is parameters
         if ($parameters != null) {
+            // Split the parameters by each space characters
             $params_parts = explode(' ', $parameters);
 
+            // Check if there is the '-d' or '-s' parameter in the command parameters
             if (in_array('-d', $params_parts)) {
+                // Defining option_short to true
                 $option_short = true;
             } else if (in_array('-s', $params_parts)) {
+                // Defining option_usageonly to true
                 $option_usageonly = true;
             }
 
+            // Get all the topics from params parts that are not in help's OPTIONS
             foreach ($params_parts as &$params_part) {
                 if (!isset(self::OPTIONS[$params_part])) {
+                    // Storing the topic in a new topics index
                     $topics[] = $params_part;
                 }
             }
         }
 
+        // Check if there is no topics and fill the object with all the commands if not
         if (empty($topics)) {
+            // Get all the defined commands
             $topics = DefinedCommands::get();
+
+            // Command were empty
             $empty_topics = true;
         }
 
+        // Looping all the topics
         foreach ($topics as &$topic) {
+            // Reseting the info array
             $infos = [];
 
+            // Defining only useful parts of commands depending on the parameters and topics given
             if ($empty_topics || (!$option_short && $option_usageonly)) {
                 $infos["USAGE"] = "\\Alph\\Commands\\" . $topic . "::USAGE";
             } else if ($option_short) {
@@ -78,10 +92,15 @@ class help implements CommandInterface
                     "EXIT_STATUS" => "\\Alph\\Commands\\" . $topic . "::EXIT_STATUS",
                 ];
             }
-            
+
+            // Looping all the infos
             foreach ($infos as $key => $info) {
+                // Check if the info is present in the requested command
                 if (defined($info)) {
+                    // Get the info's constant
                     $info = constant($info);
+
+                    // Doing different formating for each info type and sending them to the command sender
                     if ($key == "SHORT_DESCRIPTION" && $option_short) {
                         $sender->send($topic . " - " . $info);
                     } else if ($key == "USAGE" && !$empty_topics) {
@@ -89,12 +108,14 @@ class help implements CommandInterface
                     } else if ($key == "OPTIONS") {
                         $sender->send("Options:");
 
+                        // Looping around all the options
                         foreach ($info as $option_key => &$option) {
                             $sender->send($option_key . "        " . $option);
                         }
                     } else if ($key == "ARGUMENTS") {
                         $sender->send("Arguments:");
 
+                        // Looping around all the arguments
                         foreach ($info as $argument_key => &$argument) {
                             $sender->send($argument_key . "   " . $argument);
                         }
@@ -105,14 +126,21 @@ class help implements CommandInterface
                         $sender->send($info);
                     }
 
+                    // Send a jump space
                     $sender->send("");
+
+                    // Defining that there is one topic done
                     $done = true;
                 }
             }
         }
 
+        // Check if there is no topic done
         if (!$done) {
+            // Recover the last topic from the list
             $last_topic = $topics[count($topics) - 1];
+
+            // Send an error message for topic not found
             $sender->send("-bash: help: no help topics match '" . $last_topic . "'. Try 'help help' or 'man -k " . $last_topic . "' or 'info " . $last_topic . "'.");
         }
     }

@@ -9,6 +9,7 @@ class ComposerStaticInit7f26a7ca33683e13eebb1d1f1576d324
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '72579e7bd17821bb1321b87411366eae' => __DIR__ . '/..' . '/illuminate/support/helpers.php',
+        'b9141c70d35c5f6ad5615f70ebba85fb' => __DIR__ . '/../..' . '/src/Helpers.php',
         '57fccbf6fdc5ad29cc111bf2a1dfe728' => __DIR__ . '/../..' . '/src/Parameters.php',
     );
 
