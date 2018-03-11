@@ -1,8 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "Alph\\Commands\\": "Commands",
-            "Alph\\Services\\": "Services"
+            "Alph\\": "src"
         },
         "files": [
             "Parameters.php"

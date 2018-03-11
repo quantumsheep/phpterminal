@@ -6009,3 +6009,86 @@ notice] [pid 8564:tid 628] ModSecurity for Apache/2.9.2 (http://www.modsecurity.
 [Fri Mar 09 23:16:47.835929 2018] [mpm_winnt:notice] [pid 8564:tid 628] AH00364: Child: All worker threads have exited.
 [Fri Mar 09 23:16:47.856010 2018] [mpm_winnt:notice] [pid 7200:tid 624] AH00430: Parent: Child process 8564 exited successfully.
 [Fri Mar 09 23:16:47.856010 2018] [core:error] [pid 7200:tid 624] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/phpterminal/apache2/logs/httpd.pid
+[Sat Mar 10 23:00:21.317018 2018] [:notice] [pid 744:tid 148] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:21.325072 2018] [:warn] [pid 744:tid 148] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:21.325072 2018] [:notice] [pid 744:tid 148] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:21.549479 2018] [mpm_winnt:notice] [pid 744:tid 148] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 PHPTerminal configured -- resuming normal operations
+[Sat Mar 10 23:00:21.549479 2018] [mpm_winnt:notice] [pid 744:tid 148] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sat Mar 10 23:00:21.549479 2018] [core:notice] [pid 744:tid 148] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/phpterminal/apache2 -f ../servers-conf/proxy.conf'
+[Sat Mar 10 23:00:21.559464 2018] [mpm_winnt:notice] [pid 744:tid 148] AH00418: Parent: Created child process 17936
+Apache server shutdown initiated...
+notice] [pid 17936:tid 536] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:21.787480 2018] [:warn] [pid 17936:tid 536] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:21.787480 2018] [:notice] [pid 17936:tid 536] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:21.878183 2018] [mpm_winnt:notice] [pid 17936:tid 536] AH00354: Child: Starting 64 worker threads.
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:29.074901 2018] [:warn] [pid 11332:tid 616] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:29.074901 2018] [:notice] [pid 11332:tid 616] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:29.148462 2018] [core:warn] [pid 11332:tid 616] AH00098: pid file D:/Projets webs/phpterminal/apache2/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Sat Mar 10 23:00:29.366276 2018] [mpm_winnt:notice] [pid 11332:tid 616] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 PHPTerminal configured -- resuming normal operations
+[Sat Mar 10 23:00:29.366276 2018] [mpm_winnt:notice] [pid 11332:tid 616] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sat Mar 10 23:00:29.366276 2018] [core:notice] [pid 11332:tid 616] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/phpterminal/apache2 -f ../servers-conf/mainapp.conf'
+[Sat Mar 10 23:00:29.378277 2018] [mpm_winnt:notice] [pid 11332:tid 616] AH00418: Parent: Created child process 9116
+Apache server interrupted...
+018] [:notice] [pid 9116:tid 592] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:29.621981 2018] [:warn] [pid 9116:tid 592] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:29.621981 2018] [:notice] [pid 9116:tid 592] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:29.683044 2018] [mpm_winnt:notice] [pid 9116:tid 592] AH00354: Child: Starting 64 worker threads.
+[Sat Mar 10 23:00:31.016482 2018] [mpm_winnt:notice] [pid 11332:tid 616] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Sat Mar 10 23:00:33.019020 2018] [mpm_winnt:notice] [pid 9116:tid 592] AH00364: Child: All worker threads have exited.
+[Sat Mar 10 23:00:33.115720 2018] [mpm_winnt:notice] [pid 11332:tid 616] AH00430: Parent: Child process 9116 exited successfully.
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:41.153522 2018] [:warn] [pid 11788:tid 628] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:41.153522 2018] [:notice] [pid 11788:tid 628] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:41.219530 2018] [mpm_winnt:notice] [pid 11788:tid 628] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 PHPTerminal configured -- resuming normal operations
+[Sat Mar 10 23:00:41.219530 2018] [mpm_winnt:notice] [pid 11788:tid 628] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Sat Mar 10 23:00:41.219530 2018] [core:notice] [pid 11788:tid 628] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/phpterminal/apache2 -f ../servers-conf/mainapp.conf'
+[Sat Mar 10 23:00:41.229536 2018] [mpm_winnt:notice] [pid 11788:tid 628] AH00418: Parent: Created child process 14216
+Apache server shutdown initiated...
+notice] [pid 14216:tid 608] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Sat Mar 10 23:00:41.455314 2018] [:warn] [pid 14216:tid 608] ModSecurity: Loaded APR do not match with compiled!
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: LUA compiled version="Lua 5.1"
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: YAJL compiled version="2.1.0"
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: LIBXML compiled version="2.9.4"
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Sat Mar 10 23:00:41.455314 2018] [:notice] [pid 14216:tid 608] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Sat Mar 10 23:00:41.525134 2018] [mpm_winnt:notice] [pid 14216:tid 608] AH00354: Child: Starting 64 worker threads.
+[Sun Mar 11 01:43:34.122301 2018] [mpm_winnt:notice] [pid 744:tid 148] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Sun Mar 11 01:43:35.358884 2018] [mpm_winnt:notice] [pid 11788:tid 628] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Sun Mar 11 01:43:36.124939 2018] [mpm_winnt:notice] [pid 17936:tid 536] AH00364: Child: All worker threads have exited.
+[Sun Mar 11 01:43:36.156926 2018] [mpm_winnt:notice] [pid 744:tid 148] AH00430: Parent: Child process 17936 exited successfully.
+[Sun Mar 11 01:43:37.363005 2018] [mpm_winnt:notice] [pid 14216:tid 608] AH00364: Child: All worker threads have exited.
+[Sun Mar 11 01:43:37.385024 2018] [mpm_winnt:notice] [pid 11788:tid 628] AH00430: Parent: Child process 14216 exited successfully.
+[Sun Mar 11 01:43:37.387006 2018] [core:error] [pid 11788:tid 628] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/phpterminal/apache2/logs/httpd.pid

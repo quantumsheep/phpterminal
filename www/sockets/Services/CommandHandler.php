@@ -8,11 +8,13 @@ class CommandHandler implements MessageComponentInterface
 {
     protected $clients;
     private $db;
+    private $commands;
 
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
         $this->db = \Alph\Services\Database::connect();
+        $this->commands = \Alph\Services\DefinedCommands::get();
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -36,10 +38,13 @@ class CommandHandler implements MessageComponentInterface
                 // Read the sender's session data
                 $sender_session = \Alph\Services\Session::read($this->db, $parsed_cookies[0]["alph_sess"]);
 
+                // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
+                @list($cmd, $parameters) = explode(' ', $cmd, 2);
+                
                 // Check if the command exists
-                if (method_exists('\\Alph\\Commands\\' . $cmd, 'call')) {
+                if (in_array($cmd, $this->commands)) {
                     // Call the command with arguments
-                    \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, $sender, $parsed_cookies[0]["alph_sess"], $cmd]);
+                    \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, $sender, $parsed_cookies[0]["alph_sess"], $cmd, $parameters]);
                 }
             }
         }
