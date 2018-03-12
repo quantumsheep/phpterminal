@@ -47,16 +47,12 @@ class AccountManager
     }
 
     public static function createUser(\PDO $db, string $username, string $email, string $password) {
-        $stmp = $db->prepare("INSERT INTO account (email, username, password, createddate, editeddate) VALUES(:email, :username, :password, NOW(),  NOW())");
+        $stmp = $db->prepare("INSERT INTO account (email, username, password, createddate, editeddate) VALUES(:email, :username, :password, NOW(),  NOW());");
     
         $stmp->bindParam(":email", $email);
         $stmp->bindParam(":username", $username);
         $stmp->bindParam(":password", \password_hash($password, PASSWORD_BCRYPT));
 
         return $stmp->execute();
-    }
-
-    public static function createTerminal(\PDO $db, int $accountid) {
-        
     }
 }
