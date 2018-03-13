@@ -1,0 +1,90 @@
+* {
+    transition: all .3s;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-color: #1A1A1A;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 60px;
+    color: #ffffff;
+}
+
+header nav ul li {
+    display: inline;
+}
+
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.logo {
+    height: 48px;
+}
+
+.terminal {
+    width: 100%;
+    height: 100%;
+    background: #0D0D0D;
+    border: #666666;
+    border-radius: 3px;
+    cursor: text;
+    caret-color: #73f213;
+    overflow-y: auto;
+}
+
+.terminal-content {
+    padding: 10px;
+    color: #FFFFFF;
+}
+
+.terminal-input {
+    background-color : #0D0D0D;
+    border: 0;
+    color: white;
+    display: inline-block;
+}
+
+footer {
+    text-align: center;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+}
+
+.form-control:focus {
+    border-color: #555555 !important;
+    box-shadow: 0 0 0 .2rem #333333 !important;
+}
+
+.btn-primary {
+    color: #000;
+    background-color: #fcfcfc;
+    border-color: #eaeaea;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #3e3e3e;
+    border-color: #3b3b3b;
+}
+
+.btn-primary:focus {
+    border-color: #555555 !important;
+    box-shadow: 0 0 0 .2rem #333333 !important;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
+    color: #fff;
+    background-color: #3e3e3e;
+    border-color: #3b3b3b;
+}

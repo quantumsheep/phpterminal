@@ -1,0 +1,7 @@
+RewriteEngine On
+
+<Limit PUT DELETE OPTIONS>
+    Deny from all
+</Limit>
+
+RewriteRule ^.*$ src/Server.php

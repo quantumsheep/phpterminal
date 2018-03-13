@@ -1,0 +1,13 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Alph\\": "src"
+        },
+        "files": [
+            "Parameters.php"
+        ]
+    },
+    "require": {
+        "cboden/ratchet": "^0.4.1"
+    }
+}
