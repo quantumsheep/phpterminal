@@ -1,7 +1,0 @@
-RewriteEngine On
-
-<Limit PUT DELETE OPTIONS>
-    Deny from all
-</Limit>
-
-RewriteRule ^.*$ Server.php
