@@ -13,4 +13,8 @@ Route::exec(["POST"], "/signup", "AccountController::signupaction");
 Route::exec(["GET"], "/signin", "AccountController::signin");
 Route::exec(["POST"], "/signin", "AccountController::signinaction");
 
+Route::exec(["POST"], "/signin", "AccountController::signinaction");
+
+Route::exec(["GET"], "/validate/{code}", "AccountController::validate");
+
 Route::exec(["GET"], "/about/tos", "AboutController::tos");
