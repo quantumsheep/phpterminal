@@ -19,13 +19,22 @@ class AccountController
         return $view;
     }
 
-    public static function signupaction(array $params)
+    public static function signin(array $params)
     {
+        $view = (new View("account/signin"))->render();
+
+        unset($_SESSION["errors"]);
+        unset($_SESSION["data"]);
+
+        return $view;
+    }
+
+    public static function signupaction(array $params) {
         $db = Database::connect();
 
         $_SESSION["errors"] = AccountManager::checkUserRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
-        if (!empty($_SESSION["errors"])) {
+        if(!empty($_SESSION["errors"])) {
             $_SESSION["data"]["username"] = $_POST["username"];
             $_SESSION["data"]["email"] = $_POST["email"];
 
@@ -34,11 +43,20 @@ class AccountController
         }
 
         AccountManager::createUser($db, $_POST["username"], $_POST["email"], $_POST["password"]);
-        $networkmac = NetworkManager::createNetwork($db);
-        TerminalManager::createTerminal($db, $networkmac);
     }
 
-    public static function validaccount(array $params) {
+    public static function signinaction(array $params) {
+        $db = Database::connect();
         
+        $_SESSION["errors"] = AccountManager::checkUserLogin($db, $_POST["email"], $_POST["password"]);
+
+        if(!empty($_SESSION["errors"])) {
+            $_SESSION["data"]["email"] = $_POST["email"];
+
+            header("Location: /signin");
+            return;
+        }
+
+        AccountManager::connectUser($db, $_POST["email"], $_POST["password"]);
     }
 }

@@ -40,7 +40,7 @@ header nav ul li {
 }
 
 .terminal-content {
-    padding: 10px;
+    padding: 0;
     color: #FFFFFF;
 }
 
@@ -49,6 +49,10 @@ header nav ul li {
     border: 0;
     color: white;
     display: inline-block;
+}
+
+.cmd{
+    margin-left: 10px;
 }
 
 footer {

@@ -47,12 +47,41 @@ class AccountManager
     }
 
     public static function createUser(\PDO $db, string $username, string $email, string $password) {
-        $stmp = $db->prepare("INSERT INTO account (email, username, password, createddate, editeddate) VALUES(:email, :username, :password, NOW(),  NOW());");
+        $stmp = $db->prepare("INSERT INTO account (email, username, password, createddate, editeddate) VALUES(:email, :username, :password, NOW(),  NOW())");
     
         $stmp->bindParam(":email", $email);
         $stmp->bindParam(":username", $username);
         $stmp->bindParam(":password", \password_hash($password, PASSWORD_BCRYPT));
 
         return $stmp->execute();
+    }
+
+    public static function checkUserLogin(\PDO $db, int $accountid) {
+        $errors = [];
+
+        if (strlen($password) < 8) {
+            $errors[] = "Incorrect passord.";
+        }
+
+        if (!preg_match("/[a-zA-Z0-9.!#$%&'*+\/=?^_``{|}~-]+@[a-zA-Z0-9^_\-\.%+]+\.[a-zA-Z0-9]{2,8}$/", $email)) {
+            $errors[] = "Please provide a valid email adress.";
+        }
+
+        return $errors;
+    }
+
+    public static function connectUser(\PDO $db, string $email, string $password){
+        $stmp = $db->prepare("SELECT FROM account (email, password) WHERE (email=:email AND password=:password)");
+
+        $stmp->bindParam(":email", $email);
+        $stmp->bindParam(":password", \password_hash($password, PASSWORD_BCRYPT));
+
+        $stmp->execute();
+
+        if(mysql_fetch_array) {
+            return "ok";
+        }else{
+            return "ko";
+        }
     }
 }
