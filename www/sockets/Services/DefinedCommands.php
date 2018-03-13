@@ -7,6 +7,7 @@ class DefinedCommands
     {
         return [
             "help",
+            "history",
         ];
     }
 }
