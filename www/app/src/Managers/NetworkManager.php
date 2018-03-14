@@ -5,7 +5,7 @@ class NetworkManager
 {
     public static function createNetwork(\PDO $db)
     {
-        $stmp = $db->prepare("INSERT INTO network (mac, ipv4, ipv6) VALUES (:mac, :ipv4, ipv6);");
+        $stmp = $db->prepare("INSERT INTO network (mac, ipv4, ipv6) VALUES (:mac, :ipv4, :ipv6);");
         $errorCode = 0;
         $response = false;
 
@@ -14,13 +14,21 @@ class NetworkManager
                 $mac = NetworkManager::generateMac();
                 $ipv4 = NetworkManager::generatePublicIPv4();
                 // $ipv6 = NetworkManager::generatePublicIPv6();
-                $ipv6 = "";
+                $ipv6 = "1ff0";
 
-                $response = $stmp->execute([$mac, $ipv4, $ipv6]);
+                $response = $stmp->execute([
+                    ":mac" => $mac,
+                    "ipv4" => $ipv4,
+                    "ipv6" => $ipv6
+                ]);
             } catch (\PDOException $e) {
                 $errorCode = $e->errorInfo[1];
             }
         } while ($errorCode == 1062);
+
+        if(!$response) {
+            return false;
+        }
 
         return $mac;
     }

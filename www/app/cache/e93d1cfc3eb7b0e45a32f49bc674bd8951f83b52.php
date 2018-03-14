@@ -30,7 +30,11 @@
                         <a class="nav-link" href="/terminal">Terminal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/account">My account</a>
+                        <?php if(empty($_SESSION["account"])): ?>
+                        <a class="nav-link" href="/signin">Login</a>
+                        <?php else: ?>
+                        <a class="nav-link" href="/account"><?php echo e($_SESSION["account"]["username"]); ?></a>                        
+                        <?php endif; ?>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>

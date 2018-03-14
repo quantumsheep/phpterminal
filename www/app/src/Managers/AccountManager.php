@@ -93,15 +93,16 @@ class AccountManager
 
     public static function getUserIdFromCode(\PDO $db, string $code)
     {
-        $stmp = $db->prepare("SELECT idaccount FROM code = :code;");
+        $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT_VALIDATION WHERE code = :code;");
 
         $stmp->bindParam(":code", $code);
 
         if ($stmp->execute()) {
             if ($stmp->rowCount() == 1) {
-                return $stmp->fetch();
+                return $stmp->fetch()["idaccount"];
             }
         }
+        
 
         return false;
     }
@@ -112,6 +113,8 @@ class AccountManager
 
         $stmp->bindParam(":code", $code);
 
+        var_dump($stmp->errorInfo());
+        
         return $stmp->execute();
     }
 
@@ -132,7 +135,7 @@ class AccountManager
 
     public static function identificateUser(\PDO $db, string $email, string $password)
     {
-        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email;");
+        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email AND status=1;");
 
         $stmp->bindParam(":email", $email);
 
@@ -153,5 +156,9 @@ class AccountManager
         }
 
         return false;
+    }
+
+    public static function logout() {
+        unset($_SESSION["account"]);
     }
 }

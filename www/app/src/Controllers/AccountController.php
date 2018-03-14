@@ -4,6 +4,7 @@ namespace Alph\Controllers;
 use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
 use Alph\Managers\TerminalManager;
+use Alph\Managers\NetworkManager;
 use Alph\Services\Database;
 use Alph\Services\Mail;
 
@@ -29,6 +30,12 @@ class AccountController
         return $view;
     }
 
+    public static function logout(array $params) {
+        AccountManager::logout();
+
+        header("Location: /");        
+    }
+
     public static function validate(array $params)
     {
         if (strlen($params["code"]) == 100) {
@@ -38,10 +45,18 @@ class AccountController
             $idaccount = AccountManager::getUserIdFromCode($db, $params["code"]);
 
             if($idaccount !== false) {
-                $result = AccountManager::validateUser($db, $idaccount);
+                if (AccountManager::validateUser($db, $idaccount)) {
+                    $network_mac = NetworkManager::createNetwork($db);
+                    
+                    if($network_mac !== false) {
+                        echo "mac done";
+                        if(TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
 
-                if ($result) {
-                    AccountManager::removeValidationCode($db, $params["code"]);
+                            echo "terminal done";
+                            
+                            AccountManager::removeValidationCode($db, $params["code"]);
+                        }
+                    }
                 }
             }
         }
@@ -69,13 +84,18 @@ class AccountController
             $rand_str = AccountManager::createActivationCode($db, $_POST["email"]);
 
             if ($rand_str !== false) {
-                $mail = new Mail($db, "Account validation", "Please validate your email at this link: " .
-                    sprintf("%s://%s:%s/validate/%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME'], $_SERVER["SERVER_PORT"], $rand_str), [$_POST["email"]]);
+                $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
+                    sprintf("%s://%s:%s/validate/%s", 
+                        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', 
+                        $_SERVER['SERVER_NAME'], 
+                        $_SERVER["SERVER_PORT"], 
+                        $rand_str) .
+                    "\">Click here</a>.", [$_POST["email"]]);
                 $mail->send();
             }
         }
 
-        //header("Location: /signup");
+        header("Location: /signin");
     }
 
     public static function signinaction(array $params)

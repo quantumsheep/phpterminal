@@ -30,7 +30,11 @@
                         <a class="nav-link" href="/terminal">Terminal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/account">My account</a>
+                        @if(empty($_SESSION["account"]))
+                        <a class="nav-link" href="/signin">Login</a>
+                        @else
+                        <a class="nav-link" href="/account">{{$_SESSION["account"]["username"]}}</a>                        
+                        @endif
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>
