@@ -3,37 +3,52 @@ namespace Alph\Managers;
 
 class AccountManager
 {
+    /**
+     * Check logon content
+     */
     public static function checkUserRegister(\PDO $db, string $username, string $email, string $password)
     {
+        // Pre-define error list
         $errors = [];
 
+        // Check if the form is completed
         if (empty($username) || empty($email) || empty($password)) {
             $errors[] = "Please complete the form.";
             return $errors;
         }
 
+        // Check if the password is more than 8 characters
         if (strlen($password) < 8) {
             $errors[] = "The password must contains 8 characters minimum.";
         }
 
+        // Check if the username is more than 3 characters
         if (strlen($username) < 3) {
             $errors[] = "The username must contains 3 characters minimum.";
         }
 
+        // Check if the email is valid
         if (!preg_match("/[a-zA-Z0-9.!#$%&'*+\/=?^_``{|}~-]+@[a-zA-Z0-9^_\-\.%+]+\.[a-zA-Z0-9]{2,8}$/", $email)) {
             $errors[] = "Please provide a valid email adress.";
         }
 
+        // Check if there are no errors
         if (empty($errors)) {
+            // Prepare the SQL row selection
             $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT WHERE username = :username OR email = :email");
 
+            // Bind the query parameters
             $stmp->bindParam(':username', $username);
             $stmp->bindParam(':email', $email);
 
+            // Execute the SQL command
             $stmp->execute();
 
+            // Check if there's a select row
             if ($stmp->rowCount() > 0) {
+                // Loop over all the rows
                 while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                    // If there's already an email or an username matching the user input, declare an error
                     if ($row["email"] == $email) {
                         $errors[] = "This email adress is already used.";
                     } else if ($row["username"] == $username) {
@@ -43,6 +58,7 @@ class AccountManager
             }
         }
 
+        // Return the errors
         return $errors;
     }
 
@@ -93,13 +109,13 @@ class AccountManager
 
     public static function getUserIdFromCode(\PDO $db, string $code)
     {
-        $stmp = $db->prepare("SELECT idaccount FROM code = :code;");
+        $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT_VALIDATION WHERE code = :code;");
 
         $stmp->bindParam(":code", $code);
 
         if ($stmp->execute()) {
             if ($stmp->rowCount() == 1) {
-                return $stmp->fetch();
+                return $stmp->fetch()["idaccount"];
             }
         }
 
@@ -111,6 +127,8 @@ class AccountManager
         $stmp = $db->prepare("DELETE FROM ACCOUNT_VALIDATION WHERE code = :code;");
 
         $stmp->bindParam(":code", $code);
+
+        var_dump($stmp->errorInfo());
 
         return $stmp->execute();
     }
@@ -132,7 +150,7 @@ class AccountManager
 
     public static function identificateUser(\PDO $db, string $email, string $password)
     {
-        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email;");
+        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email AND status=1;");
 
         $stmp->bindParam(":email", $email);
 
@@ -143,7 +161,7 @@ class AccountManager
                 if (\password_verify($password, $user["idaccount"])) {
                     return false;
                 }
-                
+
                 $_SESSION["account"]["idaccount"] = $user["idaccount"];
                 $_SESSION["account"]["email"] = $user["email"];
                 $_SESSION["account"]["username"] = $user["username"];
@@ -153,5 +171,10 @@ class AccountManager
         }
 
         return false;
+    }
+
+    public static function logout()
+    {
+        unset($_SESSION["account"]);
     }
 }

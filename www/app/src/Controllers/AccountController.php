@@ -3,6 +3,7 @@ namespace Alph\Controllers;
 
 use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
+use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
 use Alph\Services\Database;
 use Alph\Services\Mail;
@@ -29,24 +30,45 @@ class AccountController
         return $view;
     }
 
+    public static function logout(array $params)
+    {
+        AccountManager::logout();
+
+        header("Location: /");
+    }
+
     public static function validate(array $params)
     {
-        if (strlen($params["code"]) == 100) {
-            $db = Database::connect();
+        $return = function() {
+            header("Location: /signin");
+        };
 
-            
-            $idaccount = AccountManager::getUserIdFromCode($db, $params["code"]);
+        if (strlen($params["code"]) != 100) {
+            $return();
+            return false;
+        }
 
-            if($idaccount !== false) {
-                $result = AccountManager::validateUser($db, $idaccount);
+        $db = Database::connect();
 
-                if ($result) {
-                    AccountManager::removeValidationCode($db, $params["code"]);
+        $idaccount = AccountManager::getUserIdFromCode($db, $params["code"]);
+
+        if ($idaccount !== false) {
+            if (AccountManager::validateUser($db, $idaccount)) {
+                $network_mac = NetworkManager::createNetwork($db);
+
+                if ($network_mac !== false) {
+                    $terminal = TerminalManager::createTerminal($db, $idaccount, $network_mac);
+
+                    if ($terminal["response"]) {
+                        if (NetworkManager::assignPrivateIP($db, $network_mac, $terminal["mac"])) {
+                            AccountManager::removeValidationCode($db, $params["code"]);
+                        }
+                    }
                 }
             }
         }
 
-        header("Location: /signin");
+        $return();
     }
 
     public static function signupaction(array $params)
@@ -69,13 +91,18 @@ class AccountController
             $rand_str = AccountManager::createActivationCode($db, $_POST["email"]);
 
             if ($rand_str !== false) {
-                $mail = new Mail($db, "Account validation", "Please validate your email at this link: " .
-                    sprintf("%s://%s:%s/validate/%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME'], $_SERVER["SERVER_PORT"], $rand_str), [$_POST["email"]]);
+                $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
+                    sprintf("%s://%s:%s/validate/%s",
+                        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+                        $_SERVER['SERVER_NAME'],
+                        $_SERVER["SERVER_PORT"],
+                        $rand_str) .
+                    "\">Click here</a>.", [$_POST["email"]]);
                 $mail->send();
             }
         }
 
-        //header("Location: /signup");
+        header("Location: /signin");
     }
 
     public static function signinaction(array $params)
@@ -91,13 +118,13 @@ class AccountController
             return;
         }
 
-        if(!AccountManager::identificateUser($db, $_POST["email"], $_POST["password"])) {
+        if (!AccountManager::identificateUser($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
 
             header("Location: /signin");
             return;
         }
-        
+
         header("Location: /");
     }
 }
