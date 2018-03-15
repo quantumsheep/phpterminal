@@ -118,6 +118,7 @@ class AccountManager
                 return $stmp->fetch()["idaccount"];
             }
         }
+        
 
         return false;
     }
@@ -129,7 +130,6 @@ class AccountManager
         $stmp->bindParam(":code", $code);
 
         var_dump($stmp->errorInfo());
-
         return $stmp->execute();
     }
 
