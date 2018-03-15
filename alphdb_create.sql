@@ -2,7 +2,8 @@ CREATE DATABASE IF NOT EXISTS alph;
 USE alph;
 
 CREATE TABLE `ACCOUNT` (
-	`idaccount` int NOT NULL,
+	`idaccount` int NOT NULL AUTO_INCREMENT,
+	`status` bit NOT NULL,
 	`email` varchar(254) NOT NULL UNIQUE,
 	`username` varchar(36) NOT NULL UNIQUE,
 	`password` varchar(60) NOT NULL,
@@ -23,7 +24,7 @@ CREATE TABLE `TERMINAL_DIRECTORY` (
 );
 
 CREATE TABLE `TERMINAL_FILE` (
-	`idfile` int NOT NULL,
+	`idfile` int NOT NULL AUTO_INCREMENT,
 	`terminal` char(17) NOT NULL,
 	`parentdir` int,
 	`name` varchar(255),
@@ -50,7 +51,7 @@ CREATE TABLE `NETWORK` (
 );
 
 CREATE TABLE `PORT` (
-	`idport` int NOT NULL,
+	`idport` int NOT NULL AUTO_INCREMENT,
 	`network` char(17) NOT NULL,
 	`port` int NOT NULL,
 	`status` int NOT NULL,
@@ -67,7 +68,7 @@ CREATE TABLE `PRIVATEIP` (
 );
 
 CREATE TABLE `TERMINAL_USER` (
-	`idterminal_user` int NOT NULL,
+	`idterminal_user` int NOT NULL AUTO_INCREMENT,
 	`terminal` char(17) NOT NULL,
 	`status` bit NOT NULL,
 	`username` varchar(255) NOT NULL,
@@ -76,7 +77,7 @@ CREATE TABLE `TERMINAL_USER` (
 );
 
 CREATE TABLE `TERMINAL_GROUP` (
-	`idterminal_group` int NOT NULL,
+	`idterminal_group` int NOT NULL AUTO_INCREMENT,
 	`terminal` char(17) NOT NULL,
 	`status` bit NOT NULL,
 	`groupname` varchar(255) NOT NULL,
@@ -97,7 +98,7 @@ CREATE TABLE `SESSION` (
 );
 
 CREATE TABLE `TERMINAL_USER_HISTORY` (
-	`idhistory` int NOT NULL,
+	`idhistory` int NOT NULL AUTO_INCREMENT,
 	`terminal_user` int NOT NULL,
 	`status` bit NOT NULL,
 	`command` TEXT NOT NULL,
@@ -109,6 +110,12 @@ CREATE TABLE `ACCOUNT_VALIDATION` (
 	`idaccount` int NOT NULL,
 	`code` char(100) NOT NULL,
 	PRIMARY KEY (`idaccount`)
+);
+
+CREATE TABLE `CONFIG` (
+	`key` varchar(255) NOT NULL,
+	`value` varchar(255) NOT NULL,
+	PRIMARY KEY (`key`)
 );
 
 ALTER TABLE `TERMINAL_DIRECTORY` ADD CONSTRAINT `TERMINAL_DIRECTORY_fk0` FOREIGN KEY (`terminal`) REFERENCES `TERMINAL`(`mac`);
@@ -140,3 +147,4 @@ ALTER TABLE `TERMINAL_GROUP_LINK` ADD CONSTRAINT `TERMINAL_GROUP_LINK_fk1` FOREI
 ALTER TABLE `TERMINAL_USER_HISTORY` ADD CONSTRAINT `TERMINAL_USER_HISTORY_fk0` FOREIGN KEY (`terminal_user`) REFERENCES `TERMINAL_USER`(`idterminal_user`);
 
 ALTER TABLE `ACCOUNT_VALIDATION` ADD CONSTRAINT `ACCOUNT_VALIDATION_fk0` FOREIGN KEY (`idaccount`) REFERENCES `ACCOUNT`(`idaccount`);
+

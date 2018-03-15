@@ -6236,3 +6236,74 @@ notice] [pid 2856:tid 568] ModSecurity for Apache/2.9.2 (http://www.modsecurity.
 [Sun Mar 11 23:00:35.024356 2018] [mpm_winnt:notice] [pid 16976:tid 628] AH00364: Child: All worker threads have exited.
 [Sun Mar 11 23:00:35.047374 2018] [mpm_winnt:notice] [pid 4032:tid 644] AH00430: Parent: Child process 16976 exited successfully.
 [Sun Mar 11 23:00:35.047374 2018] [core:error] [pid 4032:tid 644] (OS 2)Le fichier spécifié est introuvable.  : AH00095: failed to remove PID file D:/Projets webs/phpterminal/apache2/logs/httpd.pid
+[Wed Mar 14 23:02:37.562857 2018] [:notice] [pid 9168:tid 480] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Wed Mar 14 23:02:37.562857 2018] [:notice] [pid 13004:tid 600] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Wed Mar 14 23:02:37.574858 2018] [:warn] [pid 9168:tid 480] ModSecurity: Loaded APR do not match with compiled!
+[Wed Mar 14 23:02:37.574858 2018] [:warn] [pid 13004:tid 600] ModSecurity: Loaded APR do not match with compiled!
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: LUA compiled version="Lua 5.1"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: LUA compiled version="Lua 5.1"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: YAJL compiled version="2.1.0"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: YAJL compiled version="2.1.0"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: LIBXML compiled version="2.9.4"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: LIBXML compiled version="2.9.4"
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 13004:tid 600] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Wed Mar 14 23:02:37.574858 2018] [:notice] [pid 9168:tid 480] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Wed Mar 14 23:02:37.790679 2018] [mpm_winnt:notice] [pid 9168:tid 480] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 PHPTerminal configured -- resuming normal operations
+[Wed Mar 14 23:02:37.790679 2018] [mpm_winnt:notice] [pid 9168:tid 480] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Wed Mar 14 23:02:37.790679 2018] [core:notice] [pid 9168:tid 480] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/phpterminal/apache2 -f ../servers-conf/proxy.conf'
+[Wed Mar 14 23:02:37.802669 2018] [mpm_winnt:notice] [pid 9168:tid 480] AH00418: Parent: Created child process 876
+Apache server shutdown initiated...
+pm_winnt:notice] [pid 13004:tid 600] AH00455: Apache/2.4.29 (Win64) PHP/7.2.2 PHPTerminal configured -- resuming normal operations
+[Wed Mar 14 23:02:38.098362 2018] [mpm_winnt:notice] [pid 13004:tid 600] AH00456: Apache Lounge VC15 Server built: Nov  3 2017 11:12:00
+[Wed Mar 14 23:02:38.098362 2018] [core:notice] [pid 13004:tid 600] AH00094: Command line: 'apache2\\bin\\httpd.exe -d D:/Projets webs/phpterminal/apache2 -f ../servers-conf/mainapp.conf'
+[Wed Mar 14 23:02:38.116363 2018] [mpm_winnt:notice] [pid 13004:tid 600] AH00418: Parent: Created child process 800
+Apache server shutdown initiated...
+notice] [pid 876:tid 556] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Wed Mar 14 23:02:38.220227 2018] [:warn] [pid 876:tid 556] ModSecurity: Loaded APR do not match with compiled!
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: LUA compiled version="Lua 5.1"
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: YAJL compiled version="2.1.0"
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: LIBXML compiled version="2.9.4"
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Wed Mar 14 23:02:38.220227 2018] [:notice] [pid 876:tid 556] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity for Apache/2.9.2 (http://www.modsecurity.org/) configured.
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: APR compiled version="1.6.2"; loaded version="1.6.3"
+[Wed Mar 14 23:02:38.417413 2018] [:warn] [pid 800:tid 540] ModSecurity: Loaded APR do not match with compiled!
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: PCRE compiled version="8.41 "; loaded version="8.41 2017-07-05"
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: LUA compiled version="Lua 5.1"
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: YAJL compiled version="2.1.0"
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: LIBXML compiled version="2.9.4"
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: Original server signature: Apache/2.4.29 (Win64)
+[Wed Mar 14 23:02:38.417413 2018] [:notice] [pid 800:tid 540] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Wed Mar 14 23:02:38.433100 2018] [mpm_winnt:notice] [pid 876:tid 556] AH00354: Child: Starting 64 worker threads.
+[Wed Mar 14 23:02:38.564864 2018] [mpm_winnt:notice] [pid 800:tid 540] AH00354: Child: Starting 64 worker threads.
+[Wed Mar 14 23:38:08.719074 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4261] PHP Notice:  Undefined property: PDOStatement::$errorInfo in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\AccountManager.php on line 106
+[Wed Mar 14 23:38:31.016027 2018] [php7:error] [pid 800:tid 1156] [client ::1:4269] PHP Fatal error:  Uncaught TypeError: Argument 2 passed to Alph\\Managers\\AccountManager::validateUser() must be of the type integer, array given, called in D:\\Projets webs\\phpterminal\\www\\app\\src\\Controllers\\AccountController.php on line 51 and defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\AccountManager.php:85\nStack trace:\n#0 D:\\Projets webs\\phpterminal\\www\\app\\src\\Controllers\\AccountController.php(51): Alph\\Managers\\AccountManager::validateUser(Object(PDO), Array)\n#1 [internal function]: Alph\\Controllers\\AccountController::validate(Array)\n#2 D:\\Projets webs\\phpterminal\\www\\app\\src\\Services\\Route.php(76): call_user_func('\\\\Alph\\\\Controlle...', Array)\n#3 D:\\Projets webs\\phpterminal\\www\\app\\src\\Routes.php(18): Alph\\Services\\Route::exec(Array, '/validate/{code...', 'AccountControll...')\n#4 D:\\Projets webs\\phpterminal\\www\\app\\src\\Server.php(10): require('D:\\\\Projets webs...')\n#5 {main}\n  thrown in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\AccountManager.php on line 85
+[Wed Mar 14 23:39:09.486065 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4274] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:39:09.487068 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4274] PHP Notice:  Undefined variable: ipv6 in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 16
+[Wed Mar 14 23:39:09.492069 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4274] PHP Notice:  Undefined variable: errorCode in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 20
+[Wed Mar 14 23:42:28.945172 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4340] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:42:28.945172 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4340] PHP Notice:  Undefined variable: errorCode in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 20
+[Wed Mar 14 23:43:00.417373 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4367] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:43:00.417373 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4367] PHP Notice:  Undefined variable: errorCode in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 20
+[Wed Mar 14 23:43:18.139645 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4371] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:43:18.140640 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4371] PHP Notice:  Undefined variable: errorCode in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 20
+[Wed Mar 14 23:43:29.897170 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4374] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:43:29.898172 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4374] PHP Notice:  Undefined variable: errorCode in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 20
+[Wed Mar 14 23:46:33.210946 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4395] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:46:34.077361 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4395] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:46:34.273374 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4395] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:46:34.457360 2018] [php7:warn] [pid 800:tid 1156] [client ::1:4395] PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\NetworkManager.php on line 19
+[Wed Mar 14 23:48:36.337330 2018] [php7:notice] [pid 800:tid 1156] [client ::1:4482] PHP Notice:  Undefined variable: network_mac in D:\\Projets webs\\phpterminal\\www\\app\\src\\Controllers\\AccountController.php on line 50
+[Wed Mar 14 23:48:36.337330 2018] [php7:error] [pid 800:tid 1156] [client ::1:4482] PHP Fatal error:  Uncaught TypeError: Argument 3 passed to Alph\\Managers\\TerminalManager::createTerminal() must be of the type string, null given, called in D:\\Projets webs\\phpterminal\\www\\app\\src\\Controllers\\AccountController.php on line 50 and defined in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php:8\nStack trace:\n#0 D:\\Projets webs\\phpterminal\\www\\app\\src\\Controllers\\AccountController.php(50): Alph\\Managers\\TerminalManager::createTerminal(Object(PDO), 3, NULL)\n#1 [internal function]: Alph\\Controllers\\AccountController::validate(Array)\n#2 D:\\Projets webs\\phpterminal\\www\\app\\src\\Services\\Route.php(76): call_user_func('\\\\Alph\\\\Controlle...', Array)\n#3 D:\\Projets webs\\phpterminal\\www\\app\\src\\Routes.php(18): Alph\\Services\\Route::exec(Array, '/validate/{code...', 'AccountControll...')\n#4 D:\\Projets webs\\phpterminal\\www\\app\\src\\Server.php(10): require('D:\\\\Projets webs...')\n#5 {main}\n  thrown in D:\\Projets webs\\phpterminal\\www\\app\\src\\Managers\\TerminalManager.php on line 8
+[Thu Mar 15 00:01:44.077845 2018] [mpm_winnt:notice] [pid 13004:tid 600] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Thu Mar 15 00:01:45.587942 2018] [mpm_winnt:notice] [pid 9168:tid 480] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Thu Mar 15 00:01:46.081976 2018] [mpm_winnt:notice] [pid 800:tid 540] AH00364: Child: All worker threads have exited.
+[Thu Mar 15 00:01:46.278617 2018] [mpm_winnt:notice] [pid 13004:tid 600] AH00430: Parent: Child process 800 exited successfully.

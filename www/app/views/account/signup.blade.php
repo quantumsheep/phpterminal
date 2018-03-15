@@ -15,12 +15,10 @@
             <div class="form-group">
                 <label for="password">Username</label>
                     <input type="text" class="form-control" id="uname" name="username" aria-describedby="usernameHelp" placeholder="Enter username" value="{{ifsetor($_SESSION["data"]["username"], "")}}">
-                <small id="usernameHelp" class="form-text text-muted">We'll never share your username with anyone else.</small>
             </div>
             <div class="form-group">
                 <label for="password">Email address</label>
                 <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{ifsetor($_SESSION["data"]["email"], "")}}">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>

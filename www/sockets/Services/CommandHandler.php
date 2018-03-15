@@ -46,6 +46,8 @@ class CommandHandler implements MessageComponentInterface
                     // Call the command with arguments
                     \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, $sender, $parsed_cookies[0]["alph_sess"], $cmd, $parameters]);
                 }
+            } else {
+                $sender->send("-bash: " . $cmd . ": command not found");
             }
         }
     }

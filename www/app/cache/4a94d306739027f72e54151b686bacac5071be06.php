@@ -6,7 +6,7 @@
             </div>
             <div id="terminal-content-response">
             <div id="terminal-user">user@user:~ $
-            <input type="text" class="terminal-input" id="terminal-input">
+            <input type="text" class="terminal-input" id="terminal-input" value="">
         </div>
         </div>
     </div>
