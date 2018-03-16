@@ -30,6 +30,7 @@ class Mail
         // Tell PHPMailer to use authentication system
         $mail->SMTPAuth = true;
 
+        // Define ssl options
         $mail->SMTPOptions = [
             'ssl' => [
                 'verify_peer' => false,
