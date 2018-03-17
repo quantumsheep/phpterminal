@@ -145,6 +145,7 @@ class NetworkManager
         // Define a random part (to escape private IP)
         $part = rand(0, 2);
 
+        // Select the IP's first numbers
         switch ($part) {
             case 0:
                 $ip .= rand(1, 9);

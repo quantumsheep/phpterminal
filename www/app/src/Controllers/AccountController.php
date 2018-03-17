@@ -50,10 +50,10 @@ class AccountController
 
         $db = Database::connect();
 
-        $idaccount = AccountManager::getUserIdFromCode($db, $params["code"]);
+        $idaccount = AccountManager::getAccountIdFromCode($db, $params["code"]);
 
         if ($idaccount !== false) {
-            if (AccountManager::validateUser($db, $idaccount)) {
+            if (AccountManager::validateAccount($db, $idaccount)) {
                 $network_mac = NetworkManager::createNetwork($db);
 
                 if ($network_mac !== false) {
@@ -75,7 +75,7 @@ class AccountController
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkUserRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["username"] = $_POST["username"];
@@ -85,7 +85,7 @@ class AccountController
             return;
         }
 
-        $result = AccountManager::createUser($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if ($result) {
             $rand_str = AccountManager::createActivationCode($db, $_POST["email"]);
@@ -109,7 +109,7 @@ class AccountController
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkUserLogin($db, $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountLogin($_POST["email"], $_POST["password"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
@@ -118,7 +118,7 @@ class AccountController
             return;
         }
 
-        if (!AccountManager::identificateUser($db, $_POST["email"], $_POST["password"])) {
+        if (!AccountManager::identificateAccount($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
 
             header("Location: /signin");
