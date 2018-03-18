@@ -96,6 +96,8 @@ class NetworkManager
                 // Increment IP's last part
                 $iparr[3]++;
             }
+
+            $ip = "192.168." . $iparr[2] . "." . $iparr[3];
         } else {
             // Define the IP to the minimum address assignable
             $ip = "192.168.0.2";

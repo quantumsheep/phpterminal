@@ -84,7 +84,7 @@ class AccountController
             header("Location: /signup");
             return;
         }
-
+        
         $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if ($result) {
