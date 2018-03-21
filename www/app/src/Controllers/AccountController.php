@@ -3,8 +3,8 @@ namespace Alph\Controllers;
 
 use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
-use Alph\Managers\TerminalManager;
 use Alph\Managers\NetworkManager;
+use Alph\Managers\TerminalManager;
 use Alph\Services\Database;
 use Alph\Services\Mail;
 
@@ -30,30 +30,37 @@ class AccountController
         return $view;
     }
 
-    public static function logout(array $params) {
+    public static function logout(array $params)
+    {
         AccountManager::logout();
 
-        header("Location: /");        
+        header("Location: /");
     }
 
     public static function validate(array $params)
     {
-        if (strlen($params["code"]) == 100) {
-            $db = Database::connect();
+        $return = function() {
+            header("Location: /signin");
+        };
 
-            
-            $idaccount = AccountManager::getUserIdFromCode($db, $params["code"]);
+        if (strlen($params["code"]) != 100) {
+            $return();
+            return false;
+        }
 
-            if($idaccount !== false) {
-                if (AccountManager::validateUser($db, $idaccount)) {
-                    $network_mac = NetworkManager::createNetwork($db);
-                    
-                    if($network_mac !== false) {
-                        echo "mac done";
-                        if(TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
+        $db = Database::connect();
 
-                            echo "terminal done";
-                            
+        $idaccount = AccountManager::getAccountIdFromCode($db, $params["code"]);
+
+        if ($idaccount !== false) {
+            if (AccountManager::validateAccount($db, $idaccount)) {
+                $network_mac = NetworkManager::createNetwork($db);
+
+                if ($network_mac !== false) {
+                    $terminal = TerminalManager::createTerminal($db, $idaccount, $network_mac);
+
+                    if ($terminal["response"]) {
+                        if (NetworkManager::assignPrivateIP($db, $network_mac, $terminal["mac"])) {
                             AccountManager::removeValidationCode($db, $params["code"]);
                         }
                     }
@@ -61,14 +68,14 @@ class AccountController
             }
         }
 
-        header("Location: /signin");
+        $return();
     }
 
     public static function signupaction(array $params)
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkUserRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["username"] = $_POST["username"];
@@ -77,18 +84,18 @@ class AccountController
             header("Location: /signup");
             return;
         }
-
-        $result = AccountManager::createUser($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        
+        $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if ($result) {
             $rand_str = AccountManager::createActivationCode($db, $_POST["email"]);
 
             if ($rand_str !== false) {
                 $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
-                    sprintf("%s://%s:%s/validate/%s", 
-                        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', 
-                        $_SERVER['SERVER_NAME'], 
-                        $_SERVER["SERVER_PORT"], 
+                    sprintf("%s://%s:%s/validate/%s",
+                        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+                        $_SERVER['SERVER_NAME'],
+                        $_SERVER["SERVER_PORT"],
                         $rand_str) .
                     "\">Click here</a>.", [$_POST["email"]]);
                 $mail->send();
@@ -102,7 +109,7 @@ class AccountController
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkUserLogin($db, $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountLogin($_POST["email"], $_POST["password"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
@@ -111,13 +118,13 @@ class AccountController
             return;
         }
 
-        if(!AccountManager::identificateUser($db, $_POST["email"], $_POST["password"])) {
+        if (!AccountManager::identificateAccount($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
 
             header("Location: /signin");
             return;
         }
-        
+
         header("Location: /");
     }
 }

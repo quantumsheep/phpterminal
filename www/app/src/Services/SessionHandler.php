@@ -9,6 +9,7 @@ class SessionHandler
 
     public function __construct()
     {
+        // Declare session_name as "alph_sess"
         session_name("alph_sess");
 
         // Instantiate new connection

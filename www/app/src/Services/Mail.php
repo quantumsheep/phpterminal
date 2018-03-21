@@ -5,8 +5,14 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail
 {
+    /**
+     * PHPMailer object
+     */
     public $mail;
 
+    /**
+     * Create a new mail
+     */
     public function __construct(\PDO $db, string $subject, string $message, $to)
     {
         // Create a new PHPMailer instance
@@ -30,6 +36,7 @@ class Mail
         // Tell PHPMailer to use authentication system
         $mail->SMTPAuth = true;
 
+        // Define ssl options
         $mail->SMTPOptions = [
             'ssl' => [
                 'verify_peer' => false,
@@ -75,6 +82,9 @@ class Mail
         }
     }
 
+    /**
+     * Send the mail
+     */
     public function send()
     {
         //send the message, check for errors
