@@ -20,4 +20,6 @@ Route::exec(["GET"], "/validate/{code}", "AccountController::validate");
 
 Route::exec(["GET"], "/about/tos", "AboutController::tos");
 
+Route::exec(["GET"], "/admin", "AdminController::index");
+
 Route::checkRouted("ErrorController::e404");
