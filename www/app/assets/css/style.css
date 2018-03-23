@@ -121,3 +121,7 @@ footer {
     background-color: #3e3e3e;
     border-color: #3b3b3b;
 }
+
+.lh-normal {
+    line-height: normal;
+}
