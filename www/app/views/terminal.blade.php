@@ -9,6 +9,10 @@
                 <span>user@user:~ $</span>
                 <input type="text" class="terminal-input" id="terminal-input" value="">
             </div>
+                    <span class="terminal-caret">█</span>
+            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
+            <div id="terminal-user">user@user:~ $
+            <div id="terminal-content-response">
         </div>
     </div>
 @endsection
