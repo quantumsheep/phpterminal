@@ -57,12 +57,8 @@ class AccountController
                 $network_mac = NetworkManager::createNetwork($db);
 
                 if ($network_mac !== false) {
-                    $terminal = TerminalManager::createTerminal($db, $idaccount, $network_mac);
-
-                    if ($terminal["response"]) {
-                        if (NetworkManager::assignPrivateIP($db, $network_mac, $terminal["mac"])) {
-                            AccountManager::removeValidationCode($db, $params["code"]);
-                        }
+                    if (TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
+                        AccountManager::removeValidationCode($db, $params["code"]);
                     }
                 }
             }

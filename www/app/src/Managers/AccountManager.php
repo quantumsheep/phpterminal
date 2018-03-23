@@ -47,7 +47,7 @@ class AccountManager
             // Check if there's a select row
             if ($stmp->rowCount() > 0) {
                 // Loop over all the rows
-                while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                     // If there's already an email or an username matching the user input, declare an error
                     if ($row["email"] == $email) {
                         $errors[] = "This email adress is already used.";

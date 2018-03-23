@@ -174,4 +174,12 @@ class NetworkManager
     {
 
     }
+
+    public static function isMAC(string $str) {
+        return \preg_match("/^([0-9A-F]{2}[:-]){5}[0-9A-F]{2}$/i", $str) === 1 ? true : false;
+    }
+
+    public static function formatMAC(string $mac) {
+        return str_replace(['.', '-'], ':', $mac);
+    }
 }

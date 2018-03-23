@@ -1,5 +1,5 @@
 @extends('../layout')
-@section('title', 'Logon')
+@section('title', 'Signup')
 
 @section('content')
 <div class="container">
@@ -12,6 +12,7 @@
     @endif
     <div class="row">
         <form class="col-md-6 m-auto" method="POST">
+            {!! csrf_token() !!}
             <div class="form-group">
                 <label for="password">Username</label>
                     <input type="text" class="form-control" id="uname" name="username" aria-describedby="usernameHelp" placeholder="Enter username" value="{{ifsetor($_SESSION["data"]["username"], "")}}">
@@ -28,6 +29,7 @@
 
             <br>
             <button type="submit" class="btn btn-primary col-12">Sign Up</button>
+            <a href="/signin">Or login to your account here.</a>
         </form>
     </div>
 </div>
