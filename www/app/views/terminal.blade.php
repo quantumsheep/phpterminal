@@ -7,7 +7,8 @@
             </div>
             <div id="terminal-content-response">
             <div id="terminal-user">user@user:~ $
-            <input type="text" class="terminal-input" id="terminal-input" value="">
+            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
+                    <span class="terminal-caret">█</span>
         </div>
         </div>
     </div>
