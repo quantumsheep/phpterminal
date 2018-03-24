@@ -65,8 +65,10 @@ class Route
 
                     // Break to avoid continuing the loop
                     break;
-                } else {
+                } else if(isset($client_uri[$i])) {
                     $vars[preg_replace("/\{(.*?)\}/", "$1", $parts[$i])] = $client_uri[$i];
+                } else {
+                    return false;
                 }
                 // Check if the route part match the client uri part, if not stop the routing process for this route, else do nothing and continue
             } else if (!isset($client_uri[$i]) || $parts[$i] !== $client_uri[$i]) {

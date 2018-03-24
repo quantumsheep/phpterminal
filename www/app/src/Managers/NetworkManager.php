@@ -180,6 +180,6 @@ class NetworkManager
     }
 
     public static function formatMAC(string $mac) {
-        return str_replace(['.', '-'], ':', $mac);
+        return str_replace(['.', '-', ':'], '-', $mac);
     }
 }

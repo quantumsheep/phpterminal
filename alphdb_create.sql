@@ -7,6 +7,7 @@ CREATE TABLE `ACCOUNT` (
 	`email` varchar(254) NOT NULL UNIQUE,
 	`username` varchar(36) NOT NULL UNIQUE,
 	`password` varchar(60) NOT NULL,
+	`code` char(100),
 	`createddate` DATETIME NOT NULL,
 	`editeddate` DATETIME,
 	PRIMARY KEY (`idaccount`)
@@ -54,13 +55,12 @@ CREATE TABLE `NETWORK` (
 );
 
 CREATE TABLE `PORT` (
-	`idport` int NOT NULL AUTO_INCREMENT,
 	`network` char(17) NOT NULL,
 	`port` int NOT NULL,
 	`status` int NOT NULL,
 	`ip` varchar(15) NOT NULL,
 	`ipport` int NOT NULL,
-	PRIMARY KEY (`idport`)
+	PRIMARY KEY (`network`,`port`)
 );
 
 CREATE TABLE `PRIVATEIP` (
@@ -105,16 +105,11 @@ CREATE TABLE `SESSION` (
 CREATE TABLE `TERMINAL_USER_HISTORY` (
 	`idhistory` int NOT NULL AUTO_INCREMENT,
 	`terminal_user` int NOT NULL,
+	`account` int NOT NULL,
 	`status` bit NOT NULL,
 	`command` TEXT NOT NULL,
-	`timestamp` TIME NOT NULL,
+	`date` DATETIME NOT NULL,
 	PRIMARY KEY (`idhistory`)
-);
-
-CREATE TABLE `ACCOUNT_VALIDATION` (
-	`idaccount` int NOT NULL,
-	`code` char(100) NOT NULL,
-	PRIMARY KEY (`idaccount`)
 );
 
 CREATE TABLE `CONFIG` (
@@ -159,5 +154,5 @@ ALTER TABLE `TERMINAL_GROUP_LINK` ADD CONSTRAINT `TERMINAL_GROUP_LINK_fk1` FOREI
 
 ALTER TABLE `TERMINAL_USER_HISTORY` ADD CONSTRAINT `TERMINAL_USER_HISTORY_fk0` FOREIGN KEY (`terminal_user`) REFERENCES `TERMINAL_USER`(`idterminal_user`);
 
-ALTER TABLE `ACCOUNT_VALIDATION` ADD CONSTRAINT `ACCOUNT_VALIDATION_fk0` FOREIGN KEY (`idaccount`) REFERENCES `ACCOUNT`(`idaccount`);
+ALTER TABLE `TERMINAL_USER_HISTORY` ADD CONSTRAINT `TERMINAL_USER_HISTORY_fk1` FOREIGN KEY (`account`) REFERENCES `ACCOUNT`(`idaccount`);
 

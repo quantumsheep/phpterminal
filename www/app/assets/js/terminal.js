@@ -2,7 +2,7 @@ const conn = new WebSocket('ws://localhost:800');
 let HistoryCmd = [""];
 let HistoryCount = 0;
 let HistoryCounter = 0;
-let termContainer = document.getElementById("terminal-container");
+const termContainer = document.getElementById("terminal-container");
 let ClickCount = 0;
 
 conn.onopen = (e) => {
@@ -64,7 +64,7 @@ function click() {
     ClickCount++;
     if (ClickCount == 1) {
         singleClickTimer = setTimeout((f) => {
-            let input = document.getElementById('terminal-input');
+            const input = document.getElementById('terminal-input');
 
             let range;
             let selection;
