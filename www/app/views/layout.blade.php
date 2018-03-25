@@ -29,17 +29,27 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
+                        @if(!empty($_SESSION["account"]))
                         <a class="nav-link" href="/terminal">Terminal</a>
+                        @endif
                     </li>
                     <li class="nav-item">
                         @if(empty($_SESSION["account"]))
                         <a class="nav-link" href="/signin">Login</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="/signup">Sign Up</a>
                         @else
                         <a class="nav-link" href="/account">Account</a>                        
                         @endif
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/about">About</a>
+                        @if(!empty($_SESSION["account"]))
+                        <a class="nav-link" href="/logout">Log Out</a>                       
+                        @endif
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/tos">About</a>
                     </li>
                 </ul>
             </div>
