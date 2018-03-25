@@ -1,8 +1,17 @@
-body {
-    overflow-x: hidden;
+html {
+    height: 100%;
 }
 
-#wrapper {
+body {
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.logo {
+    height: 100%;
+}
+
+.wrapper {
     padding-left: 0;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -10,11 +19,11 @@ body {
     transition: all 0.5s ease;
 }
 
-#wrapper.toggled {
+.wrapper.toggled {
     padding-left: 250px;
 }
 
-#sidebar-wrapper {
+.sidebar-wrapper {
     z-index: 1000;
     position: fixed;
     left: 250px;
@@ -22,24 +31,28 @@ body {
     height: 100%;
     margin-left: -250px;
     overflow-y: auto;
-    background: #247ba0;
+    background: #2764c6;
+    background: -moz-linear-gradient(top, #2764c6 0%, #4ea3e5 100%);
+    background: -webkit-linear-gradient(top, #2764c6 0%,#4ea3e5 100%);
+    background: linear-gradient(to bottom, #2764c6 0%,#4ea3e5 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2764c6', endColorstr='#4ea3e5',GradientType=0);
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
 }
 
-#wrapper.toggled #sidebar-wrapper {
+.wrapper.toggled .sidebar-wrapper {
     width: 250px;
 }
 
-#page-content-wrapper {
+.page-content-wrapper {
     width: 100%;
     position: absolute;
     padding: 15px;
 }
 
-#wrapper.toggled #page-content-wrapper {
+.wrapper.toggled .page-content-wrapper {
     position: absolute;
     margin-right: -250px;
 }
@@ -93,28 +106,24 @@ body {
 }
 
 @media(min-width:768px) {
-    #wrapper {
+    .wrapper {
         padding-left: 0;
     }
-    #wrapper.toggled {
+    .wrapper.toggled {
         padding-left: 250px;
     }
-    #sidebar-wrapper {
+    .sidebar-wrapper {
         width: 0;
     }
-    #wrapper.toggled #sidebar-wrapper {
+    .wrapper.toggled .sidebar-wrapper {
         width: 250px;
     }
-    #page-content-wrapper {
+    .page-content-wrapper {
         padding: 20px;
         position: relative;
     }
-    #wrapper.toggled #page-content-wrapper {
+    .wrapper.toggled .page-content-wrapper {
         position: relative;
         margin-right: 0;
     }
-}
-
-.logo {
-    height: 100%;
 }

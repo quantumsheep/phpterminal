@@ -14,7 +14,7 @@ class TerminalController
             return header("Location: /signin");
         }
 
-        if (!NetworkManager::isMAC($params["mac"])) {
+        if (empty($params["mac"]) || !NetworkManager::isMAC($params["mac"])) {
             return header("Location: /");
         }
 

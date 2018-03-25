@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>alPH - @yield('title')</title>
+    <title>alPH - <?php echo $__env->yieldContent('title'); ?></title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="/assets/css/admin.css">
-    @yield('styles')
+    <?php echo $__env->yieldContent('styles'); ?>
 </head>
 
 <body class="wrapper toggled">
@@ -37,9 +37,9 @@
         </nav>
     </header>
 
-    @yield('content')
+    <?php echo $__env->yieldContent('content'); ?>
 
-    @yield('script')
+    <?php echo $__env->yieldContent('script'); ?>
 </body>
 
 </html>

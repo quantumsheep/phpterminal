@@ -13,8 +13,6 @@ class History
         $stmp->bindParam(":command", $cmd);
         $stmp->bindParam(":date", $date);
 
-        $stmp->execute();
-
-        var_dump($stmp->errorInfo());
+        return $stmp->execute();
     }
 }

@@ -1,4 +1,4 @@
-const conn = new WebSocket('ws://localhost:800');
+const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
 let HistoryCmd = [""];
 let HistoryCount = 0;
 let HistoryCounter = 0;
@@ -60,7 +60,7 @@ function move() {
     console.log("Move");
 };
 
-function click() {
+function click(e) {
     ClickCount++;
     if (ClickCount == 1) {
         singleClickTimer = setTimeout((f) => {

@@ -1,6 +1,8 @@
 <?php
 namespace Alph\Managers;
 
+use Alph\EntityModels\RowAccount;
+
 class AccountManager
 {
     /**
@@ -83,11 +85,54 @@ class AccountManager
         $stmp->bindParam(":password", $password);
 
         // Execute the query and verify if is right done
-        if($stmp->execute()) {
+        if ($stmp->execute()) {
             return $code;
         }
 
         return false;
+    }
+
+    public static function getAccount(\PDO $db, int $idaccount) {
+        $account = self::getAccounts($db, [$idaccount]);
+        
+        if(!empty($account)) {
+            return reset($account);
+        }
+
+        return [];
+    }
+
+    /**
+     * Get values of multiple accounts
+     */
+    public static function getAccounts(\PDO $db, array $idaccounts)
+    {
+        // Prepare SQL row selection
+        $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
+
+        $accounts = [];
+
+        foreach ($idaccounts as &$idaccount) {
+            // Bind email parameter
+            $stmp->bindParam(":idaccount", $idaccount);
+
+            if ($stmp->execute()) {
+                if ($stmp->rowCount() == 1) {
+                    $user = $stmp->fetch();
+                    $account = new RowAccount();
+
+                    // Store the account properties in the session
+                    $account->idaccount = $idaccount;
+                    $account->status = $user["status"];
+                    $account->email = $user["email"];
+                    $account->username = $user["username"];
+
+                    $accounts[$idaccount] = $account;
+                }
+            }
+        }
+
+        return $accounts;
     }
 
     /**
