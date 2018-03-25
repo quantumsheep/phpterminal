@@ -86,7 +86,7 @@ class NetworkManager
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                 $network = new RowNetwork();
 
-                $network->mac = $row["mac"];
+                $network->mac = self::formatMAC($row["mac"]);
                 $network->ipv4 = $row["ipv4"];
                 $network->ipv6 = $row["ipv6"];
 
@@ -227,6 +227,6 @@ class NetworkManager
     }
 
     public static function formatMAC(string $mac) {
-        return str_replace(['.', ':'], '-', $mac);
+        return str_replace(['.', ':'], '-', strtoupper($mac));
     }
 }
