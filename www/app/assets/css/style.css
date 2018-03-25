@@ -4,7 +4,8 @@
 }
 
 html {
-    height: 100%;
+    min-height: 100%;
+    position: relative;
 }
 
 body {
@@ -15,6 +16,7 @@ body {
     flex-direction: column;
     padding-bottom: 60px;
     color: #ffffff;
+    overflow-x: hidden;
 }
 
 header nav ul li {

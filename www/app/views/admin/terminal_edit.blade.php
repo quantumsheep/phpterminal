@@ -12,7 +12,7 @@
             <h5>{{ $model->users[0]->username }} - {{ $model->users[0]->email }}</h5>
             <br>
         </section>
-        <div class="card h-100">
+        <div class="card h-100" style="overflow: auto;">
             <div class="terminal" id="terminal-container">
                 <div class="terminal-content" id="terminal-content-user">
                     </div>
