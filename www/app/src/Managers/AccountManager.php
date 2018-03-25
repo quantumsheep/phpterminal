@@ -37,7 +37,7 @@ class AccountManager
         // Check if there are no errors
         if (empty($errors)) {
             // Prepare the SQL row selection
-            $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT WHERE username = :username OR email = :email");
+            $stmp = $db->prepare("SELECT email,username FROM ACCOUNT WHERE username = :username OR email = :email");
 
             // Bind the query parameters
             $stmp->bindParam(':username', $username);
@@ -179,7 +179,7 @@ class AccountManager
     public static function removeValidationCode(\PDO $db, string $code)
     {
         // Prepare the SQL row deletion
-        $stmp = $db->prepare("DELETE code FROM ACCOUNT WHERE code = :code;");
+        $stmp = $db->prepare("UPDATE ACCOUNT SET code = NULL WHERE code = :code;");
 
         // Bind the code parameter
         $stmp->bindParam(":code", $code);
