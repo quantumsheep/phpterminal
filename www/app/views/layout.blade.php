@@ -29,8 +29,7 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        @if(empty($_SESSION["account"]))
-                        @else
+                        @if(!empty($_SESSION["account"]))
                         <a class="nav-link" href="/terminal">Terminal</a>
                         @endif
                     </li>
@@ -45,8 +44,7 @@
                         @endif
                     </li>
                     <li class="nav-item">
-                        @if(empty($_SESSION["account"]))
-                        @else
+                        @if(!empty($_SESSION["account"]))
                         <a class="nav-link" href="/logout">Log Out</a>                       
                         @endif
                     </li>
