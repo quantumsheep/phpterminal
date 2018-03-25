@@ -1,8 +1,8 @@
-const conn = new WebSocket('ws://localhost:800');
+const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
 let HistoryCmd = [""];
 let HistoryCount = 0;
 let HistoryCounter = 0;
-let termContainer = document.getElementById("terminal-container");
+const termContainer = document.getElementById("terminal-container");
 let ClickCount = 0;
 
 conn.onopen = (e) => {
@@ -60,11 +60,11 @@ function move() {
     console.log("Move");
 };
 
-function click() {
+function click(e) {
     ClickCount++;
     if (ClickCount == 1) {
         singleClickTimer = setTimeout((f) => {
-            let input = document.getElementById('terminal-input');
+            const input = document.getElementById('terminal-input');
 
             let range;
             let selection;

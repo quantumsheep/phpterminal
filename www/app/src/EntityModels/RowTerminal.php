@@ -1,7 +1,7 @@
 <?php
-namespace Alph\Models;
+namespace Alph\EntityModels;
 
-class TerminalModel {
+class RowTerminal {
     public $mac;
     public $account;
     public $localnetwork;

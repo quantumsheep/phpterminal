@@ -1,6 +1,8 @@
 <?php
 namespace Alph\Managers;
 
+use Alph\EntityModels\RowAccount;
+
 class AccountManager
 {
     /**
@@ -28,7 +30,7 @@ class AccountManager
         }
 
         // Check if the email is valid
-        if (!preg_match("/[a-zA-Z0-9.!#$%&'*+\/=?^_``{|}~-]+@[a-zA-Z0-9^_\-\.%+]+\.[a-zA-Z0-9]{2,8}$/", $email)) {
+        if (!\filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Please provide a valid email adress.";
         }
 
@@ -68,53 +70,69 @@ class AccountManager
     public static function createAccount(\PDO $db, string $username, string $email, string $password)
     {
         // Prepare the SQL row insert
-        $stmp = $db->prepare("INSERT INTO ACCOUNT (status, email, username, password, createddate, editeddate) VALUES(0, :email, :username, :password, NOW(),  NOW())");
+        $stmp = $db->prepare("INSERT INTO ACCOUNT (status, email, username, password, code, createddate, editeddate) VALUES(0, :email, :username, :password, :code, NOW(),  NOW())");
+
+        // Get a new alphanumeric code
+        $code = randomAlphanumeric(100);
 
         // Bind the query parameters
         $stmp->bindParam(":email", $email);
         $stmp->bindParam(":username", $username);
+        $stmp->bindParam(":code", $code);
 
         // Crypt the password
         $password = \password_hash($password, PASSWORD_BCRYPT);
         $stmp->bindParam(":password", $password);
 
-        // Execute the query and return it (boolean)
-        return $stmp->execute();
-    }
-
-    /**
-     * Create an account activation code
-     */
-    public static function createActivationCode(\PDO $db, string $email)
-    {
-        // Define the allowed characters
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
-
-        // Get the characters string length
-        $characters_length = strlen($characters);
-
-        // Pre-define rand_str to an empty string
-        $rand_str = "";
-
-        // Loop 100 times
-        for ($i = 0; $i < 100; $i++) {
-            // Add a random character to the random string
-            $rand_str .= $characters[rand(0, $characters_length - 1)];
-        }
-
-        // Prepare the SQL row insert
-        $stmp = $db->prepare("INSERT INTO ACCOUNT_VALIDATION (idaccount, code) VALUES((SELECT idaccount FROM ACCOUNT WHERE email = :email), :code);");
-
-        // Bind the query parameters
-        $stmp->bindParam(":email", $email);
-        $stmp->bindParam(":code", $rand_str);
-
-        // Execute the query and return the random string if successful
+        // Execute the query and verify if is right done
         if ($stmp->execute()) {
-            return $rand_str;
+            return $code;
         }
 
         return false;
+    }
+
+    public static function getAccount(\PDO $db, int $idaccount) {
+        $account = self::getAccounts($db, [$idaccount]);
+        
+        if(!empty($account)) {
+            return reset($account);
+        }
+
+        return [];
+    }
+
+    /**
+     * Get values of multiple accounts
+     */
+    public static function getAccounts(\PDO $db, array $idaccounts)
+    {
+        // Prepare SQL row selection
+        $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
+
+        $accounts = [];
+
+        foreach ($idaccounts as &$idaccount) {
+            // Bind email parameter
+            $stmp->bindParam(":idaccount", $idaccount);
+
+            if ($stmp->execute()) {
+                if ($stmp->rowCount() == 1) {
+                    $user = $stmp->fetch();
+                    $account = new RowAccount();
+
+                    // Store the account properties in the session
+                    $account->idaccount = $idaccount;
+                    $account->status = $user["status"];
+                    $account->email = $user["email"];
+                    $account->username = $user["username"];
+
+                    $accounts[$idaccount] = $account;
+                }
+            }
+        }
+
+        return $accounts;
     }
 
     /**
@@ -138,7 +156,7 @@ class AccountManager
     public static function getAccountIdFromCode(\PDO $db, string $code)
     {
         // Prepare the SQL row selection
-        $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT_VALIDATION WHERE code = :code;");
+        $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT WHERE code = :code;");
 
         // Bind the code parameter
         $stmp->bindParam(":code", $code);
@@ -161,7 +179,7 @@ class AccountManager
     public static function removeValidationCode(\PDO $db, string $code)
     {
         // Prepare the SQL row deletion
-        $stmp = $db->prepare("DELETE FROM ACCOUNT_VALIDATION WHERE code = :code;");
+        $stmp = $db->prepare("DELETE code FROM ACCOUNT WHERE code = :code;");
 
         // Bind the code parameter
         $stmp->bindParam(":code", $code);
@@ -184,7 +202,7 @@ class AccountManager
         }
 
         // Check if the email is valid
-        if (!preg_match("/[a-zA-Z0-9.!#$%&'*+\/=?^_``{|}~-]+@[a-zA-Z0-9^_\-\.%+]+\.[a-zA-Z0-9]{2,8}$/", $email)) {
+        if (!\filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Please provide a valid email adress.";
         }
 

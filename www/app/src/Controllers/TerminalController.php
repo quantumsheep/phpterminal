@@ -14,7 +14,7 @@ class TerminalController
             return header("Location: /signin");
         }
 
-        if (!NetworkManager::isMAC($params["mac"])) {
+        if (empty($params["mac"]) || !NetworkManager::isMAC($params["mac"])) {
             return header("Location: /");
         }
 
@@ -24,7 +24,7 @@ class TerminalController
 
         $terminal = TerminalManager::getTerminal($db, $params["mac"]);
 
-        \setcookie("terminal", $params["mac"]);
+        \setcookie("terminal", $params["mac"], 0, "/");
 
         return (new View("terminal"))->render();
     }

@@ -1,11 +1,10 @@
-@extends('layout')
-@section('title', 'Terminal')
+<?php $__env->startSection('title', 'Terminal'); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
 <link rel="stylesheet" href="/assets/css/terminal.css">
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="terminal container" id="terminal-container">
         <div class="terminal-content" id="terminal-content-user">
             </div>
@@ -16,8 +15,10 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
 <script src="/assets/js/terminal.js"></script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

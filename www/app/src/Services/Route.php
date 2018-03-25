@@ -41,11 +41,11 @@ class Route
         // Counth the client requested URI length
         $client_uri_length = count($client_uri);
 
-        // Check if the route and the client requested URI have not the same length
-        // if($parts_length !== $client_uri_length) return false;
-
         // Create the array to store route variables
         $vars = [];
+
+        // Pre-define the infinite route condition
+        $infinite = false;
 
         // Loop over the route string parts
         for ($i = 0; $i < $parts_length; $i++) {
@@ -55,18 +55,23 @@ class Route
                 if ($parts[$i][strlen($parts[$i]) - 2] === '*') {
                     // Get the route variable name
                     $varname = preg_replace("/\{(.*?)\*\}/", "$1", $parts[$i]);
-
                     $vars[$varname] = "";
                     // Loop over the keeping client uri length
                     for ($j = $i; $j < $client_uri_length; $j++) {
                         // Add the client URI parts to the array
                         $vars[$varname] .= '/' . $client_uri[$j];
                     }
+                    
+                    // We are in an infinite URI
+                    $infinite = true;
 
                     // Break to avoid continuing the loop
                     break;
-                } else {
+                } else if (isset($client_uri[$i])) {
+                    // Get the route variable
                     $vars[preg_replace("/\{(.*?)\}/", "$1", $parts[$i])] = $client_uri[$i];
+                } else {
+                    return false;
                 }
                 // Check if the route part match the client uri part, if not stop the routing process for this route, else do nothing and continue
             } else if (!isset($client_uri[$i]) || $parts[$i] !== $client_uri[$i]) {
@@ -74,8 +79,10 @@ class Route
             }
         }
 
+        // Check if URI is infinite and if route is longer than client URI
+        if(!$infinite && $parts_length < $client_uri_length) return false;
+        
         self::callback($action, $vars);
-
         return true;
     }
 

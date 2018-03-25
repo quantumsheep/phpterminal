@@ -39,7 +39,7 @@ class AccountController
 
     public static function validate(array $params)
     {
-        $return = function() {
+        $return = function () {
             header("Location: /signin");
         };
 
@@ -80,22 +80,18 @@ class AccountController
             header("Location: /signup");
             return;
         }
-        
+
         $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
-        if ($result) {
-            $rand_str = AccountManager::createActivationCode($db, $_POST["email"]);
-
-            if ($rand_str !== false) {
-                $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
-                    sprintf("%s://%s:%s/validate/%s",
-                        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-                        $_SERVER['SERVER_NAME'],
-                        $_SERVER["SERVER_PORT"],
-                        $rand_str) .
-                    "\">Click here</a>.", [$_POST["email"]]);
-                $mail->send();
-            }
+        if ($result !== false) {
+            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
+                sprintf("%s://%s:%s/validate/%s",
+                    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+                    $_SERVER['SERVER_NAME'],
+                    $_SERVER["SERVER_PORT"],
+                    $result) .
+                "\">Click here</a>.", [$_POST["email"]]);
+            $mail->send();
         }
 
         header("Location: /signin");
