@@ -5,6 +5,7 @@ use Alph\Controllers\View;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
 use Alph\Models\AdminModels\AdminTerminalListModel;
+use Alph\Models\AdminModels\AdminNetworkListModel;
 use Alph\Services\Database;
 use Alph\Managers\AccountManager;
 
@@ -20,7 +21,7 @@ class AdminController
         $db = Database::connect();
         $model = new AdminTerminalListModel();
         $model->terminals = [];
-        $model->users = [];
+        $model->accounts = [];
 
         if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
             $model->terminals[] = TerminalManager::getTerminal($db, $params["mac"]);
@@ -29,7 +30,7 @@ class AdminController
                 return header("Location: /admin/terminal");
             }
 
-            $model->users[] = AccountManager::getAccount($db, $model->terminals[0]->account);
+            $model->accounts[] = AccountManager::getAccount($db, $model->terminals[0]->account);
 
             \setcookie("terminal", $params["mac"], 0, "/");
             return (new View("admin/terminal_edit", $model))->render();
@@ -42,9 +43,18 @@ class AdminController
                 $accountids[] = $terminal->account;
             }
 
-            $model->users = AccountManager::getAccounts($db, $accountids);
+            $model->accounts = AccountManager::getAccounts($db, $accountids);
 
             return (new View("admin/terminal_list", $model))->render();
         }
+    }
+
+    public static function network(array $params) {
+        $db = Database::connect();
+        $model = new AdminNetworkListModel();
+
+        $model->networks = NetworkManager::getNetworks($db);
+
+        return (new View("admin/network_list", $model))->render();        
     }
 }

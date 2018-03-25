@@ -22,6 +22,7 @@ Route::exec(["GET"], "/about/tos", "AboutController::tos");
 
 Route::exec(["GET"], "/admin", "AdminController::index");
 Route::exec(["GET"], "/admin/terminal", "AdminController::terminal");
+Route::exec(["GET"], "/admin/network", "AdminController::network");
 Route::exec(["GET"], "/admin/terminal/{mac}", "AdminController::terminal");
 Route::exec(["GET"], "/admin/users", "AdminController::users");
 
