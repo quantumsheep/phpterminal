@@ -3,8 +3,8 @@ use Alph\Services\Route;
 
 Route::checkAccess("ErrorController::e403");
 
-Route::exec(["GET"], "/", "HomeController::index");
 Route::exec(["GET"], "/assets/{filepath*}", "AssetsController::find");
+Route::exec(["GET"], "/", "HomeController::index");
 
 Route::exec(["GET"], "/terminal/{mac}", "TerminalController::index");
 
@@ -24,5 +24,9 @@ Route::exec(["GET"], "/admin", "AdminController::index");
 Route::exec(["GET"], "/admin/terminal", "AdminController::terminal");
 Route::exec(["GET"], "/admin/terminal/{mac}", "AdminController::terminal");
 Route::exec(["GET"], "/admin/users", "AdminController::users");
+
+Route::exec(["GET"], "/sitemap.xml", function() {
+    echo \Alph\Controllers\AssetsController::find(["filepath" => "sitemap.xml"]);
+});
 
 Route::checkRouted("ErrorController::e404");

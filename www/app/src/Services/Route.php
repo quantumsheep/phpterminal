@@ -25,7 +25,7 @@ class Route
         // Check if client requested URI is the same as the route string
         if ($_SERVER['REQUEST_URI'] == $route) {
             // Launch the action and echo the returned string
-            echo call_user_func("\\Alph\\Controllers\\" . $action, []);
+            self::callback($action, []);
             return $_POST['ROUTED'] = true;
         }
 
