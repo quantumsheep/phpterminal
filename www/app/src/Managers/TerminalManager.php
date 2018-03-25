@@ -19,8 +19,6 @@ class TerminalManager
         $stmp->bindParam(":account", $idaccount);
         $stmp->bindParam(":localnetwork_mac", $localnetwork_mac);
 
-        var_dump($stmp->errorInfo());
-
         // Execute the query and return the response (boolean)
         return $stmp->execute();
     }
