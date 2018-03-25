@@ -1,1 +1,3 @@
-/www/app/cache/*
+apache2/logs/access.log
+apache2/logs/error.log
+apache2/logs/httpd.pid

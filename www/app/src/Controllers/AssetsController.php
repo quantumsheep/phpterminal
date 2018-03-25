@@ -2,8 +2,10 @@
 namespace Alph\Controllers;
 
 class AssetsController {
-    public static function find($params) {
+    public static function find(array $params) {
+        // Check if the asked asset exists
         if(is_file(DIR_ASSETS . $params["filepath"])) {
+            // Define mimetypes
             $mimetypes = [
                 "ez" => "application/andrew-inset",
                 "hqx" => "application/mac-binhex40",
@@ -142,12 +144,16 @@ class AssetsController {
                 "ice" => "x-conference-xcooltalk"
             ];
 
+            // Split the filepath
             $ext = explode('.', $params["filepath"]);
             
-            header("Content-type: " . $mimetypes[$ext[count($ext)-1]] . "; charset: UTF-8");
+            // Define the Content-Type header to specify the MIME type to the browser
+            header("Content-Type: " . $mimetypes[$ext[count($ext)-1]] . "; charset: UTF-8");
 
+            // Return the asset content
             return file_get_contents(DIR_ASSETS . $params["filepath"]);
         } else {
+            // Return a 404 HTTP error code (Not found)
             http_response_code(404);
         }
     }

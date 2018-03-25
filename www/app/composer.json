@@ -4,10 +4,12 @@
             "Alph\\": "src/"
         },
         "files": [
+            "src/Helpers.php",
             "src/Parameters.php"
         ]
     },
     "require": {
-        "philo/laravel-blade": "^3.1"
+        "philo/laravel-blade": "^3.1",
+        "phpmailer/phpmailer": "^6.0"
     }
 }
