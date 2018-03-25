@@ -29,7 +29,7 @@ class NetworkManager
 
                 // Generate a new public IPv6 address                
                 // $ipv6 = NetworkManager::generatePublicIPv6();
-                $ipv6 = "1ff0";
+                $ipv6 = uniqid(rand());
 
                 // Execute the SQL query with prepared parameters
                 $response = $stmp->execute([

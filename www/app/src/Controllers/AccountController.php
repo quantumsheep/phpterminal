@@ -16,6 +16,7 @@ class AccountController
 
         unset($_SESSION["errors"]);
         unset($_SESSION["data"]);
+        unset($_SESSION["success"]);
 
         return $view;
     }
@@ -26,6 +27,7 @@ class AccountController
 
         unset($_SESSION["errors"]);
         unset($_SESSION["data"]);
+        unset($_SESSION["success"]);
 
         return $view;
     }
@@ -59,9 +61,14 @@ class AccountController
                 if ($network_mac !== false) {
                     if (TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
                         AccountManager::removeValidationCode($db, $params["code"]);
+                        $_SESSION["success"] = [];
+                        $_SESSION["success"][] = "You have successfully validate your account !";
                     }
                 }
             }
+        }else{
+            $_SESSION["errors"] = [];
+            $_SESSION["errors"][] = "Your validation code was not correct.";
         }
 
         $return();
@@ -94,6 +101,9 @@ class AccountController
             $mail->send();
         }
 
+        $_SESSION["success"] = [];
+        $_SESSION["success"][] = "You will receipt a validation mail soon, please confirm it !";
+
         header("Location: /signin");
     }
 
@@ -101,6 +111,7 @@ class AccountController
     {
         $db = Database::connect();
 
+        $_SESSION["validation"] = AccountManager::checkAccountLogin($_POST["email"], $_POST["password"]);
         $_SESSION["errors"] = AccountManager::checkAccountLogin($_POST["email"], $_POST["password"]);
 
         if (!empty($_SESSION["errors"])) {

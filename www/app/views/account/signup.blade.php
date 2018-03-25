@@ -10,6 +10,13 @@
             @endforeach
         </div>
     @endif
+    @if(!empty($_SESSION["success"]))
+        <div class="row col-12 alert alert-success" role="alert">
+            @foreach ($_SESSION["success"] as $success)
+                {{$success}}
+            @endforeach
+        </div>
+    @endif
     <div class="row">
         <form class="col-md-6 m-auto" method="POST">
             {!! csrf_token() !!}
@@ -29,7 +36,6 @@
 
             <br>
             <button type="submit" class="btn btn-primary col-12">Sign Up</button>
-            <a href="/signin">Or login to your account here.</a>
         </form>
     </div>
 </div>
