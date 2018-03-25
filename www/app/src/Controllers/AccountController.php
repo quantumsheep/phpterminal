@@ -99,10 +99,10 @@ class AccountController
                     $result) .
                 "\">Click here</a>.", [$_POST["email"]]);
             $mail->send();
-        }
 
-        $_SESSION["success"] = [];
-        $_SESSION["success"][] = "You will receipt a validation mail soon, please confirm it !";
+            $_SESSION["success"] = [];
+            $_SESSION["success"][] = "You will receipt a validation mail soon, please confirm it !";
+        }
 
         header("Location: /signin");
     }
