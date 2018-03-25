@@ -37,7 +37,7 @@ class AccountManager
         // Check if there are no errors
         if (empty($errors)) {
             // Prepare the SQL row selection
-            $stmp = $db->prepare("SELECT email,username FROM ACCOUNT WHERE username = :username OR email = :email");
+            $stmp = $db->prepare("SELECT email, username FROM ACCOUNT WHERE username = :username OR email = :email");
 
             // Bind the query parameters
             $stmp->bindParam(':username', $username);
