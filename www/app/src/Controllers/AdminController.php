@@ -25,7 +25,7 @@ class AdminController
         $model->accounts = [];
 
         if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
-            $model->terminals[] = TerminalManager::getTerminal($db, $params["mac"]);
+            $model->terminals[] = TerminalManager::getTerminal($db, NetworkManager::formatMACForDatabase($params["mac"]));
 
             if(empty($model->terminals[0])) {
                 return header("Location: /admin/terminal");
