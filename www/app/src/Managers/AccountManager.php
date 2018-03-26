@@ -165,14 +165,14 @@ class AccountManager
 
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
-                    $accountrow = $stmp->fetch();
+                    $row = $stmp->fetch();
                     $account = new RowAccount();
 
                     // Store the account properties in the session
                     $account->idaccount = $idaccount;
-                    $account->status = $accountrow["status"];
-                    $account->email = $accountrow["email"];
-                    $account->username = $accountrow["username"];
+                    $account->status = $row["status"];
+                    $account->email = $row["email"];
+                    $account->username = $row["username"];
 
                     $accounts[$idaccount] = $account;
                 }

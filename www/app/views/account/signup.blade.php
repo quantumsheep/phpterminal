@@ -36,6 +36,7 @@
 
             <br>
             <button type="submit" class="btn btn-primary col-12">Sign Up</button>
+            <a href="/signin">Or login to your account here.</a>
         </form>
     </div>
 </div>
