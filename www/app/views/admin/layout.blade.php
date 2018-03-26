@@ -8,6 +8,7 @@
     <title>alPH - @yield('title')</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S" crossorigin="anonymous">
     <link rel="stylesheet" href="/assets/css/admin.css">
     @yield('styles')
 </head>
@@ -28,10 +29,10 @@
                     <a href="/admin/terminal">Terminals</a>
                 </li>
                 <li>
-                    <a href="/admin/networks">Networks</a>
+                    <a href="/admin/network">Networks</a>
                 </li>
                 <li>
-                    <a href="/admin/users">Users</a>
+                    <a href="/admin/account">Users</a>
                 </li>
             </ul>
         </nav>

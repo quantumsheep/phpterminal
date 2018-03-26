@@ -2,6 +2,7 @@
 namespace Alph\Managers;
 
 use Alph\EntityModels\RowTerminal;
+use Alph\Managers\NetworkManager;
 
 class TerminalManager
 {
@@ -18,8 +19,6 @@ class TerminalManager
 
         $stmp->bindParam(":account", $idaccount);
         $stmp->bindParam(":localnetwork_mac", $localnetwork_mac);
-
-        var_dump($stmp->errorInfo());
 
         // Execute the query and return the response (boolean)
         return $stmp->execute();
@@ -45,6 +44,26 @@ class TerminalManager
         }
 
         return false;
+    }
+
+    public static function countTerminalsByAccounts(\PDO $db, array $idaccounts) {
+        $terminalCount = [];
+
+        $stmp = $db->prepare("SELECT COUNT(*) as c FROM TERMINAL WHERE account = :account;");
+
+        foreach($idaccounts as &$idaccount) {
+            $stmp->bindParam(":account", $idaccount);
+
+            $stmp->execute();
+
+            if($row = $stmp->fetch()) {
+                $terminalCount[$idaccount] = $row["c"];
+            } else {
+                $terminalCount[$idaccount] = 0;
+            }
+        }
+
+        return $terminalCount;
     }
 
     public static function getTerminals(\PDO $db, int $limit = 10, int $offset = 0) {
@@ -79,7 +98,7 @@ class TerminalManager
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                 $terminal = new RowTerminal();
 
-                $terminal->mac = $row["mac"];
+                $terminal->mac = NetworkManager::formatMAC($row["mac"]);
                 $terminal->account = $row["account"];
                 $terminal->localnetwork = $row["localnetwork"];
 

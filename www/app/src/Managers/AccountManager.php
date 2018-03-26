@@ -37,7 +37,7 @@ class AccountManager
         // Check if there are no errors
         if (empty($errors)) {
             // Prepare the SQL row selection
-            $stmp = $db->prepare("SELECT idaccount FROM ACCOUNT WHERE username = :username OR email = :email");
+            $stmp = $db->prepare("SELECT email, username FROM ACCOUNT WHERE username = :username OR email = :email");
 
             // Bind the query parameters
             $stmp->bindParam(':username', $username);
@@ -92,8 +92,55 @@ class AccountManager
         return false;
     }
 
-    public static function getAccount(\PDO $db, int $idaccount) {
-        $account = self::getAccounts($db, [$idaccount]);
+    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0) {
+        $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
+
+        $isOffset = $offset != null;
+        $isLimited = $limit != null;
+
+        if($isOffset && $isLimited) {
+            $sql .= " LIMIT :offset, :limit";
+        } else if($isLimited) {
+            $sql .= " LIMIT :limit";
+        } else if ($isOffset) {
+            $sql .= " OFFSET :offset";
+        }
+
+        $stmp = $db->prepare($sql);
+
+        if($isOffset) {
+            $stmp->bindParam(":offset", $offset);
+        }
+
+        if($isLimited) {
+            $stmp->bindParam(":limit", $limit, \PDO::PARAM_INT);
+        }
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            $accounts = [];
+
+            while($accountrow = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $account = new RowAccount();
+
+                // Store the account properties in the session
+                $account->idaccount = $accountrow["idaccount"];
+                $account->status = $accountrow["status"];
+                $account->email = $accountrow["email"];
+                $account->username = $accountrow["username"];
+
+                $accounts[$account->idaccount] = $account;
+            }
+
+            return $accounts;
+        }
+
+        return false;
+    }
+
+    public static function getAccountById(\PDO $db, int $idaccount) {
+        $account = self::getAccountsById($db, [$idaccount]);
         
         if(!empty($account)) {
             return reset($account);
@@ -103,9 +150,9 @@ class AccountManager
     }
 
     /**
-     * Get values of multiple accounts
+     * Get values of multiple accounts by their ID
      */
-    public static function getAccounts(\PDO $db, array $idaccounts)
+    public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
         $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
@@ -118,14 +165,14 @@ class AccountManager
 
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
-                    $user = $stmp->fetch();
+                    $accountrow = $stmp->fetch();
                     $account = new RowAccount();
 
                     // Store the account properties in the session
                     $account->idaccount = $idaccount;
-                    $account->status = $user["status"];
-                    $account->email = $user["email"];
-                    $account->username = $user["username"];
+                    $account->status = $accountrow["status"];
+                    $account->email = $accountrow["email"];
+                    $account->username = $accountrow["username"];
 
                     $accounts[$idaccount] = $account;
                 }
@@ -179,7 +226,7 @@ class AccountManager
     public static function removeValidationCode(\PDO $db, string $code)
     {
         // Prepare the SQL row deletion
-        $stmp = $db->prepare("DELETE code FROM ACCOUNT WHERE code = :code;");
+        $stmp = $db->prepare("UPDATE ACCOUNT SET code = NULL WHERE code = :code;");
 
         // Bind the code parameter
         $stmp->bindParam(":code", $code);
