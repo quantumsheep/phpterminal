@@ -11,4 +11,9 @@ class SenderDataCredentials {
      * @var string
      */
     public $password;
+
+    /**
+     * @var bool
+     */
+    public $connected;
 }

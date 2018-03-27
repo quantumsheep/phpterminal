@@ -4,6 +4,7 @@ namespace Alph\Commands;
 use Alph\Services\CommandInterface;
 use Alph\Services\DefinedCommands;
 use Ratchet\ConnectionInterface;
+use Alph\Services\SenderData;
 
 class hello implements CommandInterface
 {
@@ -32,7 +33,7 @@ class hello implements CommandInterface
      * @param string $sess_id
      * @param string $cmd
      */
-    public static function call(\PDO $db, \SplObjectStorage $clients, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
+    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
         $answer=["What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","Amusant, humain","Do what you know, cause a Pirate's free","I'm not world. I'm you","Is this real life ?","Don't talk to me","jajajajajaja","Gaggagaga","rofl","Julio","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non",];
         $choice = 0;

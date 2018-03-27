@@ -2,6 +2,7 @@
 namespace Alph\Services;
 
 use Ratchet\ConnectionInterface;
+use Alph\Services\SenderData;
 
 interface CommandInterface
 {
@@ -14,5 +15,5 @@ interface CommandInterface
      * @param string $sess_id
      * @param string $cmd
      */
-    public static function call(\PDO $db, \SplObjectStorage $clients, array &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $parameters);
+    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $parameters);
 }
