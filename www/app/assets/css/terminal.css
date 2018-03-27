@@ -13,6 +13,20 @@
     word-break: break-all;
 }
 
+html {
+    height: 100%;
+    position: relative;
+}
+
+body {
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.term{
+    transform : translateY(150px) !important;
+}
+
 .terminal-content {
     padding: 0;
     color: #FFFFFF;
