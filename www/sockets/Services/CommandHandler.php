@@ -3,6 +3,7 @@ namespace Alph\Services;
 
 use Alph\Services\History;
 use Alph\Services\Session;
+use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
@@ -11,25 +12,29 @@ class CommandHandler implements MessageComponentInterface
     protected $clients;
     private $db;
     private $commands;
+    public $data;
 
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
         $this->db = \Alph\Services\Database::connect();
         $this->commands = \Alph\Services\DefinedCommands::get();
+        $this->data = [];
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages later
         $this->clients->attach($conn);
+
+        $this->data[$conn->resourceId] = new SenderData;
     }
 
     public function onMessage(ConnectionInterface $sender, $cmd)
     {
         // Get cookie HTTP header
         $cookies = $sender->httpRequest->getHeader('Cookie');
-
+        
         // If there is no values in the cookie header, stop the process
         if (!empty($cookies)) {
             // Parse the cookies to obtain each cookies separately
@@ -43,19 +48,33 @@ class CommandHandler implements MessageComponentInterface
 
                 // Check if the idaccount is present in the sender's session
                 if (!empty($sender_session["account"]["idaccount"])) {
-                    // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
-                    @list($cmd, $parameters) = explode(' ', $cmd, 2);
+                    // if(empty($sender->terminal_data)) {
+                    //     $sender->terminal_data = [];
+                    //     $sender->terminal_data["cmd"] = [];
+                    //     $sender->terminal_data["user"] = [];
+                    // }
 
-                    // Check if the command exists
-                    if (in_array($cmd, $this->commands)) {
-                        // Call the command with arguments
-                        \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, $sender, $parsed_cookies[0]["alph_sess"], $sender_session, $parsed_cookies[0]["terminal"], $cmd, $parameters]);
-                    } else {
-                        $sender->send("-bash: " . $cmd . ": command not found");
-                    }
+                    // if (!empty($sender->terminal_data["user"]["username"]) && isset($sender->terminal_data["user"]["password"])) {
+                        // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
+                        @list($cmd, $parameters) = explode(' ', $cmd, 2);
 
-                    // Push the command into the history
-                    History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . ' ' . $parameters);                    
+                        // Check if the command exists
+                        if (in_array($cmd, $this->commands)) {
+                            // Call the command with arguments
+                            \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, &$this->data, $sender, $parsed_cookies[0]["alph_sess"], $sender_session, $parsed_cookies[0]["terminal"], $cmd, $parameters]);
+                        } else {
+                            $sender->send("-bash: " . $cmd . ": command not found");
+                        }
+
+                        // Push the command into the history
+                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . ' ' . $parameters);
+                    // } else {
+                    //     if(!empty($sender->terminal_data["user"]["username"]) && !isset($sender->terminal_data["user"]["password"])) {
+                    //         $sender->send($cmd);
+                    //     } else {
+                    //         $sender->terminal_data["user"]["username"] = $cmd;
+                    //     }
+                    // }
                 } else {
                     $sender->send("alph: account connection error");
                 }

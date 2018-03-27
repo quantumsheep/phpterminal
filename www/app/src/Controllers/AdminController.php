@@ -5,6 +5,8 @@ use Alph\Controllers\View;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
 use Alph\Models\AdminModels\AdminTerminalListModel;
+use Alph\Models\AdminModels\AdminNetworkListModel;
+use Alph\Models\AdminModels\AdminAccountListModel;
 use Alph\Services\Database;
 use Alph\Managers\AccountManager;
 
@@ -20,16 +22,16 @@ class AdminController
         $db = Database::connect();
         $model = new AdminTerminalListModel();
         $model->terminals = [];
-        $model->users = [];
+        $model->accounts = [];
 
         if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
-            $model->terminals[] = TerminalManager::getTerminal($db, $params["mac"]);
+            $model->terminals[] = TerminalManager::getTerminal($db, NetworkManager::formatMACForDatabase($params["mac"]));
 
             if(empty($model->terminals[0])) {
                 return header("Location: /admin/terminal");
             }
 
-            $model->users[] = AccountManager::getAccount($db, $model->terminals[0]->account);
+            $model->accounts[] = AccountManager::getAccountById($db, $model->terminals[0]->account);
 
             \setcookie("terminal", $params["mac"], 0, "/");
             return (new View("admin/terminal_edit", $model))->render();
@@ -42,9 +44,35 @@ class AdminController
                 $accountids[] = $terminal->account;
             }
 
-            $model->users = AccountManager::getAccounts($db, $accountids);
+            $model->accounts = AccountManager::getAccountsById($db, $accountids);
 
             return (new View("admin/terminal_list", $model))->render();
         }
+    }
+
+    public static function network(array $params) {
+        $db = Database::connect();
+        $model = new AdminNetworkListModel();
+
+        $model->networks = NetworkManager::getNetworks($db);
+
+        return (new View("admin/network_list", $model))->render();        
+    }
+
+    public static function account(array $params) {
+        $db = Database::connect();
+        $model = new AdminAccountListModel();
+
+        $model->accounts = AccountManager::getAccounts($db);
+
+        $idaccounts = [];
+
+        foreach($model->accounts as &$account) {
+            $idaccounts[] = $account->idaccount;
+        }
+
+        $model->terminalsCount = TerminalManager::countTerminalsByAccounts($db, $idaccounts);
+
+        return (new View("admin/user_list", $model))->render();        
     }
 }

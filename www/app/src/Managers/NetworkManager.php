@@ -1,6 +1,8 @@
 <?php
 namespace Alph\Managers;
 
+use Alph\EntityModels\RowNetwork;
+
 class NetworkManager
 {
     /**
@@ -50,6 +52,51 @@ class NetworkManager
 
         // Return the network's mac address
         return $mac;
+    }
+
+    public static function getNetworks(\PDO $db, int $limit = 10, int $offset = 0) {
+        $sql = "SELECT mac, ipv4, ipv6 FROM NETWORK";
+
+        $isOffset = $offset != null;
+        $isLimited = $limit != null;
+
+        if($isOffset && $isLimited) {
+            $sql .= " LIMIT :offset, :limit";
+        } else if($isLimited) {
+            $sql .= " LIMIT :limit";
+        } else if ($isOffset) {
+            $sql .= " OFFSET :offset";
+        }
+
+        $stmp = $db->prepare($sql);
+
+        if($isOffset) {
+            $stmp->bindParam(":offset", $offset);
+        }
+
+        if($isLimited) {
+            $stmp->bindParam(":limit", $limit, \PDO::PARAM_INT);
+        }
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            $networks = [];
+
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $network = new RowNetwork();
+
+                $network->mac = self::formatMAC($row["mac"]);
+                $network->ipv4 = $row["ipv4"];
+                $network->ipv6 = $row["ipv6"];
+
+                $networks[] = $network;
+            }
+
+            return $networks;
+        }
+
+        return false;
     }
 
     /**
@@ -176,10 +223,14 @@ class NetworkManager
     }
 
     public static function isMAC(string $str) {
-        return \preg_match("/^([0-9A-F]{2}[:-]){5}[0-9A-F]{2}$/i", $str) === 1 ? true : false;
+        return \preg_match("/^([0-9A-F]{2}[.:-]){5}[0-9A-F]{2}$/i", $str) === 1 ? true : false;
     }
 
     public static function formatMAC(string $mac) {
-        return str_replace(['.', ':'], '-', $mac);
+        return str_replace(['.', ':'], '-', strtoupper($mac));
+    }
+
+    public static function formatMACForDatabase(string $mac) {
+        return str_replace(['.', '-'], ':', strtoupper($mac));
     }
 }

@@ -92,8 +92,55 @@ class AccountManager
         return false;
     }
 
-    public static function getAccount(\PDO $db, int $idaccount) {
-        $account = self::getAccounts($db, [$idaccount]);
+    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0) {
+        $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
+
+        $isOffset = $offset != null;
+        $isLimited = $limit != null;
+
+        if($isOffset && $isLimited) {
+            $sql .= " LIMIT :offset, :limit";
+        } else if($isLimited) {
+            $sql .= " LIMIT :limit";
+        } else if ($isOffset) {
+            $sql .= " OFFSET :offset";
+        }
+
+        $stmp = $db->prepare($sql);
+
+        if($isOffset) {
+            $stmp->bindParam(":offset", $offset);
+        }
+
+        if($isLimited) {
+            $stmp->bindParam(":limit", $limit, \PDO::PARAM_INT);
+        }
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            $accounts = [];
+
+            while($accountrow = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $account = new RowAccount();
+
+                // Store the account properties in the session
+                $account->idaccount = $accountrow["idaccount"];
+                $account->status = $accountrow["status"];
+                $account->email = $accountrow["email"];
+                $account->username = $accountrow["username"];
+
+                $accounts[$account->idaccount] = $account;
+            }
+
+            return $accounts;
+        }
+
+        return false;
+    }
+
+    public static function getAccountById(\PDO $db, int $idaccount) {
+        $account = self::getAccountsById($db, [$idaccount]);
         
         if(!empty($account)) {
             return reset($account);
@@ -103,9 +150,9 @@ class AccountManager
     }
 
     /**
-     * Get values of multiple accounts
+     * Get values of multiple accounts by their ID
      */
-    public static function getAccounts(\PDO $db, array $idaccounts)
+    public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
         $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
@@ -118,14 +165,14 @@ class AccountManager
 
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
-                    $user = $stmp->fetch();
+                    $row = $stmp->fetch();
                     $account = new RowAccount();
 
                     // Store the account properties in the session
                     $account->idaccount = $idaccount;
-                    $account->status = $user["status"];
-                    $account->email = $user["email"];
-                    $account->username = $user["username"];
+                    $account->status = $row["status"];
+                    $account->email = $row["email"];
+                    $account->username = $row["username"];
 
                     $accounts[$idaccount] = $account;
                 }
