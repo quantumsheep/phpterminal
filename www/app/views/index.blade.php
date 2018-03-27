@@ -17,13 +17,13 @@
 
     <div class="terminal container" id="terminal-container-test">
         <div id="term">
-                <div class="terminal-content" id="terminal-content-user-test">
-                    <div id="terminal-content-response-test">
-                        <div id="terminal-user-test">user@user:~ $
-                            <span class="terminal-input" id="terminal-input-test" contenteditable="false" spellcheck="false"></span>
-                        </div>
+            <div class="terminal-content" id="terminal-content-user-test">
+                <div id="terminal-content-response-test">
+                    <div id="terminal-user-test">user@user:~ $
+                        <span class="terminal-input" id="terminal-input-test" contenteditable="false" spellcheck="false"></span>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
 

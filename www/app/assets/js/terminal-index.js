@@ -169,11 +169,17 @@ setTimeout(e => {
         document.getElementById("terminal-container-test").removeChild(document.getElementById("term"));
     }, 6700);
     setTimeout(e => {
-        document.getElementById("terminal-container-test").innerHTML = document.getElementById("terminal-container-test").innerHTML + '<div id="term"><center><p>BIENVENU SUR ALPH TERMINAL</p><p>Vous pouvez vous servir de ce terminal comme terminal de test.</p></center></div>';
-    }, 6700);
+        document.getElementById("terminal-container-test").innerHTML = document.getElementById("terminal-container-test").innerHTML + '<div id="term1" class="term1"><center><p>BIENVENU SUR ALPH TERMINAL</p><p>Vous pouvez vous servir de ce terminal comme terminal de test.</p></center></div>';
+    }, 6710);
     setTimeout(e => {
-        document.getElementById("terminal-container-test").removeChild(document.getElementById("term"));
-    }, 9700);
+        document.getElementById("term1").classList.remove("term1");
+    }, 7000);
+    setTimeout(e => {
+        document.getElementById("term1").classList.add("term1");
+    }, 7200);
+    setTimeout(e => {
+        document.getElementById("terminal-container-test").removeChild(document.getElementById("term1"));
+    }, 9500);
     setTimeout(e => {
         document.getElementById("terminal-container-test").innerHTML = document.getElementById("terminal-container-test").innerHTML +
             '<div class="terminal container" id="terminal-container">' +
@@ -308,4 +314,4 @@ conn.onmessage = (e) => {
 function appendTerminal(text) {
     document.getElementById("terminal-content-user").innerHTML = `${document.getElementById("terminal-content-user").innerHTML}<div>${text}</div>`;
 }
-}, 20000);
+}, 11400);

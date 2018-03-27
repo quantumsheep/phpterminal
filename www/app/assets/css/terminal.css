@@ -23,8 +23,13 @@ body {
     height: 100%;
 }
 
-.term{
-    transform : translateY(150px) !important;
+#term1{
+    transform: translateY(250px);
+}
+
+.term1{
+    transition-delay: 2s;
+    filter: blur(8px);
 }
 
 .terminal-content {
