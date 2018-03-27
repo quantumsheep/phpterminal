@@ -1,3 +1,5 @@
+www/app/cache/*
+!www/app/cache/puppet.txt
 apache2/logs/access.log
 apache2/logs/error.log
 apache2/logs/httpd.pid
