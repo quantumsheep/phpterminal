@@ -36,6 +36,8 @@ class CommandHandler implements MessageComponentInterface
         $this->clients->attach($conn);
 
         $this->data[$conn->resourceId] = new SenderData;
+
+        $conn->send("login as: ");
     }
 
     public function onMessage(ConnectionInterface $sender, $cmd)
@@ -83,14 +85,16 @@ class CommandHandler implements MessageComponentInterface
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
 
                             if(\password_verify($cmd, $row["password"])) {
-                                $sender->send("Connected!");
+                                $sender->send("connect");
 
                                 $this->data[$sender->resourceId]->credentials->connected = true;
                             } else {
                                 $sender->send("Access denied.");
+                                $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
                             }
                         } else {
                             $this->data[$sender->resourceId]->credentials->username = $cmd;
+                            $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
                         }
                     }
                 } else {
