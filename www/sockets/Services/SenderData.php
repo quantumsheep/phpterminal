@@ -16,5 +16,6 @@ class SenderData {
 
     public function __construct() {
         $this->credentials = new SenderDataCredentials;
+        $this->credentials->connected = false;
     }
 }

@@ -4,6 +4,7 @@ let HistoryCount = 0;
 let HistoryCounter = 0;
 const termContainer = document.getElementById("terminal-container");
 let ClickCount = 0;
+let connected = false;
 
 conn.onopen = (e) => {
     console.log("Connection established!");
@@ -19,7 +20,9 @@ conn.onopen = (e) => {
                     HistoryCount++;
                 }
                 conn.send(e.target.innerHTML);
-                appendTerminal(`user@user:~ $ ${e.target.innerHTML}`);
+
+                appendTerminal(e.target.innerHTML);
+
                 e.target.innerHTML = "";
             }
         }
