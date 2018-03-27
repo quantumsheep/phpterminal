@@ -178,21 +178,10 @@ setTimeout(e => {
         document.getElementById("term1").classList.add("term1");
     }, 7200);
     setTimeout(e => {
-        document.getElementById("terminal-container-test").removeChild(document.getElementById("term1"));
+        document.getElementById("term-test").removeChild(document.getElementById("terminal-container-test"));
+        document.getElementById("term-test").classList.add("shy");
+        document.getElementById("terminal-container").classList.remove("shy");
     }, 9500);
-    setTimeout(e => {
-        document.getElementById("terminal-container-test").innerHTML = document.getElementById("terminal-container-test").innerHTML +
-            '<div class="terminal container" id="terminal-container">' +
-            '<div class="terminal-content" id="terminal-content-user">' +
-            '</div>' +
-            '<div id="terminal-content-response">' +
-            '<div id="terminal-user">user@user:~ $' +
-            '<span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>' +
-            '<span class="terminal-caret">█</span>' +
-            '</div>' +
-            '</div>' +
-            '</div>';
-    }, 10000);
 }, 1200);
 
 const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
@@ -200,9 +189,8 @@ let HistoryCmd = [""];
 let HistoryCount = 0;
 let HistoryCounter = 0;
 let ClickCount = 0;
+const termContainer = document.getElementById("terminal-container");
 
-setTimeout(e => {
-    const termContainer = document.getElementById("terminal-container");
 conn.onopen = (e) => {
     console.log("Connection established!");
 
@@ -212,7 +200,7 @@ conn.onopen = (e) => {
             if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
                 e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
                 if (e.target.innerHTML != HistoryCmd[HistoryCounter - 1]) {
-                    HistoryCmd[HistoryCounter] = e.target.innerHTML;a
+                    HistoryCmd[HistoryCounter] = e.target.innerHTML;
                     HistoryCounter++;
                     HistoryCount++;
                 }
@@ -314,4 +302,3 @@ conn.onmessage = (e) => {
 function appendTerminal(text) {
     document.getElementById("terminal-content-user").innerHTML = `${document.getElementById("terminal-content-user").innerHTML}<div>${text}</div>`;
 }
-}, 11400);

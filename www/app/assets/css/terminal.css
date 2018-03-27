@@ -27,6 +27,10 @@ body {
     transform: translateY(250px);
 }
 
+.shy{
+    display: none !important;
+}
+
 .term1{
     transition-delay: 2s;
     filter: blur(8px);
