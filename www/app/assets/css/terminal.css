@@ -13,6 +13,29 @@
     word-break: break-all;
 }
 
+html {
+    height: 100%;
+    position: relative;
+}
+
+body {
+    overflow-x: hidden;
+    height: 100%;
+}
+
+#term1{
+    transform: translateY(250px);
+}
+
+.shy{
+    display: none !important;
+}
+
+.term1{
+    transition-delay: 2s;
+    filter: blur(8px);
+}
+
 .terminal-content {
     padding: 0;
     color: #FFFFFF;
