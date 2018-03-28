@@ -219,7 +219,7 @@ class NetworkManager
      */
     public static function generatePublicIPv6(): string
     {
-
+        
     }
 
     public static function isMAC(string $str) {
