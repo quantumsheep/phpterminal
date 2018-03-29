@@ -77,3 +77,14 @@ footer {
 .lh-normal {
     line-height: normal;
 }
+
+.terminal-list-item {
+    text-align: center;
+    color: white;
+    background: #333333;
+    border-radius: 3px;
+}
+
+.flex-1 {
+    flex: 1;
+}

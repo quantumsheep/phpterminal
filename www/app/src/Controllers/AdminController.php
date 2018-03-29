@@ -80,8 +80,9 @@ class AdminController
 
             return (new View("admin/user_edit", $model))->render();
         } else {
-            $model->accounts = AccountManager::getAccounts($db, 10, $_GET["page"] ?? null !== null ? ($_GET["page"] - 1) * 10 : 0, !empty($_GET["search"]) ? $_GET["search"] : null);
             $model->numberAccounts = AccountManager::countAccounts($db, !empty($_GET["search"]) ? $_GET["search"] : null);
+
+            $model->accounts = AccountManager::getAccounts($db, 10, $_GET["page"] ?? null !== null ? ($_GET["page"] - 1) * 10 : 0, !empty($_GET["search"]) ? $_GET["search"] : null);
 
             if ($model->accounts) {
                 $idaccounts = [];
