@@ -1,3 +1,3 @@
 @echo off
+echo Starting sockets server...
 "..\..\php\php.exe" -c "..\..\php\php.ini" ./Server.php
-pause
