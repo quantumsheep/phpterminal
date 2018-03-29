@@ -66,8 +66,10 @@ class CommandHandler implements MessageComponentInterface
                             // Call the command with arguments
                             \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, &$this->data[$sender->resourceId], $sender, $parsed_cookies[0]["alph_sess"], $sender_session, $parsed_cookies[0]["terminal"], $cmd, $parameters]);
                         } else {
-                            $sender->send("-bash: " . $cmd . ": command not found");
+                            $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
+
+                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                         // Push the command into the history
                         History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . ' ' . $parameters);
@@ -85,23 +87,39 @@ class CommandHandler implements MessageComponentInterface
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
 
                             if(\password_verify($cmd, $row["password"])) {
-                                $sender->send("connect");
+                                $greetings = [
+                                    "Alph 1.0.6-7 (2018-29-03)",
+                                    "",
+                                    "The programs included with a simulated Debian GNU/Linux system;",
+                                    "the exact distribution terms for each program are described in the",
+                                    "individual files in /usr/share/doc/*/copyright.",
+                                    "",
+                                    "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
+                                    "permitted by applicable law.",
+                                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220"
+                                ];
+
+                                foreach($greetings as &$greet) {
+                                    $sender->send("<br><span>" . $greet . "</span>");
+                                }
+
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                                 $this->data[$sender->resourceId]->credentials->connected = true;
                             } else {
-                                $sender->send("Access denied.");
-                                $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
+                                $sender->send("<br><span>Access denied.</span>");
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
                             }
                         } else {
                             $this->data[$sender->resourceId]->credentials->username = $cmd;
-                            $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
+                            $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
                         }
                     }
                 } else {
-                    $sender->send("alph: account connection error");
+                    $sender->send("<br><span>alph: account connection error</span>");
                 }
             } else {
-                $sender->send("alph: terminal connection error");
+                $sender->send("<br><span>alph: terminal connection error</span>");
             }
         }
     }

@@ -1,7 +1,7 @@
 const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
 let HistoryCmd = [""];
-let HistoryCount = 0;
-let HistoryCounter = 0;
+let HistoryPosition = 0;
+let HystoryLength = 0;
 const termContainer = document.getElementById("terminal-container");
 let ClickCount = 0;
 let connected = false;
@@ -14,11 +14,12 @@ conn.onopen = (e) => {
             e.preventDefault();
             if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
                 e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
-                if (e.target.innerHTML != HistoryCmd[HistoryCounter - 1]) {
-                    HistoryCmd[HistoryCounter] = e.target.innerHTML;
-                    HistoryCounter++;
-                    HistoryCount++;
+                if (e.target.innerHTML != HistoryCmd[HystoryLength - 1]) {
+                    HistoryCmd[HystoryLength] = e.target.innerHTML;
+                    HystoryLength++;
+                    HistoryPosition++;
                 }
+                
                 conn.send(e.target.innerHTML);
 
                 appendTerminal(e.target.innerHTML);
@@ -33,26 +34,26 @@ document.getElementById('terminal-input').addEventListener('keydown', (e) => {
     if (e.key == "ArrowUp") {
         document.getElementById('terminal-input').addEventListener('keydown', (e) => {
             if (e.key == "Enter") {
-                HistoryCount = HistoryCmd.length;
+                HistoryPosition = HistoryCmd.length;
             }
         });
-        HistoryCount--;
-        if (HistoryCount < 1) {
-            HistoryCount = 0;
+        HistoryPosition--;
+        if (HistoryPosition < 1) {
+            HistoryPosition = 0;
         }
-        document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryCount]}`;
+        document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
     } else if (e.key == "ArrowDown") {
         document.getElementById('terminal-input').addEventListener('keydown', (e) => {
             if (e.key == "Enter") {
-                HistoryCount = HistoryCmd.length;
+                HistoryPosition = HistoryCmd.length;
             }
         });
-        HistoryCount++;
-        if (HistoryCount > HistoryCmd.length - 1) {
-            HistoryCount = HistoryCmd.length;
+        HistoryPosition++;
+        if (HistoryPosition > HistoryCmd.length - 1) {
+            HistoryPosition = HistoryCmd.length;
             document.getElementById('terminal-input').innerHTML = "";
         } else {
-            document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryCount]}`;
+            document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
         }
     } else if (e.key == "Escape") {
         document.getElementById('terminal-input').innerHTML = "";
@@ -116,6 +117,6 @@ conn.onmessage = (e) => {
     termContainer.scrollTo(0, termContainer.scrollHeight);
 };
 
-function appendTerminal(text) {
-    document.getElementById("terminal-content-user").innerHTML = `${document.getElementById("terminal-content-user").innerHTML}<div>${text}</div>`;
+function appendTerminal(text, line_jump = true) {
+    document.getElementById("terminal-content-user").innerHTML += text;
 }

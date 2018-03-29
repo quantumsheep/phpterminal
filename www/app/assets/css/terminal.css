@@ -41,6 +41,10 @@ body {
     color: #FFFFFF;
 }
 
+.terminal-content br:last-child {
+    display:none;
+}
+
 .terminal-caret {
     background-color: #FFFFFF;
     font-size: 14px;

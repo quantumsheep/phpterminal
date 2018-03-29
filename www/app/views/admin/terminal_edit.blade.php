@@ -14,12 +14,13 @@
         </section>
         <div class="card h-100" style="overflow: auto;">
             <div class="terminal" id="terminal-container">
-                <div class="terminal-content" id="terminal-content-user">
-                    </div>
-                    <div id="terminal-content-response">
+                <span class="terminal-content" id="terminal-content-user">
+                    
+                </span>
+                <span id="terminal-content-response">
                     <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
                     <span class="terminal-caret">█</span>
-                </div>
+                </span>
             </div>
         </div>
     </section>
