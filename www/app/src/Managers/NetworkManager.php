@@ -1,7 +1,7 @@
 <?php
 namespace Alph\Managers;
 
-use Alph\EntityModels\RowNetwork;
+use Alph\Models\NetworkModel;
 
 class NetworkManager
 {
@@ -84,7 +84,7 @@ class NetworkManager
             $networks = [];
 
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $network = new RowNetwork();
+                $network = new NetworkModel();
 
                 $network->mac = self::formatMAC($row["mac"]);
                 $network->ipv4 = $row["ipv4"];
@@ -171,7 +171,7 @@ class NetworkManager
         $mac = "";
 
         // Loop 5 times
-        for ($i = 0; $i < 5; $i++, $mac .= ":") {
+        for ($i = 0; $i < 5; $i++, $mac .= "-") {
             // Add a MAC address part
             $mac .= base_convert(rand(0, 15), 10, 16) . base_convert(rand(0, 15), 10, 16);
         }
@@ -231,6 +231,6 @@ class NetworkManager
     }
 
     public static function formatMACForDatabase(string $mac) {
-        return str_replace(['.', '-'], ':', strtoupper($mac));
+        return str_replace(['.', ':'], '-', strtoupper($mac));
     }
 }

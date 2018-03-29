@@ -5,6 +5,11 @@
     <section class="page-content-wrapper">
         <div class="container-fluid">
             <h1>Accounts list</h1>
+            <form method="GET" class="d-flex">
+                <input type="text" class="form-control mr-1" name="search" placeholder="Search an account">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+            </form>
+            <br>
             @if($model->accounts !== false)
                 <div class="list-group">
                     @foreach($model->accounts as $account)
