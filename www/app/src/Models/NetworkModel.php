@@ -1,7 +1,7 @@
 <?php
-namespace Alph\EntityModels;
+namespace Alph\Models;
 
-class RowNetwork {
+class NetworkModel {
     public $mac;
     public $ipv4;
     public $ipv6;

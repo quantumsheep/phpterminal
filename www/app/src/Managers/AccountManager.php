@@ -1,7 +1,7 @@
 <?php
 namespace Alph\Managers;
 
-use Alph\EntityModels\RowAccount;
+use Alph\Models\AccountModel;
 
 class AccountManager
 {
@@ -92,11 +92,20 @@ class AccountManager
         return false;
     }
 
-    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0) {
+    /**
+     * @return AccountModel[]
+     */
+    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0, string $search = null) {
         $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
 
         $isOffset = $offset != null;
         $isLimited = $limit != null;
+
+        $search = \str_replace('%', "\\%", $search);
+
+        if($search !== null) {
+            $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
+        }
 
         if($isOffset && $isLimited) {
             $sql .= " LIMIT :offset, :limit";
@@ -108,6 +117,10 @@ class AccountManager
 
         $stmp = $db->prepare($sql);
 
+        if($search !== null) {
+            $stmp->bindParam(":search", $search);            
+        }
+
         if($isOffset) {
             $stmp->bindParam(":offset", $offset);
         }
@@ -118,25 +131,17 @@ class AccountManager
 
         $stmp->execute();
 
+        $accounts = [];
+
         if($stmp->rowCount() > 0) {
-            $accounts = [];
-
-            while($accountrow = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $account = new RowAccount();
-
-                // Store the account properties in the session
-                $account->idaccount = $accountrow["idaccount"];
-                $account->status = $accountrow["status"];
-                $account->email = $accountrow["email"];
-                $account->username = $accountrow["username"];
-
-                $accounts[$account->idaccount] = $account;
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $accounts[$row["idaccount"]] = AccountModel::map($row);
             }
 
             return $accounts;
         }
 
-        return false;
+        return $accounts;
     }
 
     public static function getAccountById(\PDO $db, int $idaccount) {
@@ -166,15 +171,8 @@ class AccountManager
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
                     $row = $stmp->fetch();
-                    $account = new RowAccount();
-
-                    // Store the account properties in the session
-                    $account->idaccount = $idaccount;
-                    $account->status = $row["status"];
-                    $account->email = $row["email"];
-                    $account->username = $row["username"];
-
-                    $accounts[$idaccount] = $account;
+                    
+                    $accounts[$idaccount] = AccountModel::map($row);
                 }
             }
         }

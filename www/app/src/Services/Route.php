@@ -33,7 +33,7 @@ class Route
         $parts = explode('/', $route);
 
         // Cut the client requested URI to multiple parts
-        $client_uri = explode('/', $_SERVER['REQUEST_URI']);
+        $client_uri = explode('/', strtok($_SERVER['REQUEST_URI'], '?'));
 
         // Count the route parts length
         $parts_length = count($parts);
