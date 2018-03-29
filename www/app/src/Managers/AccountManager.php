@@ -92,6 +92,30 @@ class AccountManager
         return false;
     }
 
+    public static function countAccounts(\PDO $db, string $search = null) {
+        $sql = "SELECT COUNT(idaccount) as c FROM ACCOUNT";
+
+        if($search !== null) {
+            $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
+        }
+
+        $stmp = $db->prepare($sql);
+
+        if($search !== null) {
+            $stmp->bindParam(":search", $search);            
+        }
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                return $row["c"];
+            }
+        }
+
+        return 0;
+    }
+
     /**
      * @return AccountModel[]
      */
@@ -160,7 +184,7 @@ class AccountManager
     public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
+        $stmp = $db->prepare("SELECT status, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
 
         $accounts = [];
 
@@ -171,7 +195,7 @@ class AccountManager
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
                     $row = $stmp->fetch();
-                    
+
                     $accounts[$idaccount] = AccountModel::map($row);
                 }
             }
@@ -261,24 +285,24 @@ class AccountManager
     public static function identificateAccount(\PDO $db, string $email, string $password)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email AND status=1;");
+        $stmp = $db->prepare("SELECT idaccount, email, username, password, createddate, editeddate FROM account WHERE email = :email AND status=1;");
 
         // Bind email parameter
         $stmp->bindParam(":email", $email);
 
         if ($stmp->execute()) {
             if ($stmp->rowCount() == 1) {
-                $user = $stmp->fetch();
+                $row = $stmp->fetch();
 
                 // Check if the passwords match
-                if (!\password_verify($password, $user["password"])) {
+                if (!\password_verify($password, $row["password"])) {
                     return false;
                 }
 
                 // Store the account properties in the session
-                $_SESSION["account"]["idaccount"] = $user["idaccount"];
-                $_SESSION["account"]["email"] = $user["email"];
-                $_SESSION["account"]["username"] = $user["username"];
+                $_SESSION["account"]["idaccount"] = $row["idaccount"];
+                $_SESSION["account"]["email"] = $row["email"];
+                $_SESSION["account"]["username"] = $row["username"];
 
                 return true;
             }

@@ -81,6 +81,26 @@ class TerminalManager
         return $terminals;
     }
 
+    public static function getTerminalsByNetwork(\PDO $db, string $network_mac) {
+        $stmp = $db->prepare("SELECT mac, account, localnetwork FROM TERMINAL WHERE localnetwork = :localnetwork;");
+
+        $stmp->bindParam(":localnetwork", $network_mac);
+
+        $stmp->execute();
+
+        $terminals = [];
+
+        if($stmp->rowCount() > 0) {
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $terminals[] = TerminalModel::map($row);
+            }
+
+            return $terminals;
+        }
+
+        return $terminals;
+    }
+
     public static function getTerminals(\PDO $db, int $limit = 10, int $offset = 0) {
         $sql = "SELECT mac, account, localnetwork FROM TERMINAL";
 

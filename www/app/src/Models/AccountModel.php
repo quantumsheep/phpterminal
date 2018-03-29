@@ -12,7 +12,7 @@ class AccountModel {
     public $editeddate;
 
     /**
-     * Map to a new TerminalModel
+     * Map to a new AccountModel
      * 
      * @param array $data
      * @return self;

@@ -4,30 +4,20 @@
 @section('content')
     <section class="page-content-wrapper">
         <div class="container-fluid">
-            <h1>Accounts edition : {{ $model->account->username }}</h1>
+            <h1>Networks visualization</h1>
             <table class="table table-bordered">
                 <tr>
-                    <th>Status</th>
-                    <td><i class="fas fa-circle text-{{ $model->account->status == 1 ? 'success' : 'danger' }}"></i></td>
+                    <th>Mac address</th>
+                    <td>{{ $model->network->mac }}</td>
                 </tr>
                 <tr>
-                    <th>Username</th>
-                    <td>{{ $model->account->username }}</td>
+                    <th>IPv4</th>
+                    <td>{{ $model->network->ipv4 }}</td>
                 </tr>
                 <tr>
-                    <th>Email</th>
-                    <td>{{ $model->account->email }}</td>
+                    <th>IPv6</th>
+                    <td>{{ $model->network->ipv6 }}</td>
                 </tr>
-                <tr>
-                    <th>Created date</th>
-                    <td>{{ $model->account->createddate }}</td>
-                </tr>
-                @if($model->account->createddate !== $model->account->editeddate)
-                <tr>
-                    <th>Modified date</th>
-                    <td>{{ $model->account->editeddate }}</td>
-                </tr>
-                @endif
             </table>
 
             <br>

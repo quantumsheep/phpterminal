@@ -5,11 +5,19 @@
     <section class="page-content-wrapper">
         <div class="container-fluid">
             <h1>Accounts list</h1>
-            <form method="GET" class="d-flex">
-                <input type="text" class="form-control mr-1" name="search" placeholder="Search an account">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+            <form method="GET">
+                <div class="d-flex">
+                    <input type="text" class="form-control mr-1" name="search" placeholder="Search an account" value="{{ $_GET["search"] ?? "" }}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </div>
+                <ul class="pagination mt-3">
+                    <li class="page-item"><a class="page-link" href="#"><</a></li>
+                    @for($i = 0, $j = 1; $i < $model->numberAccounts; $i += 10, $j++)
+                        <li class="page-item"><a class="page-link" href="?page={{ $j }}{{ $_GET["search"] ?? null !== null ? "&search=" . $_GET["search"] : "" }}">{{ $j }}</a></li>
+                    @endfor
+                    <li class="page-item"><a class="page-link" href="#">></a></li>
+                </ul>
             </form>
-            <br>
             @if($model->accounts !== false)
                 <div class="list-group">
                     @foreach($model->accounts as $account)
