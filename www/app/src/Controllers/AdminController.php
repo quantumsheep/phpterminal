@@ -2,11 +2,11 @@
 namespace Alph\Controllers;
 
 use Alph\Controllers\View;
+use Alph\Managers\AccountManager;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
 use Alph\Models\Model;
 use Alph\Services\Database;
-use Alph\Managers\AccountManager;
 
 class AdminController
 {
@@ -24,10 +24,10 @@ class AdminController
 
         if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
             $params["mac"] = NetworkManager::formatMACForDatabase($params["mac"]);
-            
+
             $model->terminals[] = TerminalManager::getTerminal($db, $params["mac"]);
 
-            if(empty($model->terminals[0])) {
+            if (empty($model->terminals[0])) {
                 return header("Location: /admin/terminal");
             }
 
@@ -40,7 +40,7 @@ class AdminController
 
             $accountids = [];
 
-            foreach($model->terminals as &$terminal) {
+            foreach ($model->terminals as &$terminal) {
                 $accountids[] = $terminal->account;
             }
 
@@ -50,39 +50,51 @@ class AdminController
         }
     }
 
-    public static function network(array $params) {
+    public static function network(array $params)
+    {
         $db = Database::connect();
         $model = new Model();
 
-        $model->networks = NetworkManager::getNetworks($db);
+        if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
+            $model->network = NetworkManager::getNetwork($db, $params["mac"]);
 
-        return (new View("admin/network_list", $model))->render();        
+            $model->terminals = TerminalManager::getTerminalsByNetwork($db, $params["mac"]);
+            
+            return (new View("admin/network_edit", $model))->render();            
+        } else {
+            $model->networks = NetworkManager::getNetworks($db);
+
+            return (new View("admin/network_list", $model))->render();
+        }
     }
 
-    public static function account(array $params) {
+    public static function account(array $params)
+    {
         $db = Database::connect();
         $model = new Model();
 
-        if(!empty($params["idaccount"])) {
+        if (!empty($params["idaccount"])) {
             $model->account = AccountManager::getAccountById($db, $params["idaccount"]);
 
             $model->terminals = TerminalManager::getTerminalsByAccount($db, $params["idaccount"]);
 
-            return (new View("admin/user_edit", $model))->render();             
+            return (new View("admin/user_edit", $model))->render();
         } else {
-            $model->accounts = AccountManager::getAccounts($db, 10, 0, !empty($_GET["search"]) ? $_GET["search"] : null);
+            $model->numberAccounts = AccountManager::countAccounts($db, !empty($_GET["search"]) ? $_GET["search"] : null);
 
-            if($model->accounts) {
+            $model->accounts = AccountManager::getAccounts($db, 10, $_GET["page"] ?? null !== null ? ($_GET["page"] - 1) * 10 : 0, !empty($_GET["search"]) ? $_GET["search"] : null);
+
+            if ($model->accounts) {
                 $idaccounts = [];
-    
-                foreach($model->accounts as &$account) {
+
+                foreach ($model->accounts as &$account) {
                     $idaccounts[] = $account->idaccount;
                 }
-        
+
                 $model->terminalsCount = TerminalManager::countTerminalsByAccounts($db, $idaccounts);
             }
-    
-            return (new View("admin/user_list", $model))->render(); 
+
+            return (new View("admin/user_list", $model))->render();
         }
     }
 }

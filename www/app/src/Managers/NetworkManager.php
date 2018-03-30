@@ -54,6 +54,24 @@ class NetworkManager
         return $mac;
     }
 
+    public static function getNetwork(\PDO $db, string $mac) {
+        $stmp = $db->prepare("SELECT mac, ipv4, ipv6 FROM NETWORK WHERE mac = :mac;");
+
+        $stmp->bindParam(":mac", $mac);
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $network = NetworkModel::map($row);
+
+                return $network;
+            }
+        }
+
+        return new NetworkModel();
+    }
+
     public static function getNetworks(\PDO $db, int $limit = 10, int $offset = 0) {
         $sql = "SELECT mac, ipv4, ipv6 FROM NETWORK";
 
@@ -80,23 +98,15 @@ class NetworkManager
 
         $stmp->execute();
 
+        $networks = [];
+
         if($stmp->rowCount() > 0) {
-            $networks = [];
-
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $network = new NetworkModel();
-
-                $network->mac = self::formatMAC($row["mac"]);
-                $network->ipv4 = $row["ipv4"];
-                $network->ipv6 = $row["ipv6"];
-
-                $networks[] = $network;
+                $networks[] = NetworkModel::map($row);
             }
-
-            return $networks;
         }
 
-        return false;
+        return $networks;
     }
 
     /**
