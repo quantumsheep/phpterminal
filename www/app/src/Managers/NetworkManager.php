@@ -72,7 +72,11 @@ class NetworkManager
         return new NetworkModel();
     }
 
-    public static function getNetworks(\PDO $db, int $limit = 10, int $offset = 0) {
+    /**
+     * @param int|null $limit
+     * @param int|null $offset
+     */
+    public static function getNetworks(\PDO $db, $limit = 10, $offset = 0) {
         $sql = "SELECT mac, ipv4, ipv6 FROM NETWORK";
 
         $isOffset = $offset != null;

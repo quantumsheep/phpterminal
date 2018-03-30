@@ -119,7 +119,7 @@ class AccountManager
     /**
      * @return AccountModel[]
      */
-    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0, string $search = null) {
+    public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null) {
         $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
 
         $isOffset = $offset != null;
@@ -184,7 +184,7 @@ class AccountManager
     public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT status, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
+        $stmp = $db->prepare("SELECT idaccount, status, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
 
         $accounts = [];
 

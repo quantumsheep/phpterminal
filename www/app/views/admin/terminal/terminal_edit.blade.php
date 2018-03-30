@@ -8,8 +8,8 @@
 @section('content')
     <section class="page-content-wrapper container-fluid d-flex flex-column h-100">
         <section>
-            <h1>Terminal {{ $model->terminals[0]->mac }}</h1>
-            <h5>{{ $model->accounts[0]->username }} - {{ $model->accounts[0]->email }}</h5>
+            <h1>Terminal {{ $model->terminal->mac }}</h1>
+            <h5>{{ $model->account->username }} - {{ $model->account->email }}</h5>
             <br>
         </section>
         <div class="card h-100" style="overflow: auto;">

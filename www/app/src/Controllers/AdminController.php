@@ -19,22 +19,20 @@ class AdminController
     {
         $db = Database::connect();
         $model = new Model();
-        $model->terminals = [];
-        $model->accounts = [];
 
         if (!empty($params["mac"]) && NetworkManager::isMAC($params["mac"])) {
             $params["mac"] = NetworkManager::formatMACForDatabase($params["mac"]);
 
-            $model->terminals[] = TerminalManager::getTerminal($db, $params["mac"]);
+            $model->terminal = TerminalManager::getTerminal($db, $params["mac"]);
 
-            if (empty($model->terminals[0])) {
+            if (empty($model->terminal)) {
                 return header("Location: /admin/terminal");
             }
 
-            $model->accounts[] = AccountManager::getAccountById($db, $model->terminals[0]->account);
+            $model->account = AccountManager::getAccountById($db, $model->terminal->account);
 
             \setcookie("terminal", $params["mac"], 0, "/");
-            return (new View("admin/terminal_edit", $model))->render();
+            return (new View("admin/terminal/terminal_edit", $model))->render();
         } else {
             $model->terminals = TerminalManager::getTerminals($db) ?? [];
 
@@ -46,8 +44,18 @@ class AdminController
 
             $model->accounts = AccountManager::getAccountsById($db, $accountids);
 
-            return (new View("admin/terminal_list", $model))->render();
+            return (new View("admin/terminal/terminal_list", $model))->render();
         }
+    }
+
+    public static function terminal_add(array $params) {
+        $db = Database::connect();
+        $model = new Model();
+
+        $model->networks = NetworkManager::getNetworks($db, null, null);
+        $model->accounts = AccountManager::getAccounts($db, null, null);
+
+        return (new View("admin/terminal/terminal_add", $model))->render();        
     }
 
     public static function network(array $params)
@@ -60,11 +68,11 @@ class AdminController
 
             $model->terminals = TerminalManager::getTerminalsByNetwork($db, $params["mac"]);
             
-            return (new View("admin/network_edit", $model))->render();            
+            return (new View("admin/network/network_edit", $model))->render();            
         } else {
             $model->networks = NetworkManager::getNetworks($db);
 
-            return (new View("admin/network_list", $model))->render();
+            return (new View("admin/network/network_list", $model))->render();
         }
     }
 
@@ -78,7 +86,7 @@ class AdminController
 
             $model->terminals = TerminalManager::getTerminalsByAccount($db, $params["idaccount"]);
 
-            return (new View("admin/user_edit", $model))->render();
+            return (new View("admin/account/account_edit", $model))->render();
         } else {
             $model->numberAccounts = AccountManager::countAccounts($db, !empty($_GET["search"]) ? $_GET["search"] : null);
 
@@ -94,7 +102,7 @@ class AdminController
                 $model->terminalsCount = TerminalManager::countTerminalsByAccounts($db, $idaccounts);
             }
 
-            return (new View("admin/user_list", $model))->render();
+            return (new View("admin/account/account_list", $model))->render();
         }
     }
 }

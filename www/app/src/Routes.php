@@ -20,6 +20,7 @@ Route::exec(["GET"], "/terminal/{mac}", "TerminalController::terminal");
 
 Route::exec(["GET"], "/admin", "AdminController::index");
 Route::exec(["GET"], "/admin/terminal", "AdminController::terminal");
+Route::exec(["GET"], "/admin/terminal/add", "AdminController::terminal_add");
 Route::exec(["GET"], "/admin/terminal/{mac}", "AdminController::terminal");
 Route::exec(["GET"], "/admin/network", "AdminController::network");
 Route::exec(["GET"], "/admin/network/{mac}", "AdminController::network");

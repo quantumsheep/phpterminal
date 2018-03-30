@@ -33,6 +33,38 @@ END$$
 DELIMITER ;
 
 USE `alph`;
+DROP function IF EXISTS `GENERATE_PUBLIC_IP`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GENERATE_PUBLIC_IP`() RETURNS varchar(15) CHARSET utf8
+BEGIN
+DECLARE part INT(3);
+
+generateFirstPart: LOOP
+    SET part = ROUND((RAND() * (191 - 5)) + 5);
+    
+    IF part = 10 OR part = 127 OR part = 128 OR part = 192 THEN
+		ITERATE generateFirstPart;
+    END IF;
+	LEAVE generateFirstPart;
+END LOOP generateFirstPart;
+
+RETURN CONCAT(
+	part,
+    '.',
+    FLOOR(RAND() * 255),
+    '.',
+    FLOOR(RAND() * 255),
+    '.',
+    FLOOR(RAND() * 254)
+);
+END
+#$$
+
+DELIMITER ;
+
+USE `alph`;
 DROP function IF EXISTS `MACADDRESS`;
 
 DELIMITER $$
@@ -104,3 +136,52 @@ $$
 
 DELIMITER ;
 
+USE `alph`;
+DROP procedure IF EXISTS `NewNetwork`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewNetwork`(OUT network_mac CHAR(15))
+BEGIN
+DECLARE network_mac CHAR(17);
+DECLARE network_ipv4 VARCHAR(15);
+DECLARE network_ipv6 VARCHAR(45);
+
+generateMac: LOOP
+    SET network_mac = MACADDRESS();
+    
+    IF (SELECT COUNT(mac) FROM NETWORK WHERE mac = network_mac) > 0 THEN
+		ITERATE generateMac;
+    END IF;
+    
+	LEAVE generateMac;
+END LOOP generateMac;
+
+generateIPv4: LOOP
+    SET network_ipv4 = GENERATE_PUBLIC_IP();
+    
+    IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv4 = network_ipv4) > 0 THEN
+		ITERATE generateIPv4;
+    END IF;
+    
+	LEAVE generateIPv4;
+END LOOP generateIPv4;
+
+generateIPv6: LOOP
+    SET network_ipv6 = CONCAT('fd', ROUND((RAND() * (99 - 10)) + 10), ':', ROUND((RAND() * 9999)));
+    
+    IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv6 = network_ipv6) > 0 THEN
+		ITERATE generateIPv6;
+    END IF;
+    
+	LEAVE generateIPv6;
+END LOOP generateIPv6;
+
+INSERT INTO network (mac, ipv4, ipv6) VALUES (network_mac, network_ipv4, network_ipv6);
+
+SET @network_mac = network_mac;
+END
+
+$$
+
+DELIMITER ;

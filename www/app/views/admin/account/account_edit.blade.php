@@ -33,7 +33,7 @@
             <br>
             <div class="d-flex justify-content-between mb-1">
                 <h2>Terminals</h2>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                <a href="/admin/terminal/add?account={{ $model->account->idaccount }}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
             </div>
             @if($model->terminals !== false)
                 <div class="list-group">

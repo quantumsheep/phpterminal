@@ -75,12 +75,14 @@ class Session
 
     private static function unserialize_php(string $session_data)
     {
-        $return_data = array();
+        $return_data = [];
         $offset = 0;
+
         while ($offset < strlen($session_data)) {
             if (!strstr(substr($session_data, $offset), "|")) {
-                throw new Exception("invalid data, remaining: " . substr($session_data, $offset));
+                throw new Exception("Invalid data, remaining: " . substr($session_data, $offset));
             }
+            
             $pos = strpos($session_data, "|", $offset);
             $num = $pos - $offset;
             $varname = substr($session_data, $offset, $num);
@@ -89,13 +91,15 @@ class Session
             $return_data[$varname] = $data;
             $offset += strlen(serialize($data));
         }
+
         return $return_data;
     }
 
     private static function unserialize_phpbinary(string $session_data)
     {
-        $return_data = array();
+        $return_data = [];
         $offset = 0;
+
         while ($offset < strlen($session_data)) {
             $num = ord($session_data[$offset]);
             $offset += 1;
@@ -105,6 +109,7 @@ class Session
             $return_data[$varname] = $data;
             $offset += strlen(serialize($data));
         }
+        
         return $return_data;
     }
 }
