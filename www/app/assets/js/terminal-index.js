@@ -73,7 +73,7 @@ const config = [
         timeout: 100,
         elemId: "terminal-container-test",
         data: [
-            "<div id='term1' class='term1'><center><p>BIENVENUE SUR ALPH TERMINAL</p><p>Vous pouvez vous servir de ce terminal comme terminal de test.</p></center></div>"
+            "<div id='term1' class='term1'><center><p>Welcome to alPH</p><p>You can use this terminal as a demo.</p></center></div>"
         ]
     },
     {
@@ -273,7 +273,7 @@ document.getElementById('terminal-input-exemple').addEventListener('keydown', (e
                     animateTerminal(config);
                 }
             } else {
-                document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML + e.target.innerHTML + " can not be called at an anonymous user. Why didn't signup ? (<a href='/signup'>here</a>)";
+                document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML + e.target.innerHTML + " can't be called as an anonymous user. Why don't create an account ? (<a href='/signup'>here</a>)";
             }
             document.getElementById("terminal-container-exemple").scrollTo(0, document.getElementById("terminal-container-exemple").scrollHeight);
             e.target.innerHTML = "";
