@@ -77,7 +77,7 @@ class CommandHandler implements MessageComponentInterface
                         if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
                             $stmp = $this->db->prepare("SELECT password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
-                            $terminal_mac = str_replace(['.', '-'], ':', strtoupper($parsed_cookies[0]["terminal"]));
+                            $terminal_mac = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
 
                             $stmp->bindParam(":username", $this->data[$sender->resourceId]->credentials->username);
                             $stmp->bindParam(":terminal", $terminal_mac);
@@ -85,6 +85,8 @@ class CommandHandler implements MessageComponentInterface
                             $stmp->execute();
 
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
+
+                            echo $row["password"];
 
                             if(\password_verify($cmd, $row["password"])) {
                                 $greetings = [
