@@ -52,10 +52,41 @@ class AdminController
         $db = Database::connect();
         $model = new Model();
 
+        if(!empty($_POST["account"]) && isset($_POST["network"])) {
+            $_SESSION["errors"] = [];
+            $_SESSION["success"] = [];
+
+            if(empty($_POST["network"])) {
+                $_POST["network"] = NetworkManager::createNetwork($db);
+
+                if(empty($_POST["network"])) {
+                    $_SESSION["errors"][] = "An error occured while creating a new network.";
+                    return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
+                }
+            } else if(!NetworkManager::isMAC($_POST["network"])) {
+                $_SESSION["errors"][] = "The selected network is unvalid.";
+                return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
+            }
+
+            if ($terminal_mac = TerminalManager::createTerminal($db, $_POST["account"], $_POST["network"])) {
+                $_SESSION["success"][] = "Terminal <a href=\"/admin/terminal/" . $terminal_mac . "\">" . $terminal_mac . "</a> created for account <a href=\"/admin/account/" . $_POST["account"] . "\">" . $_POST["account"] . "</a>" . " in network <a href=\"/admin/network/" . $_POST["network"] . "\">" . $_POST["network"] . "</a>";
+                
+                // return header("Location: /admin/terminal/add");
+            } else {
+                $_SESSION["errors"][] = "An error occured while creating the new terminal.";
+                // return header("Location: /admin/terminal/add?account=" . $_POST["account"] . "&network=" . $_POST["network"] . ".");
+            }
+        }
+
         $model->networks = NetworkManager::getNetworks($db, null, null);
         $model->accounts = AccountManager::getAccounts($db, null, null);
 
-        return (new View("admin/terminal/terminal_add", $model))->render();        
+        $view = (new View("admin/terminal/terminal_add", $model))->render();
+
+        unset($_SESSION["errors"]);
+        unset($_SESSION["success"]);
+
+        return $view;        
     }
 
     public static function network(array $params)

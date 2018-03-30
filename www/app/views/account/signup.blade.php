@@ -6,14 +6,14 @@
     @if(!empty($_SESSION["errors"]))
         <div class="row col-12 alert alert-danger" role="alert">
             @foreach ($_SESSION["errors"] as $error)
-                {{$error}}
+                {!! $error !!}
             @endforeach
         </div>
     @endif
     @if(!empty($_SESSION["success"]))
         <div class="row col-12 alert alert-success" role="alert">
             @foreach ($_SESSION["success"] as $success)
-                {{$success}}
+                {!! $success !!}
             @endforeach
         </div>
     @endif
@@ -32,7 +32,7 @@
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Password">
             </div>
-            <div class="text-muted">By clicking on Sign up, you agree to <a href="/about/tos" target="_blank">SMN's terms & conditions</a></div>
+            <div class="text-muted">By clicking on Sign up, you agree to <a href="/about/tos" target="blank">SMN's terms & conditions</a></div>
 
             <br>
             <button type="submit" class="btn btn-primary col-12">Sign Up</button>

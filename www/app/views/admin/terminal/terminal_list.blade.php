@@ -6,8 +6,8 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between mb-1">
                 <h1>Terminals list</h1>
-                <div>,
-                    <a href="/admin/terminal/add?network={{ $model->network->mac }}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                <div>
+                    <a href="/admin/terminal/add" class="btn btn-primary"><i class="fas fa-plus"></i></a>
                 </div>
             </div>
             <div class="list-group">

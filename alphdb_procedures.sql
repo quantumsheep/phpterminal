@@ -102,8 +102,6 @@ DELIMITER $$
 USE `alph`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewTerminal`(IN idaccount INT, IN network_mac CHAR(17))
 BEGIN
-	DECLARE terminal_mac CHAR(17);
-    
 	DECLARE terminal_user INT;
 	DECLARE terminal_group INT;
     
@@ -112,25 +110,27 @@ BEGIN
     DECLARE moment DATETIME;
     SET moment = NOW();
     
-	SET terminal_mac = MACADDRESS();
+	SET @terminal_mac = MACADDRESS();
     
-    WHILE terminal_mac IN (SELECT mac FROM TERMINAL) DO
-		SET terminal_mac = MACADDRESS();
+    WHILE @terminal_mac IN (SELECT mac FROM TERMINAL) DO
+		SET @terminal_mac = MACADDRESS();
     END WHILE;
     
-	INSERT INTO TERMINAL (mac, account, localnetwork) VALUES(terminal_mac, idaccount, network_mac);
+	INSERT INTO TERMINAL (mac, account, localnetwork) VALUES(@terminal_mac, idaccount, network_mac);
     
-    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, terminal_mac, GENERATE_PRIVATE_IP(terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
+    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
     
-    INSERT INTO TERMINAL_USER (terminal, pid, status, username, password) VALUES(terminal_mac, 1, 0, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
+    INSERT INTO TERMINAL_USER (terminal, pid, status, username, password) VALUES(@terminal_mac, 1, 0, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
     SET terminal_user = LAST_INSERT_ID();
     
-    INSERT INTO TERMINAL_GROUP (terminal, pid, status, groupname) VALUES(terminal_mac, 1, 0, 'root');
+    INSERT INTO TERMINAL_GROUP (terminal, pid, status, groupname) VALUES(@terminal_mac, 1, 0, 'root');
     SET terminal_group = LAST_INSERT_ID();
     
 	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(terminal_user, terminal_group);
     
-    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (terminal_mac, 'home', 644, terminal_user, terminal_group, moment, moment);
+    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, terminal_user, terminal_group, moment, moment);
+
+	SELECT @terminal_mac;
 END
 $$
 

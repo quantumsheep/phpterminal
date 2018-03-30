@@ -106,7 +106,7 @@ class NetworkManager
 
         if($stmp->rowCount() > 0) {
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $networks[] = NetworkModel::map($row);
+                $networks[$row["mac"]] = NetworkModel::map($row);
             }
         }
 

@@ -20,8 +20,15 @@ class TerminalManager
         $stmp->bindParam(":account", $idaccount);
         $stmp->bindParam(":localnetwork_mac", $localnetwork_mac);
 
-        // Execute the query and return the response (boolean)
-        return $stmp->execute();
+        // Execute the query
+        if($stmp->execute()) {
+            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                // Get the terminal_mac from the stored procedure
+                return $row["@terminal_mac"];
+            }
+        }
+
+        return false;
     }
 
     public static function getTerminal(\PDO $db, string $mac)
