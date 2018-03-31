@@ -60,7 +60,7 @@ RETURN CONCAT(
     FLOOR(RAND() * 254)
 );
 END
-#$$
+$$
 
 DELIMITER ;
 
@@ -102,11 +102,6 @@ DELIMITER $$
 USE `alph`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewTerminal`(IN idaccount INT, IN network_mac CHAR(17))
 BEGIN
-	DECLARE terminal_user INT;
-	DECLARE terminal_group INT;
-    
-	DECLARE parentdir INT;
-    
     DECLARE moment DATETIME;
     SET moment = NOW();
     
@@ -121,14 +116,14 @@ BEGIN
     INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
     
     INSERT INTO TERMINAL_USER (terminal, pid, status, username, password) VALUES(@terminal_mac, 1, 0, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
-    SET terminal_user = LAST_INSERT_ID();
+    SET @terminal_user = LAST_INSERT_ID();
     
     INSERT INTO TERMINAL_GROUP (terminal, pid, status, groupname) VALUES(@terminal_mac, 1, 0, 'root');
-    SET terminal_group = LAST_INSERT_ID();
+    SET @terminal_group = LAST_INSERT_ID();
     
-	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(terminal_user, terminal_group);
+	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(@terminal_user, @terminal_group);
     
-    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, terminal_user, terminal_group, moment, moment);
+    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, @terminal_user, @terminal_group, moment, moment);
 
 	SELECT @terminal_mac;
 END
@@ -141,45 +136,41 @@ DROP procedure IF EXISTS `NewNetwork`;
 
 DELIMITER $$
 USE `alph`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewNetwork`(OUT network_mac CHAR(15))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewNetwork`()
 BEGIN
-DECLARE network_mac CHAR(17);
-DECLARE network_ipv4 VARCHAR(15);
-DECLARE network_ipv6 VARCHAR(45);
+	generateMac: LOOP
+		SET @network_mac = MACADDRESS();
+		
+		IF (SELECT COUNT(mac) FROM NETWORK WHERE mac = @network_mac) > 0 THEN
+			ITERATE generateMac;
+		END IF;
+		
+		LEAVE generateMac;
+	END LOOP generateMac;
 
-generateMac: LOOP
-    SET network_mac = MACADDRESS();
-    
-    IF (SELECT COUNT(mac) FROM NETWORK WHERE mac = network_mac) > 0 THEN
-		ITERATE generateMac;
-    END IF;
-    
-	LEAVE generateMac;
-END LOOP generateMac;
+	generateIPv4: LOOP
+		SET @network_ipv4 = GENERATE_PUBLIC_IP();
+		
+		IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv4 = @network_ipv4) > 0 THEN
+			ITERATE generateIPv4;
+		END IF;
+		
+		LEAVE generateIPv4;
+	END LOOP generateIPv4;
 
-generateIPv4: LOOP
-    SET network_ipv4 = GENERATE_PUBLIC_IP();
-    
-    IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv4 = network_ipv4) > 0 THEN
-		ITERATE generateIPv4;
-    END IF;
-    
-	LEAVE generateIPv4;
-END LOOP generateIPv4;
+	generateIPv6: LOOP
+		SET @network_ipv6 = CONCAT('fd', ROUND((RAND() * (99 - 10)) + 10), ':', ROUND((RAND() * 9999)));
+		
+		IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv6 = @network_ipv6) > 0 THEN
+			ITERATE generateIPv6;
+		END IF;
+		
+		LEAVE generateIPv6;
+	END LOOP generateIPv6;
 
-generateIPv6: LOOP
-    SET network_ipv6 = CONCAT('fd', ROUND((RAND() * (99 - 10)) + 10), ':', ROUND((RAND() * 9999)));
+	INSERT INTO network (mac, ipv4, ipv6) VALUES (@network_mac, @network_ipv4, @network_ipv6);
     
-    IF (SELECT COUNT(mac) FROM NETWORK WHERE ipv6 = network_ipv6) > 0 THEN
-		ITERATE generateIPv6;
-    END IF;
-    
-	LEAVE generateIPv6;
-END LOOP generateIPv6;
-
-INSERT INTO network (mac, ipv4, ipv6) VALUES (network_mac, network_ipv4, network_ipv6);
-
-SET @network_mac = network_mac;
+    SELECT @network_mac;
 END
 
 $$

@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', 'New terminal | Administration')
 
 @section('styles')
 <link rel="stylesheet" href="/assets/css/terminal.css">
@@ -7,7 +7,7 @@
 
 @section('content')
     <section class="page-content-wrapper container-fluid">
-        <h1>Add a new terminal</h1>
+        <h1>New terminal</h1>
         <br>
         @if(!empty($_SESSION["errors"]))
             <div class="col-12 alert alert-danger" role="alert">

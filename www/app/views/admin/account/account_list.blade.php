@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', 'Accounts list | Administration')
 
 @section('content')
     <section class="page-content-wrapper">

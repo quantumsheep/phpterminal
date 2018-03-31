@@ -56,19 +56,20 @@ class AccountController
 
         if ($idaccount !== false) {
             if (AccountManager::validateAccount($db, $idaccount)) {
-                $network_mac = NetworkManager::createNetwork($db);
-
-                if ($network_mac !== false) {
+                if ($network_mac = NetworkManager::createNetwork($db)) {
                     if (TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
                         AccountManager::removeValidationCode($db, $params["code"]);
-                        $_SESSION["success"] = [];
-                        $_SESSION["success"][] = "You have successfully validate your account !";
+
+                        $_SESSION["success"] = [
+                            "You have successfully validate your account !"
+                        ];
                     }
                 }
             }
         }else{
-            $_SESSION["errors"] = [];
-            $_SESSION["errors"][] = "Your validation code was not correct.";
+            $_SESSION["errors"] = [
+                "Your validation code was not correct."
+            ];
         }
 
         $return();
@@ -100,8 +101,9 @@ class AccountController
                 "\">Click here</a>.", [$_POST["email"]]);
             $mail->send();
 
-            $_SESSION["success"] = [];
-            $_SESSION["success"][] = "You will receipt a validation mail soon, please confirm it !";
+            $_SESSION["success"] = [
+                "You will receipt a validation mail soon, please confirm it !"
+            ];
         }
 
         header("Location: /signin");

@@ -298,11 +298,10 @@ class AccountManager
                 if (!\password_verify($password, $row["password"])) {
                     return false;
                 }
+                $row["password"] = null;
 
                 // Store the account properties in the session
-                $_SESSION["account"]["idaccount"] = $row["idaccount"];
-                $_SESSION["account"]["email"] = $row["email"];
-                $_SESSION["account"]["username"] = $row["username"];
+                $_SESSION["account"] = AccountModel::map($row);
 
                 return true;
             }
