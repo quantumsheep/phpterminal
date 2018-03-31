@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', 'Terminal ' . $model->terminal->mac . ' | Administration')
 
 @section('styles')
 <link rel="stylesheet" href="/assets/css/terminal.css">

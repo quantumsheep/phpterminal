@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', $model->account->username . ' account\'s | Administration')
 
 @section('content')
     <section class="page-content-wrapper">

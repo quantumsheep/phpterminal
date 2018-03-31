@@ -1,5 +1,5 @@
 @extends('layout')
-@section('title', 'Terminal')
+@section('title', 'Home')
 
 @section('styles')
 <link rel="stylesheet" href="/assets/css/terminal.css">

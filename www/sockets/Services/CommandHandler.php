@@ -56,7 +56,7 @@ class CommandHandler implements MessageComponentInterface
                 $sender_session = Session::read($this->db, $parsed_cookies[0]["alph_sess"]);
 
                 // Check if the idaccount is present in the sender's session
-                if (!empty($sender_session["account"]["idaccount"])) {
+                if (!empty($sender_session["account"])) {
                     if ($this->data[$sender->resourceId]->credentials->connected) {
                         // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
                         @list($cmd, $parameters) = explode(' ', $cmd, 2);
@@ -72,7 +72,7 @@ class CommandHandler implements MessageComponentInterface
                         $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                         // Push the command into the history
-                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . ' ' . $parameters);
+                        History::push($this->db, 1, $sender_session["account"]->idaccount, $cmd . ' ' . $parameters);
                     } else {
                         if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
                             $stmp = $this->db->prepare("SELECT password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
@@ -85,8 +85,6 @@ class CommandHandler implements MessageComponentInterface
                             $stmp->execute();
 
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
-
-                            echo $row["password"];
 
                             if(\password_verify($cmd, $row["password"])) {
                                 $greetings = [
