@@ -48,31 +48,32 @@ class AdminController
         }
     }
 
-    public static function terminal_add(array $params) {
+    public static function terminal_add(array $params)
+    {
         $db = Database::connect();
         $model = new Model();
 
-        if($_SERVER['REQUEST_METHOD'] == "POST") {
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $_SESSION["errors"] = [];
             $_SESSION["success"] = [];
-            
-            if(!empty($_POST["account"]) && isset($_POST["network"])) {
-    
-                if(empty($_POST["network"])) {
+
+            if (!empty($_POST["account"]) && isset($_POST["network"])) {
+
+                if (empty($_POST["network"])) {
                     $_POST["network"] = NetworkManager::createNetwork($db);
-    
-                    if(empty($_POST["network"])) {
+
+                    if (empty($_POST["network"])) {
                         $_SESSION["errors"][] = "An error occured while creating a new network.";
                         return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
                     }
-                } else if(!NetworkManager::isMAC($_POST["network"])) {
+                } else if (!NetworkManager::isMAC($_POST["network"])) {
                     $_SESSION["errors"][] = "The selected network is unvalid.";
                     return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
                 }
-    
+
                 if ($terminal_mac = TerminalManager::createTerminal($db, $_POST["account"], $_POST["network"])) {
                     $_SESSION["success"][] = "Terminal <a href=\"/admin/terminal/" . $terminal_mac . "\">" . $terminal_mac . "</a> created for account <a href=\"/admin/account/" . $_POST["account"] . "\">" . $_POST["account"] . "</a>" . " in network <a href=\"/admin/network/" . $_POST["network"] . "\">" . $_POST["network"] . "</a>";
-                    
+
                     return header("Location: /admin/terminal/add");
                 } else {
                     $_SESSION["errors"][] = "An error occured while creating the new terminal.";
@@ -92,7 +93,7 @@ class AdminController
         unset($_SESSION["errors"]);
         unset($_SESSION["success"]);
 
-        return $view;        
+        return $view;
     }
 
     public static function network(array $params)
@@ -104,8 +105,8 @@ class AdminController
             $model->network = NetworkManager::getNetwork($db, $params["mac"]);
 
             $model->terminals = TerminalManager::getTerminalsByNetwork($db, $params["mac"]);
-            
-            return (new View("admin/network/network_edit", $model))->render();            
+
+            return (new View("admin/network/network_edit", $model))->render();
         } else {
             $model->networks = NetworkManager::getNetworks($db);
 
@@ -127,7 +128,13 @@ class AdminController
         } else {
             $model->numberAccounts = AccountManager::countAccounts($db, !empty($_GET["search"]) ? $_GET["search"] : null);
 
-            $model->accounts = AccountManager::getAccounts($db, 10, $_GET["page"] ?? null !== null ? ($_GET["page"] - 1) * 10 : 0, !empty($_GET["search"]) ? $_GET["search"] : null);
+            $offset = 0;
+
+            if(!empty($_GET["page"]) && \is_numeric($_GET["page"]) && $_GET["page"] > 1) {
+                $offset = ($_GET["page"] - 1) * 10;
+            }
+
+            $model->accounts = AccountManager::getAccounts($db, 10, $offset, !empty($_GET["search"]) ? $_GET["search"] : null);
 
             if ($model->accounts) {
                 $idaccounts = [];

@@ -72,7 +72,7 @@ class CommandHandler implements MessageComponentInterface
                         $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                         // Push the command into the history
-                        History::push($this->db, 1, $sender_session["account"]->idaccount, $cmd . ' ' . $parameters);
+                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
                         if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
                             $stmp = $this->db->prepare("SELECT password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
@@ -86,7 +86,7 @@ class CommandHandler implements MessageComponentInterface
 
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
 
-                            if(\password_verify($cmd, $row["password"])) {
+                            if (\password_verify($cmd, $row["password"])) {
                                 $greetings = [
                                     "Alph 1.0.6-7 (2018-29-03)",
                                     "",
@@ -96,10 +96,10 @@ class CommandHandler implements MessageComponentInterface
                                     "",
                                     "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
                                     "permitted by applicable law.",
-                                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220"
+                                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
                                 ];
 
-                                foreach($greetings as &$greet) {
+                                foreach ($greetings as &$greet) {
                                     $sender->send("<br><span>" . $greet . "</span>");
                                 }
 

@@ -122,12 +122,11 @@ class AccountManager
     public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null) {
         $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
 
-        $isOffset = $offset != null;
+        $isOffset = $offset != null && $offset > 0;
         $isLimited = $limit != null;
 
-        $search = \str_replace('%', "\\%", $search);
-
         if($search !== null) {
+            $search = \str_replace('%', "\\%", $search);
             $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
         }
 
@@ -146,7 +145,7 @@ class AccountManager
         }
 
         if($isOffset) {
-            $stmp->bindParam(":offset", $offset);
+            $stmp->bindParam(":offset", $offset, \PDO::PARAM_INT);
         }
 
         if($isLimited) {
@@ -300,8 +299,8 @@ class AccountManager
                 }
                 $row["password"] = null;
 
-                // Store the account properties in the session
-                $_SESSION["account"] = AccountModel::map($row);
+                // Store the account properties in the session (casted to an array)
+                $_SESSION["account"] = (array) AccountModel::map($row);
 
                 return true;
             }

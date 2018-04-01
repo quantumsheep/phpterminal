@@ -24,7 +24,7 @@
             </div>
         @endif
         <form method="POST">
-            {!! csrf_token() !!}            
+            {!! csrf_token() !!}
             <div class="form-group">
                 <label for="account-select">Owner's account</label>
                 <div class="d-flex">
@@ -92,7 +92,7 @@ document.getElementById("account-select").addEventListener("change", () => {
         document.getElementById("account-selected").href = `/admin/account/${document.getElementById("account-select").value}`;
     } else {
         document.getElementById("account-selected").classList.add("disabled");
-        document.getElementById("account-selected").href = "";        
+        document.getElementById("account-selected").href = "";
     }
 }, false);
 
@@ -102,7 +102,7 @@ document.getElementById("network-select").addEventListener("change", () => {
         document.getElementById("network-selected").href = `/admin/network/${document.getElementById("network-select").value}`;
     } else {
         document.getElementById("network-selected").classList.add("disabled");
-        document.getElementById("network-selected").href = "";        
+        document.getElementById("network-selected").href = "";
     }
 }, false);
 </script>
