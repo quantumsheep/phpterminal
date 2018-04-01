@@ -5,6 +5,7 @@ use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
+use Alph\Managers\AdminManager;
 use Alph\Models\Model;
 use Alph\Services\Database;
 
@@ -12,7 +13,20 @@ class AdminController
 {
     public static function index(array $params)
     {
-        return (new View("admin/index"))->render();
+        $db = Database::connect();
+        $model = new Model();
+
+        $accountCreatedData = AdminManager::getAccountCreatedByDate($db);
+
+        $model->accountCreatedDataDates = "";
+        $model->accountCreatedDataNumbers = "";
+
+        foreach($accountCreatedData as $date => &$number) {
+            $model->accountCreatedDataDates .= '"' . $date . '",';
+            $model->accountCreatedDataNumbers .= $number . ',';
+        }
+
+        return (new View("admin/index", $model))->render();
     }
 
     public static function terminal(array $params)

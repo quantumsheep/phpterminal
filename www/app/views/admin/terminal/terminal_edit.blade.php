@@ -8,7 +8,12 @@
 @section('content')
     <section class="page-content-wrapper container-fluid d-flex flex-column h-100">
         <section>
-            <h1>Terminal {{ $model->terminal->mac }}</h1>
+            <div class="d-flex justify-content-between">
+                <h1>Terminal {{ $model->terminal->mac }}</h1>
+                <div>
+                    <a href="/admin/terminal/switchnet" class="btn btn-primary"><i class="fas fa-edit"></i> Change network</a>
+                </div>
+            </div>
             <h5>
                 <a href="/admin/account/{{ $model->account->idaccount }}">{{ $model->account->username }}</a>
                 <span>- {{ $model->account->email }} - Network</span>
