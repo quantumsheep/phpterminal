@@ -78,19 +78,19 @@ const config = [
     },
     {
         timeout: 200,
-        cmd2: () => {
+        cmd: () => {
             document.getElementById("term1").classList.remove("term1");
         }
     },
     {
         timeout: 2000,
-        cmd3: () => {
+        cmd: () => {
             document.getElementById("term1").classList.add("term1");
         }
     },
     {
         timeout: 2500,
-        cmd4: () => {
+        cmd: () => {
             document.getElementById("term-test").removeChild(document.getElementById("terminal-container-test"));
             document.getElementById("term-test").classList.add("shy");
             document.getElementById("terminal-container-exemple").classList.remove("shy");
@@ -124,7 +124,7 @@ const config2 = [
     },
     {
         timeout: 1000,
-        cmd5: () => {
+        cmd: () => {
             document.getElementById("terminal-user-exemple").classList.remove("shy");
         }
     }
@@ -139,34 +139,15 @@ function animateTerminal(config) {
             setTimeout(() => {
                 elem.cmd();
             }, timeout);
-        } else if (elem.cmd2) {
-            timeout += elem.timeout;
-            setTimeout(() => {
-                elem.cmd2();
-            }, timeout);
-        } else if (elem.cmd3) {
-            timeout += elem.timeout;
-            setTimeout(() => {
-                elem.cmd3();
-            }, timeout);
-        } else if (elem.cmd4) {
-            timeout += elem.timeout;
-            setTimeout(() => {
-                elem.cmd4();
-            }, timeout);
-        } else if (elem.cmd5) {
-            timeout += elem.timeout;
-            setTimeout(() => {
-                elem.cmd5();
-            }, timeout);
-        }
-        else {
+        } else {
             for (let i in elem.data) {
                 timeout += elem.timeout;
 
                 setTimeout(() => {
                     document.getElementById(elem.elemId).innerHTML = document.getElementById(elem.elemId).innerHTML + elem.data[i];
-                    document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
+                    
+                    if(document.getElementById("terminal-container-test"))
+                        document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
                 }, timeout);
             }
         }
@@ -255,18 +236,18 @@ document.getElementById('terminal-input-exemple').addEventListener('keydown', (e
                 } else if (e.target.innerHTML == "clear") {
                     document.getElementById("terminal-content-user-exemple").innerHTML = "";
                 } else if (e.target.innerHTML == "demo") {
-                    document.getElementById("term-test").innerHTML = document.getElementById("term-test").innerHTML +
-                        '<div class="terminal container" id="terminal-container-test">' +
-                        '<div id="term">' +
-                        '<div class="terminal-content" id="terminal-content-user-test">' +
-                        '<div id="terminal-content-response-test">' +
-                        '<div id="terminal-user-test">user@user:~ $' +
-                        '<span class="terminal-input" id="terminal-input-test" contenteditable="false" spellcheck="false"></span>' +
-                        "</div>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>";
+                    document.getElementById("term-test").innerHTML = document.getElementById("term-test").innerHTML + `
+                        <div class="terminal container" id="terminal-container-test">
+                            <div id="term">
+                                <div class="terminal-content" id="terminal-content-user-test">
+                                    <div id="terminal-content-response-test">
+                                        <div id="terminal-user-test">user@user:~ $
+                                            <span class="terminal-input" id="terminal-input-test" contenteditable="false" spellcheck="false"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
                     document.getElementById("terminal-container-exemple").classList.add("shy");
                     document.getElementById("term-test").classList.remove("shy");
 

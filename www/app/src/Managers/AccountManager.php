@@ -8,20 +8,15 @@ class AccountManager
     /**
      * Check logon content
      */
-    public static function checkAccountRegister(\PDO $db, string $username, string $email, string $password)
+    public static function checkAccountRegister(\PDO $db, string $username, string $email, string $password, string $password2)
     {
         // Pre-define error list
         $errors = [];
 
         // Check if the form is completed
-        if (empty($username) || empty($email) || empty($password)) {
+        if (empty($username) || empty($email) || empty($password) || empty($password)) {
             $errors[] = "Please complete the form.";
             return $errors;
-        }
-
-        // Check if the password is more than 8 characters
-        if (strlen($password) < 8) {
-            $errors[] = "The password must contains 8 characters minimum.";
         }
 
         // Check if the username is more than 3 characters
@@ -32,6 +27,16 @@ class AccountManager
         // Check if the email is valid
         if (!\filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Please provide a valid email adress.";
+        }
+
+        // Check if the password is more than 8 characters
+        if (strlen($password) < 8) {
+            $errors[] = "The password must contains 8 characters minimum.";
+        }
+
+        // Check if the password is more than 8 characters
+        if ($password !== $password2) {
+            $errors[] = "The passwords must match.";
         }
 
         // Check if there are no errors
@@ -266,7 +271,7 @@ class AccountManager
 
         // Check if the password is more than 8 characters
         if (strlen($password) < 8) {
-            $errors[] = "Incorrect passord.";
+            $errors[] = "You have entered an invalid username or password.";
         }
 
         // Check if the email is valid

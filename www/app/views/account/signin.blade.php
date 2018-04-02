@@ -22,11 +22,11 @@
             {!! csrf_token() !!}
             <div class="form-group">
                 <label for="password">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{ifsetor($_SESSION["data"]["email"], "")}}">
+                <input type="email" required="required" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{ $_SESSION["data"]["email"] ?? null }}">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <input type="password" required="required" class="form-control" id="password" name="password" placeholder="Password">
             </div>
 
             <br>

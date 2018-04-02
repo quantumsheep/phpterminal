@@ -22,15 +22,19 @@
             {!! csrf_token() !!}
             <div class="form-group">
                 <label for="password">Username</label>
-                    <input type="text" class="form-control" id="uname" name="username" aria-describedby="usernameHelp" placeholder="Enter username" value="{{ifsetor($_SESSION["data"]["username"], "")}}">
+                    <input type="text" required="required" class="form-control" id="uname" name="username" aria-describedby="usernameHelp" placeholder="Enter username" value="{{ $_SESSION["data"]["username"] ?? null }}">
             </div>
             <div class="form-group">
                 <label for="password">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{ifsetor($_SESSION["data"]["email"], "")}}">
+                <input type="email" required="required" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{ $_SESSION["data"]["email"] ?? null }}">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <input type="password" required="required" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="password2">Password</label>
+                <input type="password" required="required" class="form-control" id="password2" name="password2" placeholder="Retype password">
             </div>
             <div class="text-muted">By clicking on Sign up, you agree to <a href="/about/tos" target="blank">SMN's terms & conditions</a></div>
 

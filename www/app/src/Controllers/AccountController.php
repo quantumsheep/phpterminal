@@ -79,7 +79,7 @@ class AccountController
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"], $_POST["password2"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["username"] = $_POST["username"];
@@ -102,7 +102,7 @@ class AccountController
             $mail->send();
 
             $_SESSION["success"] = [
-                "You will receipt a validation mail soon, please confirm it !"
+                "You will receipt a validation email soon, please confirm it!"
             ];
         }
 
@@ -119,15 +119,16 @@ class AccountController
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
 
-            header("Location: /signin");
-            return;
+            return header("Location: /signin");
         }
 
         if (!AccountManager::identificateAccount($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
+            $_SESSION["errors"] = [
+                "You have entered an invalid email or password."
+            ];
 
-            header("Location: /signin");
-            return;
+            return header("Location: /signin");
         }
 
         header("Location: /");
