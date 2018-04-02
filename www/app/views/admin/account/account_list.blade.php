@@ -30,6 +30,8 @@
                             <li class="page-item disabled"><a class="page-link"><i class="fas fa-arrow-right"></i></a></li>
                         @endif
                     </ul>
+                @else
+                    <br>
                 @endif
             </form>
             @if($model->accounts !== false)
