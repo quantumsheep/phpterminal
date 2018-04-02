@@ -11,7 +11,3 @@
         @endforeach
     </div>
 @endsection
-
-@section('script')
-<script src="/assets/js/terminal.js"></script>
-@endsection

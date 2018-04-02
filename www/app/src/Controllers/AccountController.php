@@ -89,16 +89,10 @@ class AccountController
             return;
         }
 
-        $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $account_code = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
-        if ($result !== false) {
-            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
-                sprintf("%s://%s:%s/validate/%s",
-                    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-                    $_SERVER['SERVER_NAME'],
-                    $_SERVER["SERVER_PORT"],
-                    $result) .
-                "\">Click here</a>.", [$_POST["email"]]);
+        if ($account_code !== false) {
+            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" . SITE_PROTOCOL . SITE_ADRESS . "/validate/" . $account_code . "\">Click here</a>.", [$_POST["email"]]);
             $mail->send();
 
             $_SESSION["success"] = [

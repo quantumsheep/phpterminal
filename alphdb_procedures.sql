@@ -168,7 +168,7 @@ BEGIN
 		LEAVE generateIPv6;
 	END LOOP generateIPv6;
 
-	INSERT INTO network (mac, ipv4, ipv6) VALUES (@network_mac, @network_ipv4, @network_ipv6);
+	INSERT INTO NETWORK (mac, ipv4, ipv6) VALUES (@network_mac, @network_ipv4, @network_ipv6);
     
     SELECT @network_mac;
 END
