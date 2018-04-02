@@ -289,7 +289,7 @@ class AccountManager
     public static function identificateAccount(\PDO $db, string $email, string $password)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT idaccount, email, username, password, createddate, editeddate FROM account WHERE email = :email AND status=1;");
+        $stmp = $db->prepare("SELECT idaccount, email, username, password, createddate, editeddate FROM ACCOUNT WHERE email = :email AND status=1;");
 
         // Bind email parameter
         $stmp->bindParam(":email", $email);

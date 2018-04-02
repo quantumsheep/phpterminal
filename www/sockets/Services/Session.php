@@ -6,7 +6,7 @@ class Session
     public static function read(\PDO $db, string $id)
     {
         // Prapare the query
-        $stmp = $db->prepare('SELECT data FROM session WHERE id = :id');
+        $stmp = $db->prepare('SELECT data FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -35,7 +35,7 @@ class Session
         $access = time();
 
         // Prapare the query
-        $stmp = $db->prepare('REPLACE INTO session VALUES (:id, :access, :data)');
+        $stmp = $db->prepare('REPLACE INTO SESSION VALUES (:id, :access, :data)');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -49,7 +49,7 @@ class Session
     public static function destroy(\PDO $db, string $id)
     {
         // Prapare the query
-        $stmp = $db->prepare('DELETE FROM session WHERE id = :id');
+        $stmp = $db->prepare('DELETE FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
