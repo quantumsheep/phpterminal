@@ -1,220 +1,270 @@
-setTimeout(e => {
-    setTimeout(e => {
-        document.getElementById("terminal-input-test").innerHTML = document.getElementById("terminal-input-test").innerHTML + "h";
-    }, 100);
-    setTimeout(e => {
-        document.getElementById("terminal-input-test").innerHTML = document.getElementById("terminal-input-test").innerHTML + "e";
-    }, 300);
-    setTimeout(e => {
-        document.getElementById("terminal-input-test").innerHTML = document.getElementById("terminal-input-test").innerHTML + "l";
-    }, 500);
-    setTimeout(e => {
-        document.getElementById("terminal-input-test").innerHTML = document.getElementById("terminal-input-test").innerHTML + "p";
-    }, 700);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>help [-dms] [pattern ...]</div>";
-    }, 800);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>";
-    }, 850);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + '<div id="ID01">user@user:~ $ </div>';
-    }, 900);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'h';
-    }, 2000);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'e';
-    }, 2100);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'l';
-    }, 2300);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'p';
-    }, 2400);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + ' ';
-    }, 2500);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'h';
-    }, 2600);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'i';
-    }, 2700);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 's';
-    }, 2800);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 't';
-    }, 2900);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'o';
-    }, 3000);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'r';
-    }, 3100);
-    setTimeout(e => {
-        document.getElementById("ID01").innerHTML = document.getElementById("ID01").innerHTML + 'y';
-    }, 3200);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>history: history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>";
-    }, 3250);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Display or manipulate the history list.</div>";
-    }, 3300);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Display the history list with line numbers, prefixing each modified entry with a `*'. An argument of N lists only the last N entries.</div>";
-    }, 3350);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Options:</div>";
-    }, 3400);
-    setTimeout(e => {
-        document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
-    }, 3401);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-c clear the history list by deleting all of the entries</div>";
-    }, 3450);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-d offset delete the history entry at position OFFSET.</div>";
-    }, 3500);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-a append history lines from this session to the history file</div>";
-    }, 3550);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-n read all history lines not already read from the history file and append them to the history list</div>";
-    }, 3600);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-r read the history file and append the contents to the history list</div>";
-    }, 3650);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-w write the current history to the history file</div>";
-    }, 3700);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-p perform history expansion on each ARG and display the result without storing it in the history list</div>";
-    }, 3750);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>-s append the ARGs to the history list as a single entry</div>";
-    }, 3800);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Arguments:</div>";
-    }, 3850);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>PATTERN If FILENAME is given, it is used as the history file. Otherwise, if HISTFILE has a value, that is used, else ~/.bash_history. If the HISTTIMEFORMAT variable is set and not null, its value is used as a format string for strftime(3) to print the time stamp associated with each displayed history entry. No time stamps are printed otherwise.</div>";
-    }, 3900);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Exit Status:</div>";
-    }, 3950);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>Returns success unless an invalid option is given or an error occurs.</div>";
-    }, 4000);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + '<div id="ID02">user@user:~ $ </div>';
-    }, 4050);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 'h';
-    }, 5150);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 'i';
-    }, 5250);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 's';
-    }, 5350);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 't';
-    }, 5450);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 'o';
-    }, 5550);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 'r';
-    }, 5650);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + 'y';
-    }, 5750);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + "<div>1 help</div>";
-    }, 5800);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + '<div>1 help</div>';
-    }, 5850);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + '<div>2 help history</div>';
-    }, 5900);
-    setTimeout(e => {
-        document.getElementById("ID02").innerHTML = document.getElementById("ID02").innerHTML + '<div>2 history</div>';
-    }, 5950);
-    setTimeout(e => {
-        document.getElementById("terminal-content-user-test").innerHTML = document.getElementById("terminal-content-user-test").innerHTML + '<div id="ID03">user@user:~ $ </div>';
-    }, 6000);
-    setTimeout(e => {
-        document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
-    }, 6001);
-    setTimeout(e => {
-        document.getElementById("ID03").innerHTML = document.getElementById("ID03").innerHTML + 'c';
-        document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
-    }, 6401);
-    setTimeout(e => {
-        document.getElementById("ID03").innerHTML = document.getElementById("ID03").innerHTML + 'l';
-    }, 6450);
-    setTimeout(e => {
-        document.getElementById("ID03").innerHTML = document.getElementById("ID03").innerHTML + 'e';
-    }, 6500);
-    setTimeout(e => {
-        document.getElementById("ID03").innerHTML = document.getElementById("ID03").innerHTML + 'a';
-    }, 6550);
-    setTimeout(e => {
-        document.getElementById("ID03").innerHTML = document.getElementById("ID03").innerHTML + 'r';
-    }, 6600);
-    setTimeout(e => {
-        document.getElementById("terminal-container-test").removeChild(document.getElementById("term"));
-    }, 6700);
-    setTimeout(e => {
-        document.getElementById("terminal-container-test").innerHTML = document.getElementById("terminal-container-test").innerHTML + '<div id="term1" class="term1"><center><p>BIENVENU SUR ALPH TERMINAL</p><p>Vous pouvez vous servir de ce terminal comme terminal de test.</p></center></div>';
-    }, 6710);
-    setTimeout(e => {
-        document.getElementById("term1").classList.remove("term1");
-    }, 7000);
-    setTimeout(e => {
-        document.getElementById("term1").classList.add("term1");
-    }, 7200);
-    setTimeout(e => {
-        document.getElementById("term-test").removeChild(document.getElementById("terminal-container-test"));
-        document.getElementById("term-test").classList.add("shy");
-        document.getElementById("terminal-container").classList.remove("shy");
-    }, 9500);
-}, 1200);
+const config = [
+    {
+        timeout: 100,
+        elemId: "terminal-input-test",
+        data: "help"
+    },
+    {
+        timeout: 50,
+        elemId: "terminal-content-user-test",
+        data: [
+            "<div>help [-dms] [pattern ...]</div>",
+            "<div>history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>",
+            "<div id='ID01'>user@user:~ $ </div>"
+        ]
+    },
+    {
+        timeout: 100,
+        elemId: "ID01",
+        data: "help history"
+    },
+    {
+        timeout: 50,
+        elemId: "terminal-content-user-test",
+        data: [
+            "<div>help [-dms] [pattern ...]</div>",
+            "<div>history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>",
+            "<div>Display or manipulate the history list.</div>",
+            "<div>Display the history list with line numbers, prefixing each modified entry with a `*'. An argument of N lists only the last N entries.</div>",
+            "<div>Options:</div>",
+            "<div>-c clear the history list by deleting all of the entries</div>",
+            "<div>-d offset delete the history entry at position OFFSET.</div>",
+            "<div>-a append history lines from this session to the history file</div>",
+            "<div>-n read all history lines not already read from the history file and append them to the history list</div>",
+            "<div>-r read the history file and append the contents to the history list</div>",
+            "<div>-w write the current history to the history file</div>",
+            "<div>-p perform history expansion on each ARG and display the result without storing it in the history list</div>",
+            "<div>-s append the ARGs to the history list as a single entry</div>",
+            "<div>Arguments:</div>",
+            "<div>PATTERN If FILENAME is given, it is used as the history file. Otherwise, if HISTFILE has a value, that is used, else ~/.bash_history.</div>",
+            "<div>If the HISTTIMEFORMAT variable is set and not null, its value is used as a format string for strftime(3) to print the time stamp associated with each displayed history entry. No time stamps are printed otherwise.</div>",
+            "<div>Exit Status:</div>",
+            "<div>Returns success unless an invalid option is given or an error occurs.</div>",
+            "<div id='ID02'>user@user:~ $ </div>"
+        ]
+    },
+    {
+        timeout: 100,
+        elemId: "ID02",
+        data: "history"
+    },
+    {
+        timeout: 50,
+        elemId: "terminal-content-user-test",
+        data: [
+            "<div>1 help</div>",
+            "<div>2 help history</div>",
+            "<div>2 history</div>",
+            "<div id='ID03'>user@user:~ $ </div>"
+        ]
+    },
+    {
+        timeout: 100,
+        elemId: "ID03",
+        data: "clear"
+    },
+    {
+        timeout: 200,
+        cmd: () => {
+            document.getElementById("terminal-container-test").removeChild(document.getElementById("term"));
+        }
+    },
+    {
+        timeout: 100,
+        elemId: "terminal-container-test",
+        data: [
+            "<div id='term1' class='term1'><center><p>Welcome to alPH</p><p>You can use this terminal as a demo.</p></center></div>"
+        ]
+    },
+    {
+        timeout: 200,
+        cmd: () => {
+            document.getElementById("term1").classList.remove("term1");
+        }
+    },
+    {
+        timeout: 2000,
+        cmd: () => {
+            document.getElementById("term1").classList.add("term1");
+        }
+    },
+    {
+        timeout: 2500,
+        cmd: () => {
+            document.getElementById("term-test").removeChild(document.getElementById("terminal-container-test"));
+            document.getElementById("term-test").classList.add("shy");
+            document.getElementById("terminal-container-exemple").classList.remove("shy");
+        }
+    }
+];
+const config2 = [
+    {
+        timeout: 9500,
+        elemId: "terminal-content-user-exemple",
+        data: [
+            "<div id='ID04'>Login as : </div>"
+        ]
+    },
+    {
+        timeout: 1000,
+        elemId: "",
+        data: ""
+    },
+    {
+        timeout: 100,
+        elemId: "ID04",
+        data: "anonymous"
+    },
+    {
+        timeout: 200,
+        elemId: "terminal-content-user-exemple",
+        data: [
+            "<div>You are now connected as Anonymous.</div>"
+        ]
+    },
+    {
+        timeout: 1000,
+        cmd: () => {
+            document.getElementById("terminal-user-exemple").classList.remove("shy");
+        }
+    }
+];
 
-const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
+function animateTerminal(config) {
+    let timeout = 0;
+
+    config.forEach(elem => {
+        if (elem.cmd) {
+            timeout += elem.timeout;
+            setTimeout(() => {
+                elem.cmd();
+            }, timeout);
+        } else {
+            for (let i in elem.data) {
+                timeout += elem.timeout;
+
+                setTimeout(() => {
+                    document.getElementById(elem.elemId).innerHTML = document.getElementById(elem.elemId).innerHTML + elem.data[i];
+                    
+                    if(document.getElementById("terminal-container-test"))
+                        document.getElementById("terminal-container-test").scrollTo(0, document.getElementById("terminal-container-test").scrollHeight);
+                }, timeout);
+            }
+        }
+    });
+}
+
+animateTerminal(config);
+animateTerminal(config2);
+
+
+// SOCKETS PART
+
 let HistoryCmd = [""];
 let HistoryCount = 0;
 let HistoryCounter = 0;
 let ClickCount = 0;
-const termContainer = document.getElementById("terminal-container");
+let DemoCmd = ["help", "help history", "help cowsay", "help demo", "help clear",
+    "history", "history -c",
+    "cowsay",
+    "demo",
+    "clear"]
+const termContainer = document.getElementById("terminal-container-exemple");
 
-conn.onopen = (e) => {
-    console.log("Connection established!");
-
-    document.getElementById('terminal-input').addEventListener('keydown', (e) => {
-        if (e.key == "Enter") {
-            e.preventDefault();
-            if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
-                e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
-                if (e.target.innerHTML != HistoryCmd[HistoryCounter - 1]) {
-                    HistoryCmd[HistoryCounter] = e.target.innerHTML;
-                    HistoryCounter++;
-                    HistoryCount++;
-                }
-                conn.send(e.target.innerHTML);
-                appendTerminal(`user@user:~ $ ${e.target.innerHTML}`);
-                e.target.innerHTML = "";
+document.getElementById('terminal-input-exemple').addEventListener('keydown', (e) => {
+    if (e.key == "Enter") {
+        e.preventDefault();
+        if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
+            e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
+            if (e.target.innerHTML != HistoryCmd[HistoryCounter - 1]) {
+                HistoryCmd[HistoryCounter] = e.target.innerHTML;
+                HistoryCounter++;
+                HistoryCount++;
             }
-        }
-    });
-};
+            appendTerminal(`anonymous@demoterminal:~ $ ${e.target.innerHTML}`);
+            if (DemoCmd.includes(e.target.innerHTML)) {
+                if (e.target.innerHTML == "help") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>help [-dms] [pattern ...]</div>" +
+                        "<div>history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>";
+                } else if (e.target.innerHTML == "help history") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>help [-dms] [pattern ...]</div>" +
+                        "<div>history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]</div>" +
+                        "<div>Display or manipulate the history list.</div>" +
+                        "<div>Display the history list with line numbers, prefixing each modified entry with a `*'. An argument of N lists only the last N entries.</div>" +
+                        "<div>Options:</div>" +
+                        "<div>-c clear the history list by deleting all of the entries</div>" +
+                        "<div>-d offset delete the history entry at position OFFSET.</div>" +
+                        "<div>-a append history lines from this session to the history file</div>" +
+                        "<div>-n read all history lines not already read from the history file and append them to the history list</div>" +
+                        "<div>-r read the history file and append the contents to the history list</div>" +
+                        "<div>-w write the current history to the history file</div>" +
+                        "<div>-p perform history expansion on each ARG and display the result without storing it in the history list</div>" +
+                        "<div>-s append the ARGs to the history list as a single entry</div>" +
+                        "<div>Arguments:</div>" +
+                        "<div>PATTERN If FILENAME is given, it is used as the history file. Otherwise, if HISTFILE has a value, that is used, else ~/.bash_history.</div>" +
+                        "<div>If the HISTTIMEFORMAT variable is set and not null, its value is used as a format string for strftime(3) to print the time stamp associated with each displayed history entry. No time stamps are printed otherwise.</div>" +
+                        "<div>Exit Status:</div>" +
+                        "<div>Returns success unless an invalid option is given or an error occurs.</div>";
+                } else if (e.target.innerHTML == "help cowsay") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>help [-dms] [pattern ...]</div>" +
+                        "<div>cowsay [string]</div>" +
+                        "<div>Run cowsay with the inserted string.</div>" +
+                        "<div>Let the cow talk ! (even if the cow world didn't exist)</div>";
+                } else if (e.target.innerHTML == "help demo") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>help [-dms] [pattern ...]</div>" +
+                        "<div>Rerun the start demo.</div>";
+                } else if (e.target.innerHTML == "help clear") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>help [-dms] [pattern ...]</div>" +
+                        "<div>clear</div>" +
+                        "<div>Clear the display.</div>";
+                } else if (e.target.innerHTML == "history") {
+                    for (i = 0; i < HistoryCounter; i++) {
+                        document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                            "<div>" + i + " - " + HistoryCmd[i] + "</div>";
+                    }
+                } else if (e.target.innerHTML == "history -c") {
+                    HistoryCmd = [""];
+                    HistoryCount = 0;
+                    HistoryCounter = 0;
+                    document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML +
+                        "<div>History cleared.</div>";
+                } else if (e.target.innerHTML == "clear") {
+                    document.getElementById("terminal-content-user-exemple").innerHTML = "";
+                } else if (e.target.innerHTML == "demo") {
+                    document.getElementById("term-test").innerHTML = document.getElementById("term-test").innerHTML + `
+                        <div class="terminal container" id="terminal-container-test">
+                            <div id="term">
+                                <div class="terminal-content" id="terminal-content-user-test">
+                                    <div id="terminal-content-response-test">
+                                        <div id="terminal-user-test">user@user:~ $
+                                            <span class="terminal-input" id="terminal-input-test" contenteditable="false" spellcheck="false"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    document.getElementById("terminal-container-exemple").classList.add("shy");
+                    document.getElementById("term-test").classList.remove("shy");
 
-document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+                    animateTerminal(config);
+                }
+            } else {
+                document.getElementById("terminal-content-user-exemple").innerHTML = document.getElementById("terminal-content-user-exemple").innerHTML + e.target.innerHTML + " can't be called as an anonymous user. Why don't create an account ? (<a href='/signup'>here</a>)";
+            }
+            document.getElementById("terminal-container-exemple").scrollTo(0, document.getElementById("terminal-container-exemple").scrollHeight);
+            e.target.innerHTML = "";
+        }
+    }
+});
+
+document.getElementById('terminal-input-exemple').addEventListener('keydown', (e) => {
     if (e.key == "ArrowUp") {
-        document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+        document.getElementById('terminal-input-exemple').addEventListener('keydown', (e) => {
             if (e.key == "Enter") {
                 HistoryCount = HistoryCmd.length;
             }
@@ -223,9 +273,9 @@ document.getElementById('terminal-input').addEventListener('keydown', (e) => {
         if (HistoryCount < 1) {
             HistoryCount = 0;
         }
-        document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryCount]}`;
+        document.getElementById('terminal-input-exemple').innerHTML = `${HistoryCmd[HistoryCount]}`;
     } else if (e.key == "ArrowDown") {
-        document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+        document.getElementById('terminal-input-exemple').addEventListener('keydown', (e) => {
             if (e.key == "Enter") {
                 HistoryCount = HistoryCmd.length;
             }
@@ -233,12 +283,12 @@ document.getElementById('terminal-input').addEventListener('keydown', (e) => {
         HistoryCount++;
         if (HistoryCount > HistoryCmd.length - 1) {
             HistoryCount = HistoryCmd.length;
-            document.getElementById('terminal-input').innerHTML = "";
+            document.getElementById('terminal-input-exemple').innerHTML = "";
         } else {
-            document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryCount]}`;
+            document.getElementById('terminal-input-exemple').innerHTML = `${HistoryCmd[HistoryCount]}`;
         }
     } else if (e.key == "Escape") {
-        document.getElementById('terminal-input').innerHTML = "";
+        document.getElementById('terminal-input-exemple').innerHTML = "";
     }
 });
 
@@ -250,7 +300,7 @@ function click(e) {
     ClickCount++;
     if (ClickCount == 1) {
         singleClickTimer = setTimeout((f) => {
-            const input = document.getElementById('terminal-input');
+            const input = document.getElementById('terminal-input-exemple');
 
             let range;
             let selection;
@@ -294,11 +344,6 @@ termContainer.addEventListener("mousedown", e => {
     });
 });
 
-conn.onmessage = (e) => {
-    appendTerminal(e.data);
-    termContainer.scrollTo(0, termContainer.scrollHeight);
-};
-
 function appendTerminal(text) {
-    document.getElementById("terminal-content-user").innerHTML = `${document.getElementById("terminal-content-user").innerHTML}<div>${text}</div>`;
+    document.getElementById("terminal-content-user-exemple").innerHTML = `${document.getElementById("terminal-content-user-exemple").innerHTML}<div>${text}</div>`;
 }

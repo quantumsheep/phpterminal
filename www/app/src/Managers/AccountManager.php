@@ -1,27 +1,22 @@
 <?php
 namespace Alph\Managers;
 
-use Alph\EntityModels\RowAccount;
+use Alph\Models\AccountModel;
 
 class AccountManager
 {
     /**
      * Check logon content
      */
-    public static function checkAccountRegister(\PDO $db, string $username, string $email, string $password)
+    public static function checkAccountRegister(\PDO $db, string $username, string $email, string $password, string $password2)
     {
         // Pre-define error list
         $errors = [];
 
         // Check if the form is completed
-        if (empty($username) || empty($email) || empty($password)) {
+        if (empty($username) || empty($email) || empty($password) || empty($password)) {
             $errors[] = "Please complete the form.";
             return $errors;
-        }
-
-        // Check if the password is more than 8 characters
-        if (strlen($password) < 8) {
-            $errors[] = "The password must contains 8 characters minimum.";
         }
 
         // Check if the username is more than 3 characters
@@ -32,6 +27,16 @@ class AccountManager
         // Check if the email is valid
         if (!\filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Please provide a valid email adress.";
+        }
+
+        // Check if the password is more than 8 characters
+        if (strlen($password) < 8) {
+            $errors[] = "The password must contains 8 characters minimum.";
+        }
+
+        // Check if the password is more than 8 characters
+        if ($password !== $password2) {
+            $errors[] = "The passwords must match.";
         }
 
         // Check if there are no errors
@@ -92,11 +97,43 @@ class AccountManager
         return false;
     }
 
-    public static function getAccounts(\PDO $db, int $limit = 10, int $offset = 0) {
+    public static function countAccounts(\PDO $db, string $search = null) {
+        $sql = "SELECT COUNT(idaccount) as c FROM ACCOUNT";
+
+        if($search !== null) {
+            $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
+        }
+
+        $stmp = $db->prepare($sql);
+
+        if($search !== null) {
+            $stmp->bindParam(":search", $search);            
+        }
+
+        $stmp->execute();
+
+        if($stmp->rowCount() > 0) {
+            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                return $row["c"];
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * @return AccountModel[]
+     */
+    public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null) {
         $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
 
-        $isOffset = $offset != null;
+        $isOffset = $offset != null && $offset > 0;
         $isLimited = $limit != null;
+
+        if($search !== null) {
+            $search = \str_replace('%', "\\%", $search);
+            $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
+        }
 
         if($isOffset && $isLimited) {
             $sql .= " LIMIT :offset, :limit";
@@ -108,8 +145,12 @@ class AccountManager
 
         $stmp = $db->prepare($sql);
 
+        if($search !== null) {
+            $stmp->bindParam(":search", $search);            
+        }
+
         if($isOffset) {
-            $stmp->bindParam(":offset", $offset);
+            $stmp->bindParam(":offset", $offset, \PDO::PARAM_INT);
         }
 
         if($isLimited) {
@@ -118,25 +159,17 @@ class AccountManager
 
         $stmp->execute();
 
+        $accounts = [];
+
         if($stmp->rowCount() > 0) {
-            $accounts = [];
-
-            while($accountrow = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $account = new RowAccount();
-
-                // Store the account properties in the session
-                $account->idaccount = $accountrow["idaccount"];
-                $account->status = $accountrow["status"];
-                $account->email = $accountrow["email"];
-                $account->username = $accountrow["username"];
-
-                $accounts[$account->idaccount] = $account;
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $accounts[$row["idaccount"]] = AccountModel::map($row);
             }
 
             return $accounts;
         }
 
-        return false;
+        return $accounts;
     }
 
     public static function getAccountById(\PDO $db, int $idaccount) {
@@ -155,7 +188,7 @@ class AccountManager
     public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT status, email, username FROM ACCOUNT WHERE idaccount = :idaccount;");
+        $stmp = $db->prepare("SELECT idaccount, status, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
 
         $accounts = [];
 
@@ -166,15 +199,8 @@ class AccountManager
             if ($stmp->execute()) {
                 if ($stmp->rowCount() == 1) {
                     $row = $stmp->fetch();
-                    $account = new RowAccount();
 
-                    // Store the account properties in the session
-                    $account->idaccount = $idaccount;
-                    $account->status = $row["status"];
-                    $account->email = $row["email"];
-                    $account->username = $row["username"];
-
-                    $accounts[$idaccount] = $account;
+                    $accounts[$idaccount] = AccountModel::map($row);
                 }
             }
         }
@@ -245,7 +271,7 @@ class AccountManager
 
         // Check if the password is more than 8 characters
         if (strlen($password) < 8) {
-            $errors[] = "Incorrect passord.";
+            $errors[] = "You have entered an invalid username or password.";
         }
 
         // Check if the email is valid
@@ -263,24 +289,23 @@ class AccountManager
     public static function identificateAccount(\PDO $db, string $email, string $password)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT idaccount, email, username, password FROM account WHERE email = :email AND status=1;");
+        $stmp = $db->prepare("SELECT idaccount, email, username, password, createddate, editeddate FROM ACCOUNT WHERE email = :email AND status=1;");
 
         // Bind email parameter
         $stmp->bindParam(":email", $email);
 
         if ($stmp->execute()) {
             if ($stmp->rowCount() == 1) {
-                $user = $stmp->fetch();
+                $row = $stmp->fetch();
 
                 // Check if the passwords match
-                if (!\password_verify($password, $user["password"])) {
+                if (!\password_verify($password, $row["password"])) {
                     return false;
                 }
+                $row["password"] = null;
 
-                // Store the account properties in the session
-                $_SESSION["account"]["idaccount"] = $user["idaccount"];
-                $_SESSION["account"]["email"] = $user["email"];
-                $_SESSION["account"]["username"] = $user["username"];
+                // Store the account properties in the session (casted to an array)
+                $_SESSION["account"] = (array) AccountModel::map($row);
 
                 return true;
             }

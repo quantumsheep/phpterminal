@@ -38,7 +38,11 @@ body {
 
 .terminal-content {
     padding: 0;
-    color: #FFFFFF;
+    color: #DBDBDB;
+}
+
+.terminal-content br:last-child {
+    display:none;
 }
 
 .terminal-caret {

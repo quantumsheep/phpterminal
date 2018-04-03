@@ -56,7 +56,7 @@ class CommandHandler implements MessageComponentInterface
                 $sender_session = Session::read($this->db, $parsed_cookies[0]["alph_sess"]);
 
                 // Check if the idaccount is present in the sender's session
-                if (!empty($sender_session["account"]["idaccount"])) {
+                if (!empty($sender_session["account"])) {
                     if ($this->data[$sender->resourceId]->credentials->connected) {
                         // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
                         @list($cmd, $parameters) = explode(' ', $cmd, 2);
@@ -66,16 +66,18 @@ class CommandHandler implements MessageComponentInterface
                             // Call the command with arguments
                             \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, &$this->data[$sender->resourceId], $sender, $parsed_cookies[0]["alph_sess"], $sender_session, $parsed_cookies[0]["terminal"], $cmd, $parameters]);
                         } else {
-                            $sender->send("-bash: " . $cmd . ": command not found");
+                            $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
+                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
+
                         // Push the command into the history
-                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . ' ' . $parameters);
+                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
                         if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
                             $stmp = $this->db->prepare("SELECT password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
-                            $terminal_mac = str_replace(['.', '-'], ':', strtoupper($parsed_cookies[0]["terminal"]));
+                            $terminal_mac = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
 
                             $stmp->bindParam(":username", $this->data[$sender->resourceId]->credentials->username);
                             $stmp->bindParam(":terminal", $terminal_mac);
@@ -84,24 +86,40 @@ class CommandHandler implements MessageComponentInterface
 
                             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
 
-                            if(\password_verify($cmd, $row["password"])) {
-                                $sender->send("connect");
+                            if (\password_verify($cmd, $row["password"])) {
+                                $greetings = [
+                                    "Alph 1.0.6-7 (2018-29-03)",
+                                    "",
+                                    "The programs included with a simulated Debian GNU/Linux system;",
+                                    "the exact distribution terms for each program are described in the",
+                                    "individual files in /usr/share/doc/*/copyright.",
+                                    "",
+                                    "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
+                                    "permitted by applicable law.",
+                                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
+                                ];
+
+                                foreach ($greetings as &$greet) {
+                                    $sender->send("<br><span>" . $greet . "</span>");
+                                }
+
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                                 $this->data[$sender->resourceId]->credentials->connected = true;
                             } else {
-                                $sender->send("Access denied.");
-                                $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
+                                $sender->send("<br><span>Access denied.</span>");
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
                             }
                         } else {
                             $this->data[$sender->resourceId]->credentials->username = $cmd;
-                            $sender->send($this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: ");
+                            $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
                         }
                     }
                 } else {
-                    $sender->send("alph: account connection error");
+                    $sender->send("<br><span>alph: account connection error</span>");
                 }
             } else {
-                $sender->send("alph: terminal connection error");
+                $sender->send("<br><span>alph: terminal connection error</span>");
             }
         }
     }

@@ -103,28 +103,28 @@ class help implements CommandInterface
 
                     // Doing different formating for each info type and sending them to the command sender
                     if ($key == "SHORT_DESCRIPTION" && $option_short) {
-                        $sender->send($topic . " - " . $info);
+                        $sender->send("<br><span>" . $topic . " - " . $info . "</span>");
                     } else if ($key == "USAGE" && !$empty_topics) {
-                        $sender->send($topic . ": " . $info);
+                        $sender->send("<br><span>" . $topic . ": " . $info . "</span>");
                     } else if ($key == "OPTIONS") {
-                        $sender->send("Options:");
+                        $sender->send("<br><span>Options:</span>");
 
                         // Looping around all the options
                         foreach ($info as $option_key => &$option) {
-                            $sender->send($option_key . "        " . $option);
+                            $sender->send("<br><span>" . $option_key . "        " . $option . "</span>");
                         }
                     } else if ($key == "ARGUMENTS") {
-                        $sender->send("Arguments:");
+                        $sender->send("<br><span>Arguments:</span>");
 
                         // Looping around all the arguments
                         foreach ($info as $argument_key => &$argument) {
-                            $sender->send($argument_key . "   " . $argument);
+                            $sender->send("<br><span>" . $argument_key . "   " . $argument . "</span>");
                         }
                     } else if ($key == "EXIT_STATUS") {
-                        $sender->send("Exit Status:");
-                        $sender->send($info);
+                        $sender->send("<br><span>Exit Status:</span>");
+                        $sender->send("<br><span>" . $info . "</span>");
                     } else {
-                        $sender->send($info);
+                        $sender->send("<br><span>" . $info . "</span>");
                     }
 
                     // Send a jump space

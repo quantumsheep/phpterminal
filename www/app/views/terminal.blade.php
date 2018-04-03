@@ -7,14 +7,13 @@
 
 @section('content')
     <div class="terminal container" id="terminal-container">
-        <div class="terminal-content" id="terminal-content-user">
-            </div>
-            <div id="terminal-content-response">
-            <div id="terminal-user">
-                <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
-                <span class="terminal-caret">█</span>
-            </div>
-        </div>
+        <span class="terminal-content" id="terminal-content-user">
+        
+        </span>
+        <span id="terminal-content-response">
+            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
+            <span class="terminal-caret">█</span>
+        </span>
     </div>
 @endsection
 

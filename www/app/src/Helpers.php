@@ -1,18 +1,7 @@
 <?php
 /**
- * Check if a variable is set and return it, else return the default value
+ * Generate a new CSRF token and return an input of it
  */
-function ifsetor(&$variable, $default = null)
-{
-    if (isset($variable)) {
-        $tmp = $variable;
-    } else {
-        $tmp = $default;
-    }
-    
-    return $tmp;
-}
-
 function csrf_token() {
     if(empty($_SESSION["token"])) {
         $_SESSION['token'] = bin2hex(random_bytes(32));

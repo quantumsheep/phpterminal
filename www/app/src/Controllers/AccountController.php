@@ -56,19 +56,20 @@ class AccountController
 
         if ($idaccount !== false) {
             if (AccountManager::validateAccount($db, $idaccount)) {
-                $network_mac = NetworkManager::createNetwork($db);
-
-                if ($network_mac !== false) {
+                if ($network_mac = NetworkManager::createNetwork($db)) {
                     if (TerminalManager::createTerminal($db, $idaccount, $network_mac)) {
                         AccountManager::removeValidationCode($db, $params["code"]);
-                        $_SESSION["success"] = [];
-                        $_SESSION["success"][] = "You have successfully validate your account !";
+
+                        $_SESSION["success"] = [
+                            "You have successfully validate your account !"
+                        ];
                     }
                 }
             }
         }else{
-            $_SESSION["errors"] = [];
-            $_SESSION["errors"][] = "Your validation code was not correct.";
+            $_SESSION["errors"] = [
+                "Your validation code was not correct."
+            ];
         }
 
         $return();
@@ -78,7 +79,7 @@ class AccountController
     {
         $db = Database::connect();
 
-        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_POST["username"], $_POST["email"], $_POST["password"], $_POST["password2"]);
 
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["username"] = $_POST["username"];
@@ -88,20 +89,15 @@ class AccountController
             return;
         }
 
-        $result = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
+        $account_code = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
-        if ($result !== false) {
-            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" .
-                sprintf("%s://%s:%s/validate/%s",
-                    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-                    $_SERVER['SERVER_NAME'],
-                    $_SERVER["SERVER_PORT"],
-                    $result) .
-                "\">Click here</a>.", [$_POST["email"]]);
+        if ($account_code !== false) {
+            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" . SITE_PROTOCOL . SITE_ADRESS . "/validate/" . $account_code . "\">Click here</a>.", [$_POST["email"]]);
             $mail->send();
 
-            $_SESSION["success"] = [];
-            $_SESSION["success"][] = "You will receipt a validation mail soon, please confirm it !";
+            $_SESSION["success"] = [
+                "You will receipt a validation email soon, please confirm it!"
+            ];
         }
 
         header("Location: /signin");
@@ -117,15 +113,16 @@ class AccountController
         if (!empty($_SESSION["errors"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
 
-            header("Location: /signin");
-            return;
+            return header("Location: /signin");
         }
 
         if (!AccountManager::identificateAccount($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
+            $_SESSION["errors"] = [
+                "You have entered an invalid email or password."
+            ];
 
-            header("Location: /signin");
-            return;
+            return header("Location: /signin");
         }
 
         header("Location: /");

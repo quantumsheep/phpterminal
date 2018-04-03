@@ -1,7 +1,7 @@
 <?php
 namespace Alph\Managers;
 
-use Alph\EntityModels\RowTerminal;
+use Alph\Models\TerminalModel;
 use Alph\Managers\NetworkManager;
 
 class TerminalManager
@@ -20,27 +20,29 @@ class TerminalManager
         $stmp->bindParam(":account", $idaccount);
         $stmp->bindParam(":localnetwork_mac", $localnetwork_mac);
 
-        // Execute the query and return the response (boolean)
-        return $stmp->execute();
+        // Execute the query
+        if($stmp->execute()) {
+            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                // Get the terminal_mac from the stored procedure
+                return $row["@terminal_mac"];
+            }
+        }
+
+        return false;
     }
 
     public static function getTerminal(\PDO $db, string $mac)
     {
-        $stmp = $db->prepare("SELECT account, localnetwork FROM TERMINAL WHERE mac = :mac;");
+        $stmp = $db->prepare("SELECT mac, account, localnetwork FROM TERMINAL WHERE mac = :mac;");
 
         $stmp->bindParam(":mac", $mac);
 
         $stmp->execute();
 
         if ($stmp->rowCount() == 1) {
-            $terminal = new RowTerminal();
             $row = $stmp->fetch(\PDO::FETCH_ASSOC);
 
-            $terminal->mac = $mac;
-            $terminal->account = $row["account"];
-            $terminal->localnetwork = $row["localnetwork"];
-
-            return $terminal;
+            return TerminalModel::map($row);
         }
 
         return false;
@@ -64,6 +66,46 @@ class TerminalManager
         }
 
         return $terminalCount;
+    }
+
+    public static function getTerminalsByAccount(\PDO $db, string $idaccount) {
+        $stmp = $db->prepare("SELECT mac, account, localnetwork FROM TERMINAL WHERE account = :idaccount;");
+
+        $stmp->bindParam(":idaccount", $idaccount);
+
+        $stmp->execute();
+
+        $terminals = [];
+
+        if($stmp->rowCount() > 0) {
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $terminals[] = TerminalModel::map($row);
+            }
+
+            return $terminals;
+        }
+
+        return $terminals;
+    }
+
+    public static function getTerminalsByNetwork(\PDO $db, string $network_mac) {
+        $stmp = $db->prepare("SELECT mac, account, localnetwork FROM TERMINAL WHERE localnetwork = :localnetwork;");
+
+        $stmp->bindParam(":localnetwork", $network_mac);
+
+        $stmp->execute();
+
+        $terminals = [];
+
+        if($stmp->rowCount() > 0) {
+            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $terminals[] = TerminalModel::map($row);
+            }
+
+            return $terminals;
+        }
+
+        return $terminals;
     }
 
     public static function getTerminals(\PDO $db, int $limit = 10, int $offset = 0) {
@@ -92,22 +134,16 @@ class TerminalManager
 
         $stmp->execute();
 
+        $terminals = [];
+
         if($stmp->rowCount() > 0) {
-            $terminals = [];
-
             while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $terminal = new RowTerminal();
-
-                $terminal->mac = NetworkManager::formatMAC($row["mac"]);
-                $terminal->account = $row["account"];
-                $terminal->localnetwork = $row["localnetwork"];
-
-                $terminals[] = $terminal;
+                $terminals[] = TerminalModel::map($row);
             }
 
             return $terminals;
         }
 
-        return false;
+        return $terminals;
     }
 }

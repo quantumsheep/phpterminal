@@ -7,6 +7,7 @@ class AssetsController {
         if(is_file(DIR_ASSETS . $params["filepath"])) {
             // Define mimetypes
             $mimetypes = [
+                "ico" => "image/x-icon",
                 "ez" => "application/andrew-inset",
                 "hqx" => "application/mac-binhex40",
                 "cpt" => "application/mac-compactpro",

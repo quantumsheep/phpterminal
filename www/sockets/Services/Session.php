@@ -6,7 +6,7 @@ class Session
     public static function read(\PDO $db, string $id)
     {
         // Prapare the query
-        $stmp = $db->prepare('SELECT data FROM session WHERE id = :id');
+        $stmp = $db->prepare('SELECT data FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -35,7 +35,7 @@ class Session
         $access = time();
 
         // Prapare the query
-        $stmp = $db->prepare('REPLACE INTO session VALUES (:id, :access, :data)');
+        $stmp = $db->prepare('REPLACE INTO SESSION VALUES (:id, :access, :data)');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -49,7 +49,7 @@ class Session
     public static function destroy(\PDO $db, string $id)
     {
         // Prapare the query
-        $stmp = $db->prepare('DELETE FROM session WHERE id = :id');
+        $stmp = $db->prepare('DELETE FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -75,12 +75,14 @@ class Session
 
     private static function unserialize_php(string $session_data)
     {
-        $return_data = array();
+        $return_data = [];
         $offset = 0;
+
         while ($offset < strlen($session_data)) {
             if (!strstr(substr($session_data, $offset), "|")) {
-                throw new Exception("invalid data, remaining: " . substr($session_data, $offset));
+                throw new Exception("Invalid data, remaining: " . substr($session_data, $offset));
             }
+            
             $pos = strpos($session_data, "|", $offset);
             $num = $pos - $offset;
             $varname = substr($session_data, $offset, $num);
@@ -89,13 +91,15 @@ class Session
             $return_data[$varname] = $data;
             $offset += strlen(serialize($data));
         }
+
         return $return_data;
     }
 
     private static function unserialize_phpbinary(string $session_data)
     {
-        $return_data = array();
+        $return_data = [];
         $offset = 0;
+
         while ($offset < strlen($session_data)) {
             $num = ord($session_data[$offset]);
             $offset += 1;
@@ -105,6 +109,7 @@ class Session
             $return_data[$varname] = $data;
             $offset += strlen(serialize($data));
         }
+        
         return $return_data;
     }
 }
