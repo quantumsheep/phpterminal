@@ -79,10 +79,17 @@ footer {
 }
 
 .terminal-list-item {
+    opacity: 0.75;
     text-align: center;
-    color: white;
+    color: white !important;
+    text-decoration: none !important;
     background: #333333;
     border-radius: 3px;
+}
+
+.terminal-list-item:hover {
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 .flex-1 {

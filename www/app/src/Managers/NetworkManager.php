@@ -11,58 +11,29 @@ class NetworkManager
     public static function createNetwork(\PDO $db)
     {
         // Prepare the SQL row insert
-        $stmp = $db->prepare("INSERT INTO network (mac, ipv4, ipv6) VALUES (:mac, :ipv4, :ipv6);");
+        $stmp = $db->prepare("CALL NewNetwork();");
 
-        // Pre-define errorCode
-        $errorCode = 0;
-
-        // Pre-define SQL query response
-        $response = false;
-
-        // Do one time and loop if errorCode is key duplicate (for MAC, IPv4 or IPv6 address duplication)
-        do {
-            // Try to execute the query, if not catch the error
-            try {
-                // Generate a new mac address
-                $mac = NetworkManager::generateMac();
-
-                // Generate a new public IPv4 address
-                $ipv4 = NetworkManager::generatePublicIPv4();
-
-                // Generate a new public IPv6 address                
-                // $ipv6 = NetworkManager::generatePublicIPv6();
-                $ipv6 = uniqid(rand());
-
-                // Execute the SQL query with prepared parameters
-                $response = $stmp->execute([
-                    ":mac" => $mac,
-                    "ipv4" => $ipv4,
-                    "ipv6" => $ipv6
-                ]);
-            } catch (\PDOException $e) {
-                // Get the error code
-                $errorCode = $e->errorInfo[1];
+        // Execute the query
+        if ($stmp->execute()) {
+            if ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                // Get the network's MAC from the stored procedure
+                return $row["@network_mac"];
             }
-        } while ($errorCode == 1062);
-
-        // Return false if the query wasn't executed right
-        if(!$response) {
-            return false;
         }
 
-        // Return the network's mac address
-        return $mac;
+        return false;
     }
 
-    public static function getNetwork(\PDO $db, string $mac) {
+    public static function getNetwork(\PDO $db, string $mac)
+    {
         $stmp = $db->prepare("SELECT mac, ipv4, ipv6 FROM NETWORK WHERE mac = :mac;");
 
         $stmp->bindParam(":mac", $mac);
 
         $stmp->execute();
 
-        if($stmp->rowCount() > 0) {
-            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+        if ($stmp->rowCount() > 0) {
+            if ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                 $network = NetworkModel::map($row);
 
                 return $network;
@@ -72,15 +43,20 @@ class NetworkManager
         return new NetworkModel();
     }
 
-    public static function getNetworks(\PDO $db, int $limit = 10, int $offset = 0) {
+    /**
+     * @param int|null $limit
+     * @param int|null $offset
+     */
+    public static function getNetworks(\PDO $db, $limit = 10, $offset = 0)
+    {
         $sql = "SELECT mac, ipv4, ipv6 FROM NETWORK";
 
         $isOffset = $offset != null;
         $isLimited = $limit != null;
 
-        if($isOffset && $isLimited) {
+        if ($isOffset && $isLimited) {
             $sql .= " LIMIT :offset, :limit";
-        } else if($isLimited) {
+        } else if ($isLimited) {
             $sql .= " LIMIT :limit";
         } else if ($isOffset) {
             $sql .= " OFFSET :offset";
@@ -88,11 +64,11 @@ class NetworkManager
 
         $stmp = $db->prepare($sql);
 
-        if($isOffset) {
+        if ($isOffset) {
             $stmp->bindParam(":offset", $offset);
         }
 
-        if($isLimited) {
+        if ($isLimited) {
             $stmp->bindParam(":limit", $limit, \PDO::PARAM_INT);
         }
 
@@ -100,9 +76,9 @@ class NetworkManager
 
         $networks = [];
 
-        if($stmp->rowCount() > 0) {
-            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
-                $networks[] = NetworkModel::map($row);
+        if ($stmp->rowCount() > 0) {
+            while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                $networks[$row["mac"]] = NetworkModel::map($row);
             }
         }
 
@@ -111,11 +87,12 @@ class NetworkManager
 
     /**
      * Assign a new private IP to a terminal in a specific network
-     * 
+     *
      * @param string $network Network's mac address
      * @param string $terminal Terminal's mac address
      */
-    public static function assignPrivateIP(\PDO $db, string $network, string $terminal) {
+    public static function assignPrivateIP(\PDO $db, string $network, string $terminal)
+    {
         // Prepare the SQL row selection
         $stmp = $db->prepare("SELECT ip FROM PRIVATEIP WHERE network = :network ORDER BY ip DESC LIMIT 1;");
 
@@ -130,12 +107,12 @@ class NetworkManager
         $ip;
 
         // Check if there's one IP in the SQL query (limited at one row)
-        if($stmp->rowCount() == 1) {
+        if ($stmp->rowCount() == 1) {
             // Get the ip address from query's selected row
             $ip = $stmp->fetch()["ip"];
 
             // Check if the maximum IP has been reached (192.168.255.254)
-            if($ip == "192.168.255.254") {
+            if ($ip == "192.168.255.254") {
                 return false;
             }
 
@@ -143,11 +120,11 @@ class NetworkManager
             $iparr = explode('.', $ip);
 
             // Check if IP's last part is 255 (the limit)
-            if($iparr[3] == 255) {
+            if ($iparr[3] == 255) {
                 // Increment IP's third part
                 $iparr[2]++;
 
-                // Define IP's last part to 1               
+                // Define IP's last part to 1
                 $iparr[3] = 1;
             } else {
                 // Increment IP's last part
@@ -159,7 +136,7 @@ class NetworkManager
             // Define the IP to the minimum address assignable
             $ip = "192.168.0.2";
         }
-        
+
         // Prepare the SQL row insert
         $stmp = $db->prepare("INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (:network, :terminal, :ip) ON DUPLICATE KEY UPDATE ip = :ip;");
 
@@ -229,18 +206,21 @@ class NetworkManager
      */
     public static function generatePublicIPv6(): string
     {
-        
+
     }
 
-    public static function isMAC(string $str) {
+    public static function isMAC(string $str)
+    {
         return \preg_match("/^([0-9A-F]{2}[.:-]){5}[0-9A-F]{2}$/i", $str) === 1 ? true : false;
     }
 
-    public static function formatMAC(string $mac) {
+    public static function formatMAC(string $mac)
+    {
         return str_replace(['.', ':'], '-', strtoupper($mac));
     }
 
-    public static function formatMACForDatabase(string $mac) {
+    public static function formatMACForDatabase(string $mac)
+    {
         return str_replace(['.', ':'], '-', strtoupper($mac));
     }
 }

@@ -45,7 +45,7 @@ class SessionHandler
     public function _read(string $id)
     {
         // Prapare the query
-        $stmp = $this->db->prepare('SELECT data FROM session WHERE id = :id');
+        $stmp = $this->db->prepare('SELECT data FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -74,7 +74,7 @@ class SessionHandler
         $access = time();
 
         // Prapare the query
-        $stmp = $this->db->prepare('REPLACE INTO session VALUES (:id, :access, :data)');
+        $stmp = $this->db->prepare('REPLACE INTO SESSION VALUES (:id, :access, :data)');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -88,7 +88,7 @@ class SessionHandler
     public function _destroy($id)
     {
         // Prapare the query
-        $stmp = $this->db->prepare('DELETE FROM session WHERE id = :id');
+        $stmp = $this->db->prepare('DELETE FROM SESSION WHERE id = :id');
 
         // Bind query's parameters
         $stmp->bindParam(':id', $id);
@@ -103,7 +103,7 @@ class SessionHandler
         $old = time() - $max;
 
         // Prapare the query
-        $stmp = $this->db->prepare('DELETE * FROM session WHERE access < :old');
+        $stmp = $this->db->prepare('DELETE * FROM SESSION WHERE access < :old');
 
         // Bind query's parameters
         $stmp->bindParam(':old', $old);

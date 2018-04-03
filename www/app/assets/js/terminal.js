@@ -120,3 +120,8 @@ conn.onmessage = (e) => {
 function appendTerminal(text, line_jump = true) {
     document.getElementById("terminal-content-user").innerHTML += text;
 }
+
+if(document.querySelector('#account-select option[selected]')) {
+    document.querySelector('#account-select option[selected]').removeAttribute("selected");
+    document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
+}

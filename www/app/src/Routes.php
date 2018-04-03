@@ -4,6 +4,11 @@ use Alph\Services\Route;
 Route::checkAccess("ErrorController::e403");
 
 Route::exec(["GET"], "/assets/{filepath*}", "AssetsController::find");
+
+Route::exec(["GET"], "/favicon.ico", function() {
+    echo \Alph\Controllers\AssetsController::find(["filepath" => "favicon.ico"]);
+});
+
 Route::exec(["GET"], "/", "HomeController::index");
 
 Route::exec(["GET"], "/signup", "AccountController::signup");
@@ -20,6 +25,7 @@ Route::exec(["GET"], "/terminal/{mac}", "TerminalController::terminal");
 
 Route::exec(["GET"], "/admin", "AdminController::index");
 Route::exec(["GET"], "/admin/terminal", "AdminController::terminal");
+Route::exec(["GET", "POST"], "/admin/terminal/add", "AdminController::terminal_add");
 Route::exec(["GET"], "/admin/terminal/{mac}", "AdminController::terminal");
 Route::exec(["GET"], "/admin/network", "AdminController::network");
 Route::exec(["GET"], "/admin/network/{mac}", "AdminController::network");

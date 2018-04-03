@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS alph;
+CREATE DATABASE IF NOT EXISTS alph DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 USE alph;
 
 CREATE TABLE `ACCOUNT` (
@@ -7,7 +7,7 @@ CREATE TABLE `ACCOUNT` (
 	`email` varchar(254) NOT NULL UNIQUE,
 	`username` varchar(36) NOT NULL UNIQUE,
 	`password` varchar(60) NOT NULL,
-	`code` char(100),
+	`code` char(100) NULL,
 	`createddate` DATETIME NOT NULL,
 	`editeddate` DATETIME,
 	PRIMARY KEY (`idaccount`)

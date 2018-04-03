@@ -1,10 +1,15 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', 'Networks list | Administration')
 
 @section('content')
     <section class="page-content-wrapper">
         <div class="container-fluid">
-            <h1>Networks list</h1>
+            <div class="d-flex justify-content-between mb-1">
+                <h1>Networks list</h1>
+                <div>
+                    <a href="/admin/network/add" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                </div>
+            </div>
             @if($model->networks !== false)
                 <div class="list-group">
                     @foreach($model->networks as $network)

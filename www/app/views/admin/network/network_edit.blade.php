@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', 'Network ' . $model->network->mac . ' | Administration')
 
 @section('content')
     <section class="page-content-wrapper">
@@ -22,8 +22,10 @@
 
             <br>
             <div class="d-flex justify-content-between mb-1">
-                <h2>Terminals</h2>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                <h2>Terminals ({{ count($model->terminals) }})</h2>
+                <div>
+                    <a href="/admin/terminal/add?network={{ $model->network->mac }}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                </div>
             </div>
             @if($model->terminals !== false)
                 <div class="list-group">

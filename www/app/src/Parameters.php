@@ -17,6 +17,10 @@ define("DIR_VIEWS", DIR_ROOT . "views" . DS);
 // Define the DIR_BLADE_CACHE constant that define the cache to store Blade files
 define("DIR_BLADE_CACHE", DIR_ROOT . "cache" . DS);
 
+// Define the proxy's protocol and link adress
+define("SITE_PROTOCOL", "http://");
+define("SITE_ADRESS", "localhost:800");
+
 // Define the database informations constants
 define("DB_HOST", "localhost");
 define("DB_PORT", "9956");

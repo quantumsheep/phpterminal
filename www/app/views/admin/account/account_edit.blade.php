@@ -1,5 +1,5 @@
 @extends('admin/layout')
-@section('title', 'Terminal')
+@section('title', $model->account->username . ' account\'s | Administration')
 
 @section('content')
     <section class="page-content-wrapper">
@@ -33,7 +33,9 @@
             <br>
             <div class="d-flex justify-content-between mb-1">
                 <h2>Terminals</h2>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                <div>
+                    <a href="/admin/terminal/add?account={{ $model->account->idaccount }}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                </div>
             </div>
             @if($model->terminals !== false)
                 <div class="list-group">

@@ -21,7 +21,7 @@ class TerminalController
 
         return (new View("terminal_list", $model))->render();        
     }
-
+    
     public static function terminal(array $params)
     {
         if (empty($_SESSION["account"]["idaccount"])) {
