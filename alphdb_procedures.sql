@@ -115,10 +115,10 @@ BEGIN
     
     INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
     
-    INSERT INTO TERMINAL_USER (terminal, pid, status, username, password) VALUES(@terminal_mac, 1, 0, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
+    INSERT INTO TERMINAL_USER (terminal, pid, status, username, password) VALUES(@terminal_mac, 0, 1, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
     SET @terminal_user = LAST_INSERT_ID();
     
-    INSERT INTO TERMINAL_GROUP (terminal, pid, status, groupname) VALUES(@terminal_mac, 1, 0, 'root');
+    INSERT INTO TERMINAL_GROUP (terminal, pid, status, groupname) VALUES(@terminal_mac, 0, 1, 'root');
     SET @terminal_group = LAST_INSERT_ID();
     
 	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(@terminal_user, @terminal_group);

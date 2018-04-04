@@ -32,6 +32,7 @@ Route::exec(["GET"], "/admin/network/{mac}", "AdminController::network");
 Route::exec(["GET"], "/admin/account", "AdminController::account");
 Route::exec(["GET"], "/admin/account/{idaccount}", "AdminController::account");
 Route::exec(["GET"], "/admin/referential", "AdminController::referential");
+Route::exec(["GET"], "/admin/referential/add", "AdminController::referential_add");
 
 Route::exec(["GET"], "/about/tos", "AboutController::tos");
 

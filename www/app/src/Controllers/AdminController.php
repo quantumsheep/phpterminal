@@ -174,4 +174,11 @@ class AdminController
 
         return (new View("admin/referential/referential_list", $model))->render();
     }
+
+    public static function referential_add(array $params) {
+        $db = Database::connect();
+        $model = new Model();
+        
+        return (new View("admin/referential/referential_add", $model))->render();        
+    }
 }
