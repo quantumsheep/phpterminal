@@ -3,9 +3,10 @@ namespace Alph\Controllers;
 
 use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
+use Alph\Managers\AdminManager;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
-use Alph\Managers\AdminManager;
+use Alph\Managers\ReferencialManager;
 use Alph\Models\Model;
 use Alph\Services\Database;
 
@@ -21,7 +22,7 @@ class AdminController
         $model->accountCreatedDataDates = "";
         $model->accountCreatedDataNumbers = "";
 
-        foreach($accountCreatedData as $date => &$number) {
+        foreach ($accountCreatedData as $date => &$number) {
             $model->accountCreatedDataDates .= '"' . $date . '",';
             $model->accountCreatedDataNumbers .= $number . ',';
         }
@@ -144,7 +145,7 @@ class AdminController
 
             $offset = 0;
 
-            if(!empty($_GET["page"]) && \is_numeric($_GET["page"]) && $_GET["page"] > 1) {
+            if (!empty($_GET["page"]) && \is_numeric($_GET["page"]) && $_GET["page"] > 1) {
                 $offset = ($_GET["page"] - 1) * 10;
             }
 
@@ -162,5 +163,15 @@ class AdminController
 
             return (new View("admin/account/account_list", $model))->render();
         }
+    }
+
+    public static function referential(array $params)
+    {
+        $db = Database::connect();
+        $model = new Model();
+
+        $model->referentialCategories = ReferencialManager::getReferencialCategories($db);
+
+        return (new View("admin/referential/referential_list", $model))->render();
     }
 }
