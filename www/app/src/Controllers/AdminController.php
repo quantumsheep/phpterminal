@@ -179,6 +179,17 @@ class AdminController
         $db = Database::connect();
         $model = new Model();
         
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+            $_SESSION["errors"] = [];
+            $_SESSION["success"] = [];
+
+            if (!empty($_POST["code"]) && isset($_POST["network"])) {
+                
+            }
+        }
+
+        $model->referentialCategories = ReferencialManager::getReferencialCategories($db);
+
         return (new View("admin/referential/referential_add", $model))->render();        
     }
 }

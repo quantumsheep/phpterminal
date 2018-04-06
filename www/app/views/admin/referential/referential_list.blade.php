@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between mb-1">
                 <h1>Referential categories</h1>
                 <div>
-                    <a href="/admin/referential/add" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                    <a href="/admin/referential/add?type=1" class="btn btn-primary"><i class="fas fa-plus"></i></a>
                 </div>
             </div>
             <div class="list-group">

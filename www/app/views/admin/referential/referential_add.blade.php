@@ -25,8 +25,48 @@
         @endif
         <form method="POST">
             {!! csrf_token() !!}
-
+            <div class="form-group">
+                <label for="type-select">Type</label>
+                <select class="form-control" id="type-select">
+                    @if(empty($_GET["category"]))
+                    <option value="0" selected="selected">Item</option>
+                    <option value="1">Category</option>
+                    @else
+                    <option value="0">Item</option>
+                    <option value="1" selected="selected">Category</option>
+                    @endif
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="category-select">Category</label>
+                <select class="form-control" id="category-select">
+                    <option></option>
+                    @foreach($model->referentialCategories as &$category)
+                        <option value="{{ $category["idreferencial"] }}">{{ $category["idreferencial"] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="code-input">Code</label>
+                <input type="text" class="form-control" id="code-input">
+            </div>
+            <div class="form-group{{ empty($_GET["category"]) ? "" : " d-none" }}" id="value-input-parent">
+                <label for="value-input">Value</label>
+                <input type="text" class="form-control" id="value-input">
+            </div>
             <button type="submit" class="btn btn-primary">Create the new terminal</button>
         </form>
     </section>
+@endsection
+
+@section('script')
+<script>
+document.getElementById("type-select").addEventListener("change", e => {
+    if(e.target.value === "0") {
+        document.getElementById("value-input-parent").classList.remove("d-none");
+    } else if(e.target.value === "1") {
+        document.getElementById("value-input-parent").classList.add("d-none");
+    }
+});
+</script>
 @endsection

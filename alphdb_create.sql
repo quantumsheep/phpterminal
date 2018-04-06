@@ -130,7 +130,7 @@ CREATE TABLE `REFERENCIAL` (
 	`type` bit NOT NULL,
 	`category` int,
 	`code` varchar(255) NOT NULL UNIQUE,
-	`value` TEXT NOT NULL,
+	`value` TEXT,
 	PRIMARY KEY (`idreferencial`)
 );
 
