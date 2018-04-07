@@ -27,8 +27,8 @@
             {!! csrf_token() !!}
             <div class="form-group">
                 <label for="type-select">Type</label>
-                <select class="form-control" id="type-select">
-                    @if(empty($_GET["category"]))
+                <select class="form-control" name="type" id="type-select">
+                    @if(!empty($_GET["category"]))
                     <option value="0" selected="selected">Item</option>
                     <option value="1">Category</option>
                     @else
@@ -39,22 +39,26 @@
             </div>
             <div class="form-group">
                 <label for="category-select">Category</label>
-                <select class="form-control" id="category-select">
+                <select class="form-control" name="category" id="category-select">
                     <option></option>
-                    @foreach($model->referentialCategories as &$category)
-                        <option value="{{ $category["idreferencial"] }}">{{ $category["idreferencial"] }}</option>
+                    @foreach($model->referentials as &$referential)
+                        @if($referential->idreferential == $_GET["referential"])
+                            <option value="{{ $referential->idreferential }}" selected="selected">{{ $referential->code }}</option>
+                        @else
+                            <option value="{{ $referential->idreferential }}">{{ $referential->code }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
             <div class="form-group">
                 <label for="code-input">Code</label>
-                <input type="text" class="form-control" id="code-input">
+                <input type="text" class="form-control" name="code" id="code-input">
             </div>
-            <div class="form-group{{ empty($_GET["category"]) ? "" : " d-none" }}" id="value-input-parent">
+            <div class="form-group{{ !empty($_GET["category"]) ? "" : " d-none" }}" id="value-input-parent">
                 <label for="value-input">Value</label>
-                <input type="text" class="form-control" id="value-input">
+                <input type="text" class="form-control" name="value" id="value-input">
             </div>
-            <button type="submit" class="btn btn-primary">Create the new terminal</button>
+            <button type="submit" class="btn btn-primary">Create the new referencial</button>
         </form>
     </section>
 @endsection

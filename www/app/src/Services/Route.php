@@ -47,6 +47,10 @@ class Route
         // Pre-define the infinite route condition
         $infinite = false;
 
+        if(empty($client_uri[$client_uri_length - 1])) {
+            unset($client_uri[--$client_uri_length]);
+        }
+
         // Loop over the route string parts
         for ($i = 0; $i < $parts_length; $i++) {
             // If the first character of the part is '{', it must be a route variable
@@ -81,7 +85,7 @@ class Route
 
         // Check if URI is infinite and if route is longer than client URI
         if(!$infinite && $parts_length < $client_uri_length) return false;
-        
+
         self::callback($action, $vars);
         return true;
     }
