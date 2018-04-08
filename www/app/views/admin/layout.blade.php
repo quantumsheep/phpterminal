@@ -35,6 +35,9 @@
                 <li>
                     <a href="/admin/account">Users</a>
                 </li>
+                <li>
+                    <a href="/admin/referential">Referencial</a>
+                </li>
             </ul>
         </nav>
     </header>

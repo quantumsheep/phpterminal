@@ -23,15 +23,36 @@ Route::exec(["GET"], "/validate/{code}", "AccountController::validate");
 Route::exec(["GET"], "/terminal", "TerminalController::terminal_list");
 Route::exec(["GET"], "/terminal/{mac}", "TerminalController::terminal");
 
+
+/**
+ * Administration routes
+ */
 Route::exec(["GET"], "/admin", "AdminController::index");
+
 Route::exec(["GET"], "/admin/terminal", "AdminController::terminal");
-Route::exec(["GET", "POST"], "/admin/terminal/add", "AdminController::terminal_add");
+
+Route::exec(["GET"], "/admin/terminal/add", "AdminController::terminal_add");
+Route::exec(["POST"], "/admin/terminal/add", "AdminController::terminal_add_action");
+
 Route::exec(["GET"], "/admin/terminal/{mac}", "AdminController::terminal");
+
+
 Route::exec(["GET"], "/admin/network", "AdminController::network");
 Route::exec(["GET"], "/admin/network/{mac}", "AdminController::network");
+
+
 Route::exec(["GET"], "/admin/account", "AdminController::account");
 Route::exec(["GET"], "/admin/account/{idaccount}", "AdminController::account");
+
+
 Route::exec(["GET"], "/admin/referential", "AdminController::referential");
+
+Route::exec(["GET"], "/admin/referential/add", "AdminController::referential_add");
+Route::exec(["POST"], "/admin/referential/add", "AdminController::referential_add_action");
+
+Route::exec(["GET"], "/admin/referential/{idreferential}", "AdminController::referential");
+Route::exec(["POST"], "/admin/referential/{idreferential}", "AdminController::referential_edit");
+
 
 Route::exec(["GET"], "/about/tos", "AboutController::tos");
 

@@ -64,7 +64,17 @@ class CommandHandler implements MessageComponentInterface
                         // Check if the command exists
                         if (in_array($cmd, $this->commands)) {
                             // Call the command with arguments
-                            \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [$this->db, $this->clients, &$this->data[$sender->resourceId], $sender, $parsed_cookies[0]["alph_sess"], $sender_session, $parsed_cookies[0]["terminal"], $cmd, $parameters]);
+                            \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [
+                                $this->db,
+                                $this->clients,
+                                &$this->data[$sender->resourceId],
+                                $sender,
+                                $parsed_cookies[0]["alph_sess"],
+                                $sender_session,
+                                $parsed_cookies[0]["terminal"], 
+                                $cmd, 
+                                $parameters
+                            ]);
                         } else {
                             $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
@@ -75,7 +85,7 @@ class CommandHandler implements MessageComponentInterface
                         History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
                         if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
-                            $stmp = $this->db->prepare("SELECT password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
+                            $stmp = $this->db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
                             $terminal_mac = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
 
@@ -106,6 +116,7 @@ class CommandHandler implements MessageComponentInterface
                                 $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
 
                                 $this->data[$sender->resourceId]->credentials->connected = true;
+                                $this->data[$sender->resourceId]->credentials->idterminal_user = $row["idterminal_user"];
                             } else {
                                 $sender->send("<br><span>Access denied.</span>");
                                 $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");

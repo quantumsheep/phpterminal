@@ -13,6 +13,11 @@ class SenderDataCredentials {
     public $password;
 
     /**
+     * @var int
+     */
+    public $idterminal_user;
+
+    /**
      * @var bool
      */
     public $connected;
