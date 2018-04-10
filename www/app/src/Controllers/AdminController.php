@@ -5,8 +5,8 @@ use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
 use Alph\Managers\AdminManager;
 use Alph\Managers\NetworkManager;
+use Alph\Managers\ReferentialManager;
 use Alph\Managers\TerminalManager;
-use Alph\Managers\ReferencialManager;
 use Alph\Models\Model;
 use Alph\Services\Database;
 
@@ -68,8 +68,21 @@ class AdminController
         $db = Database::connect();
         $model = new Model();
 
-        if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            $_SESSION["errors"] = [];
+        $model->networks = NetworkManager::getNetworks($db, null, null);
+        $model->accounts = AccountManager::getAccounts($db, null, null);
+
+        $view = (new View("admin/terminal/terminal_add", $model))->render();
+
+        unset($_SESSION["errors"]);
+        unset($_SESSION["success"]);
+
+        return $view;
+    }
+
+    public static function terminal_add_action(array $params) {
+        $db = Database::connect();
+
+        $_SESSION["errors"] = [];
             $_SESSION["success"] = [];
 
             if (!empty($_POST["account"]) && isset($_POST["network"])) {
@@ -98,17 +111,6 @@ class AdminController
                 $_SESSION["errors"][] = "Thanks to complete the form.";
                 return header("Location: /admin/terminal/add?account=" . ($_POST["account"] ?? null) . "&network=" . ($_POST["network"] ?? null));
             }
-        }
-
-        $model->networks = NetworkManager::getNetworks($db, null, null);
-        $model->accounts = AccountManager::getAccounts($db, null, null);
-
-        $view = (new View("admin/terminal/terminal_add", $model))->render();
-
-        unset($_SESSION["errors"]);
-        unset($_SESSION["success"]);
-
-        return $view;
     }
 
     public static function network(array $params)
@@ -170,8 +172,65 @@ class AdminController
         $db = Database::connect();
         $model = new Model();
 
-        $model->referentialCategories = ReferencialManager::getReferencialCategories($db);
+        $model->idreferencial = !empty($params["idreferential"]) ? intval($params["idreferential"]) : NULL;
+
+        if(!empty($model->idreferencial)) {
+            $model->referential = ReferentialManager::getReferential($db, $model->idreferencial);
+
+            if(!empty($model->referential)) {
+                $model->referentialParentName = ReferentialManager::getReferentialCategoryCode($db, $model->referential->category);
+            }
+        }
+
+        $model->referentials = ReferentialManager::getReferentials($db, $model->idreferencial);
 
         return (new View("admin/referential/referential_list", $model))->render();
+    }
+
+    public static function referential_add(array $params)
+    {
+        $db = Database::connect();
+        $model = new Model();
+
+        $model->referentials = ReferentialManager::getReferentials($db);
+
+        return (new View("admin/referential/referential_add", $model))->render();
+    }
+
+    public static function referential_add_action(array $params) {
+        $db = Database::connect();
+
+        $_SESSION["errors"] = [];
+        $_SESSION["success"] = [];
+        if (isset($_POST["type"]) && isset($_POST["code"])) {
+            // Redefining category
+
+            if(!empty($_POST["category"]) && ($_POST["type"] === "0" || $_POST["type"] === "1")) {
+                $_POST["category"] = intval($_POST["category"]);
+            } else {
+                $_POST["category"] = null;
+            }
+
+            // Checking value's value           
+            if(empty($_POST["value"]) || $_POST["type"] === "0") {
+                $_POST["value"] = null;
+            }
+
+            ReferentialManager::createReferential($db, intval($_POST["type"]), $_POST["code"], $_POST["category"], $_POST["value"]);
+        }
+
+        header("Location: ");
+    }
+
+    public static function referential_edit(array $params) {
+        $db = Database::connect();
+
+        if(!empty($params["idreferential"])) {
+            if(isset($_POST["value"])) {
+                ReferentialManager::updateValue($db, intval($params["idreferential"]), $_POST["value"]);
+            }
+        }
+
+        header("Location: ");        
     }
 }
