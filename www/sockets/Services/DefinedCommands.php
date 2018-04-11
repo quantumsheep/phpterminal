@@ -9,6 +9,7 @@ class DefinedCommands
             "help",
             "history",
             "hello",
+            "mkdir",
         ];
     }
 }
