@@ -105,7 +105,8 @@ class mkdir implements CommandInterface
                 $stmp->bindParam(":parent", $daddy);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-                $stmp->bindParam(":owner", $data->credentials->idterminal_user);
+                $stmp->bindParam(":owner", $data->user->idterminal_user);
+                
                 $stmp->execute();
             }
         }
