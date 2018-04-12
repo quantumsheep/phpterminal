@@ -7,7 +7,7 @@ use Ratchet\ConnectionInterface;
 
 class mkdir implements CommandInterface
 {
-    const USAGE = "help [-dms] [pattern ...]";
+    const USAGE = "mkdir [OPTION]... DIRECTORY...";
 
     const SHORT_DESCRIPTION = "Display information about builtin commands.";
     const FULL_DESCRIPTION = "Displays brief summaries of builtin commands.  If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise the list of help topics is printed.";

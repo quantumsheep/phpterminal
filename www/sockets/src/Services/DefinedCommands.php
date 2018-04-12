@@ -10,7 +10,8 @@ class DefinedCommands
             "history",
             "hello",
             "mkdir",
-            "cd"
+            "cd",
+            "touch",
         ];
     }
 }
