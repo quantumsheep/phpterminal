@@ -38,14 +38,14 @@ class mkdir implements CommandInterface
         $daddy = null;
         $i = 0;
         $newDirs = [];
-
+        $params = "";
 
         //if no params
         if (empty($parameters)) {
             $sender->send("<br>Opérande manquant<br>Saisissez mkdir --help pour plus d'information");
             return;
         }
-        
+
         //check for "" case
         preg_match_all("/ (\"([^\"]*)\") /", " " . $parameters . " ", $quotedParams);
 
@@ -56,49 +56,51 @@ class mkdir implements CommandInterface
             }
         }
 
-        
+        // -d parameters multiple creation case
 
-        //table of new directory with $paramParts
+        // Table of new directory with $paramParts
         $paramParts = explode(" ", $parameters);
-        if (!empty($paramParts) && $paramParts[0][0] != '-') {
-            while (!empty($paramParts[$i]) && $paramParts[$i][0] != '-' && $i < count($paramParts)) {
-                $newDirs[] = $paramParts[$i];
-                $i++;
+        if (!empty($paramParts)) {
+            for ($i = 0; $i < count($paramParts); $i++) {
+                if (!empty($paramParts[$i]) && $paramParts[$i][0] != '-') {
+                    $newDirs[] = $paramParts[$i];
+                } else {
+                    $params .= $paramParts[$i];
+                }
             }
-            if (!empty($paramParts[1])) {
-                $params = $paramParts[$i];
-            }
-        } else if (!empty($paramParts[1])) {
-            $i = 1;
-            $params = $paramParts[0];
-            while (!empty($paramParts[$i]) && $paramParts[$i][0] != '-' && $i < count($paramParts));
-            $newDirs[] = $paramParts[$i];
-            $i++;
         }
 
-        $sender->send($params);
-
-        //add the quotedParams to the new directories list
+        // Add the quotedParams to the new directories list
         if (!empty($quotedParams[2])) {
             for ($i = 0; $i < count($quotedParams[2]); $i++) {
                 $newDirs[] = $quotedParams[2][$i];
             }
         }
 
+        // Get parameters
+        $paramLetters = explode("-", $params);
+
         foreach ($newDirs as $name) {
-            //Case Directory already exists
+
+            // Case Directory already exists
             $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
             $check->bindParam(":name", $name);
             $check->execute();
 
             // Check if directory exists
             if ($check->rowCount() > 0) {
-                $sender->send("<br>Error : ".$name." directory already exists");
+                $sender->send("<br>Error : " . $name . " directory already exists");
+
+                // Case directory name exceed 255 char
+            } else if (strlen($name) > 255) {
+                $sender->send("Error : one of the directories' name is too long. It must not exceed 255 characters.");
+
+                // Case everything matches
             } else {
-                //prepare
+                // Prepare
                 $stmp = $db->prepare("INSERT INTO TERMINAL_DIRECTORY(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
-                //bind parameters put in SQL
+                // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
                 $stmp->bindParam(":parent", $daddy);
                 $stmp->bindParam(":name", $name);
