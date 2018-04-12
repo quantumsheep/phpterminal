@@ -6,7 +6,6 @@
     border: #666666;
     border-radius: 3px;
     cursor: text;
-    caret-color: transparent;
     overflow-y: auto;
     color: #FFFFFF;
     padding: 10px;
@@ -43,35 +42,4 @@ body {
 
 .terminal-content br:last-child {
     display:none;
-}
-
-.terminal-caret {
-    background-color: #FFFFFF;
-    font-size: 14px;
-    -webkit-animation: 1.2s linear infinite condemed_blink_effect;
-    animation: 1.2s linear infinite condemed_blink_effect;
-}
-
-@-webkit-keyframes condemed_blink_effect {
-    0% {
-        visibility: hidden;
-    }
-    50% {
-        visibility: hidden;
-    }
-    100% {
-        visibility: visible;
-    }
-}
-
-@keyframes condemed_blink_effect {
-    0% {
-        visibility: hidden;
-    }
-    50% {
-        visibility: hidden;
-    }
-    100% {
-        visibility: visible;
-    }
 }
