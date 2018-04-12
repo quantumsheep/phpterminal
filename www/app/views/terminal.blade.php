@@ -12,7 +12,6 @@
         </span>
         <span id="terminal-content-response">
             <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
-            <span class="terminal-caret">█</span>
         </span>
     </div>
 @endsection
