@@ -57,7 +57,8 @@ class CommandHandler implements MessageComponentInterface
 
                 // Check if the idaccount is present in the sender's session
                 if (!empty($sender_session["account"])) {
-                    if ($this->data[$sender->resourceId]->credentials->connected) {
+                    // Check if the sender is actually connected to an account
+                    if ($this->data[$sender->resourceId]->connected) {
                         // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
                         @list($cmd, $parameters) = explode(' ', $cmd, 2);
 
@@ -79,17 +80,17 @@ class CommandHandler implements MessageComponentInterface
                             $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
+                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:~# </span>");
 
                         // Push the command into the history
                         History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
-                        if (!empty($this->data[$sender->resourceId]->credentials->username) && !isset($this->data[$sender->resourceId]->credentials->password)) {
+                        if (!empty($this->data[$sender->resourceId]->user->username) && !isset($this->data[$sender->resourceId]->user->password)) {
                             $stmp = $this->db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
                             $terminal_mac = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
 
-                            $stmp->bindParam(":username", $this->data[$sender->resourceId]->credentials->username);
+                            $stmp->bindParam(":username", $this->data[$sender->resourceId]->user->username);
                             $stmp->bindParam(":terminal", $terminal_mac);
 
                             $stmp->execute();
@@ -113,17 +114,18 @@ class CommandHandler implements MessageComponentInterface
                                     $sender->send("<br><span>" . $greet . "</span>");
                                 }
 
-                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220:~# </span>");
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:~# </span>");
 
-                                $this->data[$sender->resourceId]->credentials->connected = true;
-                                $this->data[$sender->resourceId]->credentials->idterminal_user = $row["idterminal_user"];
+                                $this->data[$sender->resourceId]->position = "/";
+                                $this->data[$sender->resourceId]->connected = true;
+                                $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
                                 $sender->send("<br><span>Access denied.</span>");
-                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                             }
                         } else {
-                            $this->data[$sender->resourceId]->credentials->username = $cmd;
-                            $sender->send("<br><span>" . $this->data[$sender->resourceId]->credentials->username . "@54.37.69.220's password: <span>");
+                            $this->data[$sender->resourceId]->user->username = $cmd;
+                            $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                         }
                     }
                 } else {

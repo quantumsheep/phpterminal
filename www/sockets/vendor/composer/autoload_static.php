@@ -46,8 +46,7 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         ),
         'A' => 
         array (
-            'Alph\\Services\\' => 14,
-            'Alph\\Commands\\' => 14,
+            'Alph\\' => 5,
         ),
     );
 
@@ -112,13 +111,9 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'Alph\\Services\\' => 
+        'Alph\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/Services',
-        ),
-        'Alph\\Commands\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Commands',
+            0 => __DIR__ . '/../..' . '/src',
         ),
     );
 
