@@ -8,7 +8,7 @@ use Alph\Services\SenderData;
 
 class hello implements CommandInterface
 {
-    const USAGE = "help [-dms] [pattern ...]";
+    const USAGE = "hello";
 
     const SHORT_DESCRIPTION = "Display information about builtin commands.";
     const FULL_DESCRIPTION = "Displays brief summaries of builtin commands.  If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise the list of help topics is printed.";
