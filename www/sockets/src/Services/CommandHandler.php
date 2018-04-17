@@ -72,18 +72,18 @@ class CommandHandler implements MessageComponentInterface
                                 $sender,
                                 $parsed_cookies[0]["alph_sess"],
                                 $sender_session,
-                                $parsed_cookies[0]["terminal"], 
-                                $cmd, 
-                                $parameters
+                                $parsed_cookies[0]["terminal"],
+                                $cmd,
+                                $parameters,
                             ]);
                         } else {
                             $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:~# </span>");
+                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
                         // Push the command into the history
-                        History::push($this->db, 1, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
+                        History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
                         if (!empty($this->data[$sender->resourceId]->user->username) && !isset($this->data[$sender->resourceId]->user->password)) {
                             $stmp = $this->db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
@@ -114,9 +114,10 @@ class CommandHandler implements MessageComponentInterface
                                     $sender->send("<br><span>" . $greet . "</span>");
                                 }
 
-                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:~# </span>");
-
                                 $this->data[$sender->resourceId]->position = "/";
+
+                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
+
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
