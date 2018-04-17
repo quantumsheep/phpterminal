@@ -41,12 +41,31 @@ class cd implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        $parameters = "/test";
+        if (empty($parameters)) {
+            return $data->position = '/';
+        }
 
-        $path = explode('/', $parameters);
+        $path = explode(' ', $parameters)[0];
 
-        if($path[0] == '') {
-            
+        if (empty($path)) {
+            return;
+        }
+
+        if($path == '--help') {
+            $parameters = 'cd';
+            return help::call(...\func_get_args());
+        }
+
+        $path = explode('/', $path);
+
+        if ($path[0] == '') {
+            $data->position = join('/', $path);
+        } else {
+            if ($path[0] == '.') {
+                $path = array_slice($path, 1);
+            }
+
+            $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
         }
     }
 }
