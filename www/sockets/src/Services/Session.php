@@ -3,59 +3,19 @@ namespace Alph\Services;
 
 class Session
 {
-    public static function read(\PDO $db, string $id)
+    public static function read(string $id)
     {
-        // Prapare the query
-        $stmp = $db->prepare('SELECT data FROM SESSION WHERE id = :id');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-
-        // If the query was successful
-        if ($stmp->execute()) {
-            // Save returned row
-            $row = $stmp->fetch();
-
-            // Return an empty string if $row returns nothing (false)
-            if ($row === false) {
-                return '';
-            }
-
-            // Return the data
-            return self::unserialize($row['data']);
-        } else {
-            // Return an empty string
-            return '';
-        }
+        return self::unserialize((string)@file_get_contents(DIR_SESS . 'sess_' . $id));
     }
 
     public static function write(\PDO $db, string $id, $data)
     {
-        // Timestamp creation for session duration timeout
-        $access = time();
-
-        // Prapare the query
-        $stmp = $db->prepare('REPLACE INTO SESSION VALUES (:id, :access, :data)');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-        $stmp->bindParam(':access', $access);
-        $stmp->bindParam(':data', $data);
-
-        // Returns TRUE on success or FALSE on failure
-        return $stmp->execute();
+        return \file_put_contents(DIR_SESS . 'sess_' . $id, $data) !== false;
     }
 
     public static function destroy(\PDO $db, string $id)
     {
-        // Prapare the query
-        $stmp = $db->prepare('DELETE FROM SESSION WHERE id = :id');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-
-        // Returns TRUE on success or FALSE on failure
-        return $stmp->execute();
+        return unlink(DIR_SESS . 'sess_' . $id);
     }
 
     public static function unserialize(string $session_data)

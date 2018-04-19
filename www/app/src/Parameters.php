@@ -8,6 +8,9 @@ define("DIR_ROOT", dirname(dirname(dirname((new \ReflectionClass(\Composer\Autol
 // Define the DIR_SRC constant that link to src directory
 define("DIR_SRC", DIR_ROOT . "src" . DS);
 
+// Define the DIR_SESS constant that link to the sessions directory
+define("DIR_SESS", DIR_ROOT . '..' . DS . 'sessions' . DS);
+
 // Define the DIR_ASSETS constant that link to src directory
 define("DIR_ASSETS", DIR_ROOT . "assets" . DS);
 

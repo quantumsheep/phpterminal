@@ -28,100 +28,100 @@ conn.onopen = (e) => {
             }
         }
     });
-};
 
-document.getElementById('terminal-input').addEventListener('keydown', (e) => {
-    if (e.key == "ArrowUp") {
-        document.getElementById('terminal-input').addEventListener('keydown', (e) => {
-            if (e.key == "Enter") {
-                HistoryPosition = HistoryCmd.length;
+    document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+        if (e.key == "ArrowUp") {
+            document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+                if (e.key == "Enter") {
+                    HistoryPosition = HistoryCmd.length;
+                }
+            });
+            HistoryPosition--;
+            if (HistoryPosition < 1) {
+                HistoryPosition = 0;
             }
-        });
-        HistoryPosition--;
-        if (HistoryPosition < 1) {
-            HistoryPosition = 0;
-        }
-        document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
-    } else if (e.key == "ArrowDown") {
-        document.getElementById('terminal-input').addEventListener('keydown', (e) => {
-            if (e.key == "Enter") {
-                HistoryPosition = HistoryCmd.length;
-            }
-        });
-        HistoryPosition++;
-        if (HistoryPosition > HistoryCmd.length - 1) {
-            HistoryPosition = HistoryCmd.length;
-            document.getElementById('terminal-input').innerHTML = "";
-        } else {
             document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
+        } else if (e.key == "ArrowDown") {
+            document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+                if (e.key == "Enter") {
+                    HistoryPosition = HistoryCmd.length;
+                }
+            });
+            HistoryPosition++;
+            if (HistoryPosition > HistoryCmd.length - 1) {
+                HistoryPosition = HistoryCmd.length;
+                document.getElementById('terminal-input').innerHTML = "";
+            } else {
+                document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
+            }
+        } else if (e.key == "Escape") {
+            document.getElementById('terminal-input').innerHTML = "";
         }
-    } else if (e.key == "Escape") {
-        document.getElementById('terminal-input').innerHTML = "";
-    }
-});
-
-function move() {
-    console.log("Move");
-};
-
-function click(e) {
-    ClickCount++;
-    if (ClickCount == 1) {
-        singleClickTimer = setTimeout((f) => {
-            const input = document.getElementById('terminal-input');
-
-            let range;
-            let selection;
-
-            if (document.createRange) //Firefox, Chrome, Opera, Safari, IE 9+
-            {
-                range = document.createRange();
-                range.selectNodeContents(input);
-                range.collapse(false);
-                selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-            else if (document.selection) //IE 8 and lower
-            {
-                range = document.body.createTextRange();
-                range.moveToElementText(input);
-                range.collapse(false);
-                range.select();
-            }
-            ClickCount = 0;
-        }, 200);
-    } else if (ClickCount > 1) {
-        clearTimeout(singleClickTimer);
-        ClickCount = 0;
-    }
-};
-
-termContainer.addEventListener("click", click, false);
-
-termContainer.addEventListener("mousedown", e => {
-    termContainer.addEventListener("click", click, false);
-    mouseDown = setTimeout((f) => {
-        termContainer.addEventListener("mousemove", move, false);
-        termContainer.removeEventListener("click", click, false);
-
-    }, 200);
-    termContainer.addEventListener("mouseup", e => {
-        clearTimeout(mouseDown);
-        termContainer.removeEventListener("mousemove", move, false);
     });
-});
-
-conn.onmessage = (e) => {
-    appendTerminal(e.data);
-    termContainer.scrollTo(0, termContainer.scrollHeight);
+    
+    function move() {
+        console.log("Move");
+    };
+    
+    function click(e) {
+        ClickCount++;
+        if (ClickCount == 1) {
+            singleClickTimer = setTimeout((f) => {
+                const input = document.getElementById('terminal-input');
+    
+                let range;
+                let selection;
+    
+                if (document.createRange) //Firefox, Chrome, Opera, Safari, IE 9+
+                {
+                    range = document.createRange();
+                    range.selectNodeContents(input);
+                    range.collapse(false);
+                    selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+                else if (document.selection) //IE 8 and lower
+                {
+                    range = document.body.createTextRange();
+                    range.moveToElementText(input);
+                    range.collapse(false);
+                    range.select();
+                }
+                ClickCount = 0;
+            }, 200);
+        } else if (ClickCount > 1) {
+            clearTimeout(singleClickTimer);
+            ClickCount = 0;
+        }
+    };
+    
+    termContainer.addEventListener("click", click, false);
+    
+    termContainer.addEventListener("mousedown", e => {
+        termContainer.addEventListener("click", click, false);
+        mouseDown = setTimeout((f) => {
+            termContainer.addEventListener("mousemove", move, false);
+            termContainer.removeEventListener("click", click, false);
+    
+        }, 200);
+        termContainer.addEventListener("mouseup", e => {
+            clearTimeout(mouseDown);
+            termContainer.removeEventListener("mousemove", move, false);
+        });
+    });
+    
+    conn.onmessage = (e) => {
+        appendTerminal(e.data);
+        termContainer.scrollTo(0, termContainer.scrollHeight);
+    };
+    
+    function appendTerminal(text, line_jump = true) {
+        document.getElementById("terminal-content-user").innerHTML += text;
+    }
+    
+    if(document.querySelector('#account-select option[selected]')) {
+        document.querySelector('#account-select option[selected]').removeAttribute("selected");
+        document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
+    }
 };
-
-function appendTerminal(text, line_jump = true) {
-    document.getElementById("terminal-content-user").innerHTML += text;
-}
-
-if(document.querySelector('#account-select option[selected]')) {
-    document.querySelector('#account-select option[selected]').removeAttribute("selected");
-    document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
-}
