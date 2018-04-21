@@ -96,13 +96,6 @@ CREATE TABLE `TERMINAL_GROUP_LINK` (
 	PRIMARY KEY (`terminal_user`,`terminal_group`)
 );
 
-CREATE TABLE `SESSION` (
-	`id` varchar(32) NOT NULL,
-	`access` int(10),
-	`data` TEXT NOT NULL,
-	PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `TERMINAL_USER_HISTORY` (
 	`idhistory` int NOT NULL AUTO_INCREMENT,
 	`terminal_user` int NOT NULL,
