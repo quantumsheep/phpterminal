@@ -37,14 +37,7 @@ class mkdir implements CommandInterface
         $basicmod = 777;
         $newDirs = [];
         $params = "";
-
-        // Get relative parent from position
-        $position = explode("/", $data->position);
-        if (empty($position)) {
-            $relativeParent = "/";
-        } else {
-            $relativeParent = $position[count($position)-1];
-        }
+        $daddy = null;
 
         //if no params
         if (empty($parameters)) {
@@ -119,7 +112,7 @@ class mkdir implements CommandInterface
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $relativeParent);
+                $stmp->bindParam(":parent", $daddy);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
                 $stmp->bindParam(":owner", $data->user->idterminal_user);

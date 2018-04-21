@@ -5,7 +5,7 @@ use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
-class cd implements CommandInterface
+class ls implements CommandInterface
 {
     const USAGE = "cd [-L|[-P [-e]] [-@]] [dir]";
 
@@ -41,49 +41,8 @@ class cd implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-
-        //
-        if (empty($parameters)) {
-            return $data->position = '/';
-        }
-
-        $path = explode(' ', $parameters)[0];
-
-        if (empty($path)) {
+        if(empty($parameters)){
             return;
-        }
-
-        if ($path == '--help') {
-            $parameters = 'cd';
-            return help::call(...\func_get_args());
-        }
-
-        $path = explode('/', $path);
-
-        if ($path[0] == '') {
-            $data->position = join('/', $path);
-        } else {
-            if ($path[0] == '.') {
-                $path = array_slice($path, 1);
-            }
-        }
-
-        for ($i = 0; $i < count($path); $i++) {
-
-            // Check if directory exists relatively to parent
-            $name = $path[$i];
-            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
-            $check->bindParam(":name", $name);
-            $check->execute();
-            if ($check->rowCount() == 0 && $name != "/") {
-                $sender->send("<br>Error : " . $name . " directory doesn't exists");
-                return;
-
-                // Modify position
-            } else {
-                $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
-                return;
-            }
         }
     }
 }
