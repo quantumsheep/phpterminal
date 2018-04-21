@@ -172,7 +172,55 @@ BEGIN
     
     SELECT @network_mac;
 END
-
 $$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION SPLIT_STR(
+  x VARCHAR(255),
+  delim VARCHAR(12),
+  pos INT
+)
+RETURNS VARCHAR(255) DETERMINISTIC
+BEGIN 
+    RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
+       LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
+       delim, '');
+END
+$$
+
+DELIMITER ;
+
+USE `alph`;
+DROP procedure IF EXISTS `GetIdDirectoryFromPath`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetIdDirectoryFromPath`(IN path TEXT)
+BEGIN
+	DECLARE i INT;
+	DECLARE id INT;
+    DECLARE dirname VARCHAR(255);
+    SET i = 2;
+    
+    SET  dirname = (SELECT SPLIT_STR(path, '/', i));
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname);
+
+    WHILE dirname <> NULL DO
+		SET dirname = (SELECT SPLIT_STR(path, '/', i));
+        
+		IF (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND name = dirname) <> NULL THEN
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND name = dirname);
+        END IF;
+        
+		SET i = i + 1;
+    END WHILE;
+		
+	SELECT dirname;
+    SELECT id;
+END$$
+
+DELIMITER ;
+
