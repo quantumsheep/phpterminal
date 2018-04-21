@@ -37,12 +37,20 @@ class mkdir implements CommandInterface
         $basicmod = 777;
         $newDirs = [];
         $params = "";
-        $daddy = null;
+        $idDirectory = null;
 
-        //if no params
+        // If no params
         if (empty($parameters)) {
             $sender->send("<br>Opérande manquant<br>Saisissez mkdir --help pour plus d'information");
             return;
+        }
+
+        // Get position by current directory name
+        $position = explode("/", $data->position);
+        if (empty($position)) {
+            $daddyName = null;
+        } else {
+            $daddy = $position[count($position) - 1];
         }
 
         //check for "" case
@@ -88,14 +96,28 @@ class mkdir implements CommandInterface
 
         foreach ($newDirs as $name) {
 
-            // Case Directory already exists
-            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
+            //Convert relative position name to IdDirectory
+            if ($daddy != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $daddy);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
+
+            // Case Directory already exists in current directory
+            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name AND parent = :daddy");
             $check->bindParam(":name", $name);
+            $check->bindParam(":daddy", $idDirectory);
             $check->execute();
-
             if ($check->rowCount() > 0) {
+                $sender->send("<br>Error : " . $name . " directory already exists");
+            }
 
-                // Check if directory exists
+            if ($name == $daddy) {
+                // if Directory got same name as parent
                 $sender->send("<br>Error : " . $name . " directory already exists");
 
             } else if (strlen($name) > 255) {
@@ -112,7 +134,7 @@ class mkdir implements CommandInterface
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $daddy);
+                $stmp->bindParam(":parent", $idDirectory);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
                 $stmp->bindParam(":owner", $data->user->idterminal_user);
