@@ -43,7 +43,7 @@ class mkdir implements CommandInterface
         if (empty($position)) {
             $relativeParent = "/";
         } else {
-            $relativeParent = $position[strlen($position)];
+            $relativeParent = $position[count($position)-1];
         }
 
         //if no params
@@ -100,8 +100,8 @@ class mkdir implements CommandInterface
             $check->bindParam(":name", $name);
             $check->execute();
 
-            
             if ($check->rowCount() > 0) {
+
                 // Check if directory exists
                 $sender->send("<br>Error : " . $name . " directory already exists");
 
