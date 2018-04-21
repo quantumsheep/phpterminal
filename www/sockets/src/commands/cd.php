@@ -51,7 +51,7 @@ class cd implements CommandInterface
             return;
         }
 
-        if($path == '--help') {
+        if ($path == '--help') {
             $parameters = 'cd';
             return help::call(...\func_get_args());
         }
@@ -64,8 +64,22 @@ class cd implements CommandInterface
             if ($path[0] == '.') {
                 $path = array_slice($path, 1);
             }
+        }
+        for ($i = 0; $i < count($path); $i++) {
 
-            $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
+            // Check if directory exists
+            $name = $path[$i];
+            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
+            $check->bindParam(":name", $name);
+            $check->execute();
+            if ($check->rowCount() == 0) {
+                $sender->send("<br>Error : " . $name . " directory doesn't exists");
+                return;
+
+            // Modify position
+            } else {
+                $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
+            }
         }
     }
 }
