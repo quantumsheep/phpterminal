@@ -1,114 +1,67 @@
 <?php
 namespace Alph\Services;
 
-use Alph\Services\Database;
-
 class SessionHandler
 {
-    public $db;
-
     public function __construct()
     {
         // Declare session_name as "alph_sess"
         session_name("alph_sess");
 
-        // Instantiate new connection
-        $this->db = Database::connect();
-
         // Set handler to overide session
         session_set_save_handler(
-            array($this, "_open"),
-            array($this, "_close"),
-            array($this, "_read"),
-            array($this, "_write"),
-            array($this, "_destroy"),
-            array($this, "_gc")
+            [$this, "_open"],
+            [$this, "_close"],
+            [$this, "_read"],
+            [$this, "_write"],
+            [$this, "_destroy"],
+            [$this, "_gc"]
         );
-        
+
+        //register_shutdown_function([$this, "_close"]);
+
         // Start the session
         session_start();
     }
 
-    public function _open()
+    public function _open($savePath, $sessionName)
     {
-        // Return false if the db is in false state
-        return $this->db !== false;
+        if (!is_dir(DIR_SESS)) {
+            mkdir(DIR_SESS, 0777);
+        }
+
+        return true;
     }
 
     public function _close()
     {
         // Close the database connection
-        $db = null;
         return true;
     }
 
     public function _read(string $id)
     {
-        // Prapare the query
-        $stmp = $this->db->prepare('SELECT data FROM SESSION WHERE id = :id');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-
-        // If the query was successful
-        if ($stmp->execute()) {
-            // Save returned row
-            $row = $stmp->fetch();
-
-            // Return an empty string if $row returns nothing (false)
-            if($row === false) {
-                return '';
-            }
-
-            // Return the data
-            return $row['data'];
-        } else {
-            // Return an empty string
-            return '';
-        }
+        return (string)@file_get_contents(DIR_SESS . 'sess_' . session_id());
     }
 
     public function _write(string $id, $data)
     {
-        // Timestamp creation for session duration timeout
-        $access = time();
-
-        // Prapare the query
-        $stmp = $this->db->prepare('REPLACE INTO SESSION VALUES (:id, :access, :data)');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-        $stmp->bindParam(':access', $access);
-        $stmp->bindParam(':data', $data);
-
-        // Returns TRUE on success or FALSE on failure
-        return $stmp->execute();
+        return \file_put_contents(DIR_SESS . 'sess_' . session_id(), $data) !== false;
     }
 
     public function _destroy($id)
     {
-        // Prapare the query
-        $stmp = $this->db->prepare('DELETE FROM SESSION WHERE id = :id');
-
-        // Bind query's parameters
-        $stmp->bindParam(':id', $id);
-
-        // Returns TRUE on success or FALSE on failure
-        return $stmp->execute();
+        return unlink(DIR_SESS . 'sess_' . session_id());
     }
 
     public function _gc($max)
     {
-        // Calculate the end sessions timeout
-        $old = time() - $max;
+        foreach (glob(DIR_SESS . 'sess_*') as $file) {
+            if (filemtime($file) + $maxlifetime < time() && file_exists($file)) {
+                unlink($file);
+            }
+        }
 
-        // Prapare the query
-        $stmp = $this->db->prepare('DELETE * FROM SESSION WHERE access < :old');
-
-        // Bind query's parameters
-        $stmp->bindParam(':old', $old);
-
-        // Returns TRUE on success or FALSE on failure
-        return $stmp->execute();
+        return true;
     }
 }

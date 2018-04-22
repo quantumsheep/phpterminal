@@ -11,22 +11,22 @@ use Ratchet\ConnectionInterface;
 class template implements CommandInterface
 {
     /**
-     * The usage of the command
+     * Command's usage
      */
     const USAGE = "";
 
     /**
-     * The short descriptin of the command
+     * Command's short description
      */
     const SHORT_DESCRIPTION = "";
 
     /**
-     * The full description of the command
+     * Command's full description
      */
     const FULL_DESCRIPTION = "";
 
     /**
-     * All the options of the command
+     * Command's options
      */
     const OPTIONS = [
         "" => "",
@@ -34,20 +34,20 @@ class template implements CommandInterface
     ];
 
     /**
-     * The arguments of the command
+     * Command's arguments
      */
     const ARGUMENTS = [
         "PATTERN" => "",
     ];
 
     /**
-     * The exit status of the command
+     * Command's exit status
      */
     const EXIT_STATUS = "";
 
     /**
      * Call the command
-     * Define the algorithm of the command
+     *
      * @param \PDO $db
      * @param \SplObjectStorage $clients
      * @param ConnectionInterface $sender

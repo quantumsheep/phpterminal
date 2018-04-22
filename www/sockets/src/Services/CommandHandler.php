@@ -53,7 +53,7 @@ class CommandHandler implements MessageComponentInterface
             // Check if alph_sess is defined in the sender's cookies
             if (isset($parsed_cookies[0]["alph_sess"]) && isset($parsed_cookies[0]["terminal"])) {
                 // Read the sender's session data
-                $sender_session = Session::read($this->db, $parsed_cookies[0]["alph_sess"]);
+                $sender_session = Session::read($parsed_cookies[0]["alph_sess"]);
 
                 // Check if the idaccount is present in the sender's session
                 if (!empty($sender_session["account"])) {

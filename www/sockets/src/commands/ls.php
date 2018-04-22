@@ -5,7 +5,7 @@ use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
-class cd implements CommandInterface
+class ls implements CommandInterface
 {
     const USAGE = "cd [-L|[-P [-e]] [-@]] [dir]";
 
@@ -37,51 +37,47 @@ class cd implements CommandInterface
      * @param \SplObjectStorage $clients
      * @param ConnectionInterface $sender
      * @param string $sess_id
-     * @param string $cmd
+     * @param string $cmd   ²
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-
-        // cd by himself return to root
-        if (empty($parameters)) {
-            return $data->position = '/';
-        }
-
-        $path = explode(' ', $parameters)[0];
-
-        if (empty($path)) {
-            return;
-        }
-
-        if ($path == '--help') {
-            $parameters = 'cd';
-            return help::call(...\func_get_args());
-        }
-
-        $path = explode('/', $path);
-
-        if ($path[0] == '') {
-            $data->position = join('/', $path);
+        $idDirectory = null;
+        $jump = 0;
+        // Get name of relative position directory
+        if ($data->position == '/') {
+            $positionDir = null;
         } else {
-            if ($path[0] == '.') {
-                $path = array_slice($path, 1);
-            }
+            $position = explode("/", $data->position);
+            $positionDir = $position[count($position) - 1];
         }
 
-        for ($i = 0; $i < count($path); $i++) {
+        if (empty($parameters)) {
+            // Get actual directory ID
+            if ($positionDir != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $positionDir);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
 
-            // Check if directory exists relatively to parent
-            $name = $path[$i];
-            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
-            $check->bindParam(":name", $name);
-            $check->execute();
-            if ($check->rowCount() == 0 && $data->position != "/") {
-                $sender->send("<br>Error : " . $name . " directory doesn't exists");
-                return;
-
-            } else {
-                // Modify position
-                $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
+            // Fetch directories and file in the actual Directory
+            $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE parent = :daddy");
+            $stmp->bindParam(":daddy", $idDirectory);
+            if ($stmp->execute()) {
+                if ($stmp->rowCount() > 0) {
+                    $fetchedDirectories = $stmp->fetchAll(\PDO::FETCH_ASSOC);
+                    if (!empty($fetchedDirectories)) {
+                        for ($i = 0; $i < count($fetchedDirectories); $i++, $jump++) {
+                            if ($jump % 4 == 0) {
+                                $sender->send("<br>");
+                            }
+                            $sender->send($fetchedDirectories[$i]["name"] . "&emsp;");
+                        }
+                    }
+                }
             }
         }
     }

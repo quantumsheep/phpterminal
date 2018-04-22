@@ -12,6 +12,7 @@ class DefinedCommands
             "mkdir",
             "cd",
             "touch",
+            "ls",
         ];
     }
 }
