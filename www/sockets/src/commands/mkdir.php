@@ -65,7 +65,6 @@ class mkdir implements CommandInterface
         }
 
         // -d parameters multiple creation case
-        $sender->send($parameters);
         preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $stringFullPath);
         if (!empty($stringFullPath[0])) {
             $sender->send($stringFullPath[0][0]);

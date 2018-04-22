@@ -70,7 +70,7 @@ class cd implements CommandInterface
 
         for ($i = 0; $i < count($path); $i++) {
 
-            // Check if directory exists relatively to parent
+            // Check if directory exists
             $name = $path[$i];
             $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
             $check->bindParam(":name", $name);
