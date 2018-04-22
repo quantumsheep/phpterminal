@@ -37,19 +37,21 @@ class mkdir implements CommandInterface
         $basicmod = 777;
         $newDirs = [];
         $params = "";
+        $idDirectory = null;
+        $arrayFullPath = [];
 
-        // Get relative parent from position
-        $position = explode("/", $data->position);
-        if (empty($position)) {
-            $relativeParent = "/";
-        } else {
-            $relativeParent = $position[count($position)-1];
-        }
-
-        //if no params
+        // If no params
         if (empty($parameters)) {
             $sender->send("<br>Opérande manquant<br>Saisissez mkdir --help pour plus d'information");
             return;
+        }
+
+        // Get position by current directory name
+        $position = explode("/", $data->position);
+        if (empty($position)) {
+            $positionDir = null;
+        } else {
+            $positionDir = $position[count($position) - 1];
         }
 
         //check for "" case
@@ -63,11 +65,20 @@ class mkdir implements CommandInterface
         }
 
         // -d parameters multiple creation case
-        /*if (preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $absolutePathNDir) != 0) {
-        $sender->send($absolutePathNDir[0]);
-        $checkMultiDirectory = true;
+        preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $stringFullPath);
+        if (!empty($stringFullPath[0])) {
+            $sender->send($stringFullPath[0][0]);
+            // Get elements from regex
+            for ($i = 0; $i < count($stringFullPath[0]); $i++) {
+                $arrayFullPath[$i] = explode("/", $stringFullPath[0][$i]);
+                for ($j = 1; $j < count($arrayFullPath[$i]); $j++) {
+                    $arrayFullPath[$i] = str_replace($arrayFullPath[$i], "\"", "");
+                    $sender->send($arrayFullPath[$i][0]);
+                }
+
+            }
+            return;
         }
-         */
 
         // Table of new directory with $paramParts
         $paramParts = explode(" ", $parameters);
@@ -95,20 +106,34 @@ class mkdir implements CommandInterface
 
         foreach ($newDirs as $name) {
 
-            // Case Directory already exists
-            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
+            // case directory's name is /
+            if ($name == "/") {
+                $sender->send("<br>" . $positionDir . ":Impossible to create / directory. The directory already exists.");
+            }
+
+            //Convert relative position name to IdDirectory
+            if ($positionDir != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $positionDir);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
+
+            // Case Directory already exists in current directory
+            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name AND parent = :daddy");
             $check->bindParam(":name", $name);
+            $check->bindParam(":daddy", $idDirectory);
             $check->execute();
-
             if ($check->rowCount() > 0) {
-
-                // Check if directory exists
-                $sender->send("<br>Error : " . $name . " directory already exists");
+                $sender->send("<br>" . $positionDir . ":" . $name . " directory already exists");
 
             } else if (strlen($name) > 255) {
 
                 // Case directory name exceed 255 char
-                $sender->send("Error : one of the directories' name is too long. It must not exceed 255 characters.");
+                $sender->send("<br>" . $positionDir . ": one of the directories' name is too long. It must not exceed 255 characters.");
 
             } else {
 
@@ -119,7 +144,7 @@ class mkdir implements CommandInterface
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $relativeParent);
+                $stmp->bindParam(":parent", $idDirectory);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
                 $stmp->bindParam(":owner", $data->user->idterminal_user);
