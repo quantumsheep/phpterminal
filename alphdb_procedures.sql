@@ -172,7 +172,72 @@ BEGIN
     
     SELECT @network_mac;
 END
-
 $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION SPLIT_STR(
+  x VARCHAR(255),
+  delim VARCHAR(12),
+  pos INT
+)
+RETURNS VARCHAR(255) DETERMINISTIC
+BEGIN 
+    RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
+       LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
+       delim, '');
+END
+$$
+
+DELIMITER ;
+
+USE `alph`;
+DROP function IF EXISTS `SPLIT_STR`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR`(x VARCHAR(255), delim VARCHAR(12), pos INT) RETURNS varchar(255) CHARSET utf8
+BEGIN
+RETURN REPLACE(SUBSTRING(
+				SUBSTRING_INDEX(x, delim, pos),
+				CHAR_LENGTH(
+					SUBSTRING_INDEX(x, delim, pos -1)
+				) + 1),
+				delim, "");--
+END$$
+
+DELIMITER ;
+
+USE `alph`;
+DROP function IF EXISTS `IdDirectoryFromPath`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT) RETURNS text CHARSET utf8
+BEGIN
+	DECLARE i INT;
+	DECLARE id INT;
+    DECLARE dirname VARCHAR(255);
+    SET i = 2;
+    
+    SET dirname = SPLIT_STR(path, '/', 2);
+    
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname AND parent IS NULL);
+
+	SET i = 3;
+    
+    WHILE dirname <> '' DO
+		SET dirname = SPLIT_STR(path, '/', i);
+
+		IF dirname <> '' THEN
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND `name` = dirname);
+			SET i = i + 1;
+        END IF;
+    END WHILE;
+    
+    RETURN id;
+END$$
 
 DELIMITER ;

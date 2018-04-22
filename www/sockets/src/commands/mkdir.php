@@ -40,7 +40,15 @@ class mkdir implements CommandInterface
         $idDirectory = null;
         $arrayFullPath = [];
 
-        // If no params
+        // Get relative parent from position
+        $position = explode("/", $data->position);
+        if (empty($position)) {
+            $relativeParent = "/";
+        } else {
+            $relativeParent = $position[count($position)-1];
+        }
+
+        //if no params
         if (empty($parameters)) {
             $sender->send("<br>Opérande manquant<br>Saisissez mkdir --help pour plus d'information");
             return;
@@ -65,17 +73,11 @@ class mkdir implements CommandInterface
         }
 
         // -d parameters multiple creation case
-        $sender->send($parameters);
-        preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $stringFullPath);
-        if (!empty($stringFullPath[0])) {
-            $sender->send($stringFullPath[0][0]);
-            // Get elements from regex
-            for ($i = 0; $i < count($stringFullPath[0]); $i++) {
-                $arrayFullPath[$i] = explode("/", $stringFullPath[0][$i]);
-                for ($j = 1; $j < count($arrayFullPath[$i]); $j++) {
-                    $arrayFullPath[$i] = str_replace($arrayFullPath[$i], "\"", "");
-                    $sender->send($arrayFullPath[$i][0]);
-                }
+        /*if (preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $absolutePathNDir) != 0) {
+        $sender->send($absolutePathNDir[0]);
+        $checkMultiDirectory = true;
+        }
+         */
 
             }
             return;
@@ -128,13 +130,16 @@ class mkdir implements CommandInterface
             $check->bindParam(":name", $name);
             $check->bindParam(":daddy", $idDirectory);
             $check->execute();
+
             if ($check->rowCount() > 0) {
-                $sender->send("<br>" . $positionDir . ":" . $name . " directory already exists");
+
+                // Check if directory exists
+                $sender->send("<br>Error : " . $name . " directory already exists");
 
             } else if (strlen($name) > 255) {
 
                 // Case directory name exceed 255 char
-                $sender->send("<br>" . $positionDir . ": one of the directories' name is too long. It must not exceed 255 characters.");
+                $sender->send("Error : one of the directories' name is too long. It must not exceed 255 characters.");
 
             } else {
 
@@ -145,7 +150,7 @@ class mkdir implements CommandInterface
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $idDirectory);
+                $stmp->bindParam(":parent", $relativeParent);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
                 $stmp->bindParam(":owner", $data->user->idterminal_user);
