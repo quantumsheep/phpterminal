@@ -114,11 +114,6 @@ class mkdir implements CommandInterface
             $check->execute();
             if ($check->rowCount() > 0) {
                 $sender->send("<br>Error : " . $name . " directory already exists");
-            }
-
-            if ($name == $daddy) {
-                // if Directory got same name as parent
-                $sender->send("<br>Error : " . $name . " directory already exists");
 
             } else if (strlen($name) > 255) {
 
