@@ -38,6 +38,7 @@ class mkdir implements CommandInterface
         $newDirs = [];
         $params = "";
         $idDirectory = null;
+        $arrayFullPath = [];
 
         // If no params
         if (empty($parameters)) {
@@ -48,9 +49,9 @@ class mkdir implements CommandInterface
         // Get position by current directory name
         $position = explode("/", $data->position);
         if (empty($position)) {
-            $daddyName = null;
+            $positionDir = null;
         } else {
-            $daddy = $position[count($position) - 1];
+            $positionDir = $position[count($position) - 1];
         }
 
         //check for "" case
@@ -64,11 +65,21 @@ class mkdir implements CommandInterface
         }
 
         // -d parameters multiple creation case
-        /*if (preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $absolutePathNDir) != 0) {
-        $sender->send($absolutePathNDir[0]);
-        $checkMultiDirectory = true;
+        $sender->send($parameters);
+        preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $stringFullPath);
+        if (!empty($stringFullPath[0])) {
+            $sender->send($stringFullPath[0][0]);
+            // Get elements from regex
+            for ($i = 0; $i < count($stringFullPath[0]); $i++) {
+                $arrayFullPath[$i] = explode("/", $stringFullPath[0][$i]);
+                for ($j = 1; $j < count($arrayFullPath[$i]); $j++) {
+                    $arrayFullPath[$i] = str_replace($arrayFullPath[$i], "\"", "");
+                    $sender->send($arrayFullPath[$i][0]);
+                }
+
+            }
+            return;
         }
-         */
 
         // Table of new directory with $paramParts
         $paramParts = explode(" ", $parameters);
@@ -96,10 +107,15 @@ class mkdir implements CommandInterface
 
         foreach ($newDirs as $name) {
 
+            // case directory's name is /
+            if ($name == "/") {
+                $sender->send("<br>" . $positionDir . ":Impossible to create / directory. The directory already exists.");
+            }
+
             //Convert relative position name to IdDirectory
-            if ($daddy != null) {
+            if ($positionDir != null) {
                 $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
-                $getIdDirectory->bindParam(":daddy", $daddy);
+                $getIdDirectory->bindParam(":daddy", $positionDir);
                 if ($getIdDirectory->execute()) {
                     if ($getIdDirectory->rowCount() > 0) {
                         $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
@@ -113,12 +129,12 @@ class mkdir implements CommandInterface
             $check->bindParam(":daddy", $idDirectory);
             $check->execute();
             if ($check->rowCount() > 0) {
-                $sender->send("<br>Error : " . $name . " directory already exists");
+                $sender->send("<br>" . $positionDir . ":" . $name . " directory already exists");
 
             } else if (strlen($name) > 255) {
 
                 // Case directory name exceed 255 char
-                $sender->send("Error : one of the directories' name is too long. It must not exceed 255 characters.");
+                $sender->send("<br>" . $positionDir . ": one of the directories' name is too long. It must not exceed 255 characters.");
 
             } else {
 

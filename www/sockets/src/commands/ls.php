@@ -37,12 +37,44 @@ class ls implements CommandInterface
      * @param \SplObjectStorage $clients
      * @param ConnectionInterface $sender
      * @param string $sess_id
-     * @param string $cmd
+     * @param string $cmd   ²
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        if(empty($parameters)){
-            return;
+        $idDirectory = null;
+
+        // Get name of relative position directory
+        if ($data->position == '/') {
+            $positionDir = null;
+        } else {
+            $position = explode("/", $data->position);
+            $$positionDir = $position[count($position) - 1];
+        }
+
+        if (empty($parameters)) {
+            // Get actual directory ID
+            $idDirectory = null;
+            if ($positionDir != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $positionDir);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
+
+            // Fetch directories and file in the actual Directory
+            $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE parent = :daddy");
+            $stmp->bindParam(":daddy", $idDirectory);
+            if ($stmp->execute()) {
+                if ($stmp->rowCount() > 0) {
+                    $fetchedDirectories = $stmp->fetchAll(\PDO::FETCH_ASSOC);
+                    if (!empty($fetchedDirectories)) {
+                        $sender->send($fetchedDirectories[0]["name"]);
+                    }
+                }
+            }
         }
     }
 }

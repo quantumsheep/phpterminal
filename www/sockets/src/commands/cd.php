@@ -42,7 +42,7 @@ class cd implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
 
-        //
+        // cd by himself return to root
         if (empty($parameters)) {
             return $data->position = '/';
         }
@@ -75,14 +75,13 @@ class cd implements CommandInterface
             $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
             $check->bindParam(":name", $name);
             $check->execute();
-            if ($check->rowCount() == 0 && $name != "/") {
+            if ($check->rowCount() == 0 && $data->position != "/") {
                 $sender->send("<br>Error : " . $name . " directory doesn't exists");
                 return;
 
-                // Modify position
             } else {
+                // Modify position
                 $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
-                return;
             }
         }
     }
