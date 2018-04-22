@@ -194,33 +194,50 @@ $$
 DELIMITER ;
 
 USE `alph`;
-DROP procedure IF EXISTS `GetIdDirectoryFromPath`;
+DROP function IF EXISTS `SPLIT_STR`;
 
 DELIMITER $$
 USE `alph`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetIdDirectoryFromPath`(IN path TEXT)
+CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR`(x VARCHAR(255), delim VARCHAR(12), pos INT) RETURNS varchar(255) CHARSET utf8
+BEGIN
+RETURN REPLACE(SUBSTRING(
+				SUBSTRING_INDEX(x, delim, pos),
+				CHAR_LENGTH(
+					SUBSTRING_INDEX(x, delim, pos -1)
+				) + 1),
+				delim, "");--
+END$$
+
+DELIMITER ;
+
+USE `alph`;
+DROP function IF EXISTS `IdDirectoryFromPath`;
+
+DELIMITER $$
+USE `alph`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT) RETURNS text CHARSET utf8
 BEGIN
 	DECLARE i INT;
 	DECLARE id INT;
     DECLARE dirname VARCHAR(255);
     SET i = 2;
     
-    SET  dirname = (SELECT SPLIT_STR(path, '/', i));
-    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname);
+    SET dirname = SPLIT_STR(path, '/', 2);
+    
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname AND parent IS NULL);
 
-    WHILE dirname <> NULL DO
-		SET dirname = (SELECT SPLIT_STR(path, '/', i));
-        
-		IF (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND name = dirname) <> NULL THEN
-			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND name = dirname);
+	SET i = 3;
+    
+    WHILE dirname <> '' DO
+		SET dirname = SPLIT_STR(path, '/', i);
+
+		IF dirname <> '' THEN
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND `name` = dirname);
+			SET i = i + 1;
         END IF;
-        
-		SET i = i + 1;
     END WHILE;
-		
-	SELECT dirname;
-    SELECT id;
+    
+    RETURN id;
 END$$
 
 DELIMITER ;
-
