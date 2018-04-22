@@ -42,18 +42,17 @@ class ls implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
         $idDirectory = null;
-
+        $jump = 0;
         // Get name of relative position directory
         if ($data->position == '/') {
             $positionDir = null;
         } else {
             $position = explode("/", $data->position);
-            $$positionDir = $position[count($position) - 1];
+            $positionDir = $position[count($position) - 1];
         }
 
         if (empty($parameters)) {
             // Get actual directory ID
-            $idDirectory = null;
             if ($positionDir != null) {
                 $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
                 $getIdDirectory->bindParam(":daddy", $positionDir);
@@ -71,7 +70,12 @@ class ls implements CommandInterface
                 if ($stmp->rowCount() > 0) {
                     $fetchedDirectories = $stmp->fetchAll(\PDO::FETCH_ASSOC);
                     if (!empty($fetchedDirectories)) {
-                        $sender->send($fetchedDirectories[0]["name"]);
+                        for ($i = 0; $i < count($fetchedDirectories); $i++, $jump++) {
+                            if ($jump % 4 == 0) {
+                                $sender->send("<br>");
+                            }
+                            $sender->send($fetchedDirectories[$i]["name"] . "&emsp;");
+                        }
                     }
                 }
             }
