@@ -2,8 +2,8 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
-use Ratchet\ConnectionInterface;
 use Alph\Services\SenderData;
+use Ratchet\ConnectionInterface;
 
 class touch implements CommandInterface
 {
@@ -21,13 +21,13 @@ class touch implements CommandInterface
         "-c" => "--no-create do not create any files",
         "-d" => "--date=STRING parse STRING and use it instead of current time",
         "-f" => "(ignored)",
-        "-h" =>  "--no-dereference affect each symbolic link instead of any referenced file (useful only on systems that can change the timestamps of a symlink)",
+        "-h" => "--no-dereference affect each symbolic link instead of any referenced file (useful only on systems that can change the timestamps of a symlink)",
         "-m" => "change only the modification time",
         "-r" => "--reference=FILE use this file's times instead of current time",
         "-t" => "STAMP use [[CC]YY]MMDDhhmm[.ss] instead of current time",
         "--time=WORD" => "change the specified time: WORD is access, atime, or use: equiv‐ alent to -a WORD is modify or mtime: equivalent to -m",
         "--help" => "display this help and exit",
-        "--version" => "output version information and exit"
+        "--version" => "output version information and exit",
     ];
 
     const ARGUMENTS = [
@@ -48,6 +48,88 @@ class touch implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        console.log("test");
+        $basicmod = 777;
+        $params = "";
+        $positionDir = "KO";
+        $dataFile = "";
+
+        // If no params
+        if (empty($parameters)) {
+            $sender->send("<br>Opérande manquant<br>Saisissez touch --help pour plus d'information");
+            return;
+        } else {
+
+            if ($data->position == '/') {
+                $positionDir = null;
+            } else {
+                $position = explode("/", $data->position);
+                $positionDir = $position[count($position) - 1];
+            }
+
+            // Get actual directory ID
+            if ($positionDir != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $positionDir);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
+
+            preg_match_all("/\"[^\"]*\"/", $parameters, $quotedParams);
+
+            var_dump($quotedParams);
+
+            if (!empty($quotedParams[0])) {
+
+                for ($i = 0; $i < sizeof($quotedParams); $i++) {
+                    $tmp[$i] = $quotedParams[0][$i];
+                }
+
+                $str = implode($tmp);
+                $sender->send(" | " . $str);
+
+                foreach ($tmp as $value) {
+                    str_replace($value, "", $parameters);
+                }
+                
+               // $sender->send(" | " . $parameters);
+                $parameters .= " " . $str;
+                // $sender->send(" | " . $parameters);
+            }
+
+            // Get parameters
+            $paramList = explode(" ", $parameters);
+
+            foreach ($paramList as $name) {
+                //If file contain a directory
+
+                //If file is OK
+
+                //If file is not OK
+
+                if (strpos($name, '"')) {
+
+                }
+
+                $dataFile = "OK";
+
+                // Prepare
+                $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+                // Bind parameters put in SQL
+                $stmp->bindParam(":terminal", $terminal_mac);
+                $stmp->bindParam(":parent", $positionDir);
+                $stmp->bindParam(":name", $name);
+                $stmp->bindParam(":data", $dataFile);
+                $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+                $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+                $stmp->execute();
+            }
+        }
     }
+
 }
+
