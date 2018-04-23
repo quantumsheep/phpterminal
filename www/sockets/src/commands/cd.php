@@ -41,23 +41,35 @@ class cd implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
+        $goPath = true;
 
         // cd by himself return to root
         if (empty($parameters)) {
             return $data->position = '/';
         }
 
-        $path = explode(' ', $parameters)[0];
+        // Get element
+        $path = explode(' ', $parameters);
 
+        // Test if multi argument
+        if(isset($path[1])){
+            $sender->send("<br>Error : Multiple argument");
+            return;
+        }
+
+        // 
+        $path = $path[0];
         if (empty($path)) {
             return;
         }
 
+        // case parameters is help
         if ($path == '--help') {
             $parameters = 'cd';
             return help::call(...\func_get_args());
         }
 
+        // Get each element of path
         $path = explode('/', $path);
 
         if ($path[0] == '') {
@@ -77,12 +89,16 @@ class cd implements CommandInterface
             $check->execute();
             if ($check->rowCount() == 0 && $data->position != "/") {
                 $sender->send("<br>Error : " . $name . " directory doesn't exists");
-                return;
+                $goPath = false;
 
-            } else {
-                // Modify position
-                $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
             }
         }
+
+        if($goPath == true){
+            // Modify position
+            $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
+        }
+        
+    
     }
 }

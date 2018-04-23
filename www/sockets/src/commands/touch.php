@@ -51,3 +51,4 @@ class touch implements CommandInterface
         console.log("test");
     }
 }
+
