@@ -29,9 +29,9 @@ conn.onopen = (e) => {
         }
     });
 
-    document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+    document.getElementById('terminal-input').addEventListener('keydown', e => {
         if (e.key == "ArrowUp") {
-            document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+            document.getElementById('terminal-input').addEventListener('keydown', e => {
                 if (e.key == "Enter") {
                     HistoryPosition = HistoryCmd.length;
                 }
@@ -42,7 +42,7 @@ conn.onopen = (e) => {
             }
             document.getElementById('terminal-input').innerHTML = `${HistoryCmd[HistoryPosition]}`;
         } else if (e.key == "ArrowDown") {
-            document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+            document.getElementById('terminal-input').addEventListener('keydown', e => {
                 if (e.key == "Enter") {
                     HistoryPosition = HistoryCmd.length;
                 }
@@ -66,7 +66,7 @@ conn.onopen = (e) => {
     function click(e) {
         ClickCount++;
         if (ClickCount == 1) {
-            singleClickTimer = setTimeout((f) => {
+            singleClickTimer = setTimeout(f => {
                 const input = document.getElementById('terminal-input');
     
                 let range;
@@ -100,7 +100,7 @@ conn.onopen = (e) => {
     
     termContainer.addEventListener("mousedown", e => {
         termContainer.addEventListener("click", click, false);
-        mouseDown = setTimeout((f) => {
+        mouseDown = setTimeout(f => {
             termContainer.addEventListener("mousemove", move, false);
             termContainer.removeEventListener("click", click, false);
     
@@ -111,11 +111,25 @@ conn.onopen = (e) => {
         });
     });
     
-    conn.onmessage = (e) => {
-        appendTerminal(e.data);
+    conn.onmessage = e => {
+        const data = e.data.split(/\|(.+)/);
+
+        console.log(data);
+        if(data[0] == "message") {
+            appendTerminal(data[1]);
+        } else {
+            action(data[1]);
+        }
+
         termContainer.scrollTo(0, termContainer.scrollHeight);
     };
     
+    function action(action) {
+        if(action == "clear") {
+            document.getElementById("terminal-content-user").innerHTML = null;
+        }
+    }
+
     function appendTerminal(text, line_jump = true) {
         document.getElementById("terminal-content-user").innerHTML += text;
     }

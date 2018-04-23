@@ -72,7 +72,7 @@ class history implements CommandInterface
 
         } else {
             for ($i = 0; $i < $Counter; $i++) {
-                $sender->send("<br>" . ($i + 1) . " " . $history[$i]["command"]);
+                $sender->send("message|<br>" . ($i + 1) . " " . $history[$i]["command"]);
             }
         }
     }

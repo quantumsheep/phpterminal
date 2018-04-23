@@ -13,6 +13,7 @@ class DefinedCommands
             "cd",
             "touch",
             "ls",
+            "clear",
         ];
     }
 }
