@@ -46,30 +46,33 @@ class history implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        $history = ["help", "history"];
-        $dickCountedOfTheSizeOfTheMoon = count($history);
+        $check = $db->prepare("SELECT command FROM terminal_user_history WHERE terminal_user = :terminal_user");
+        $check->bindParam(":terminal_user", $data->user->idterminal_user);
+        $check->execute();
+
+        $history = $check->fetchAll();
+        $Counter = count($history);
 
         if ($parameters != null) {
-
             $params_parts = explode(' ', $parameters);
 
             if (in_array('-c', $params_parts)) {
                 $option_short = true;
-                for ($i = 0; $i < $dickCountedOfTheSizeOfTheMoon; $i++) {
+                for ($i = 0; $i < $Counter; $i++) {
                     $history[$i] = " ";
                 }
             } else if (in_array('-d', $params_parts)) {
                 if (in_array(preg_match("[0-9]", $params_parts), $params_parts)) {
                     $option_short = true;
-                    for ($i = 10; $i < $dickCountedOfTheSizeOfTheMoon; $i++) {
+                    for ($i = 10; $i < $Counter; $i++) {
                         $history[$i] = " ";
                     }
                 }
             }
 
         } else {
-            for ($i = 0; $i < $dickCountedOfTheSizeOfTheMoon; $i++) {
-                $sender->send($i + 1 . " " . $history[$i]);
+            for ($i = 0; $i < $Counter; $i++) {
+                $sender->send("<br>" . ($i + 1) . " " . $history[$i]["command"]);
             }
         }
     }
