@@ -88,15 +88,15 @@ class cd implements CommandInterface
             $check->bindParam(":name", $name);
             $check->execute();
             if ($check->rowCount() == 0 && $data->position != "/") {
-                $sender->send("<br>Error : " . $name . " directory doesn't exists");
                 $goPath = false;
-
             }
         }
 
-        if($goPath == true){
+        if($goPath){
             // Modify position
             $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
+        } else {
+            $sender->send("<br>Error : " . $name . " directory doesn't exists");
         }
         
     

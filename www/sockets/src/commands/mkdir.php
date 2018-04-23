@@ -37,7 +37,7 @@ class mkdir implements CommandInterface
         $basicmod = 777;
         $newDirs = [];
         $params = "";
-        $idDirectory = null;
+        $idDirectory = 0;
         $arrayFullPath = [];
 
         // If no params
@@ -47,10 +47,11 @@ class mkdir implements CommandInterface
         }
 
         // Get position by current directory name
-        $position = explode("/", $data->position);
-        if (empty($position)) {
+        if ($data->position == "/") {
+            $sender->send($idDirectory);
             $positionDir = null;
         } else {
+            $position = explode("/", $data->position);
             $positionDir = $position[count($position) - 1];
         }
 
@@ -68,6 +69,7 @@ class mkdir implements CommandInterface
         preg_match_all("/ ((\/\"[^\"]+[\"]?\")|(\/[^\"\/ ]+))+\/? /", " " . $parameters . " ", $stringFullPath);
         if (!empty($stringFullPath[0])) {
             $sender->send($stringFullPath[0][0]);
+
             // Get elements from regex
             for ($i = 0; $i < count($stringFullPath[0]); $i++) {
                 $arrayFullPath[$i] = explode("/", $stringFullPath[0][$i]);
@@ -112,7 +114,7 @@ class mkdir implements CommandInterface
             }
 
             //Convert relative position name to IdDirectory
-            if ($positionDir != null) {
+            if (!empty($positionDir)) {
                 $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
                 $getIdDirectory->bindParam(":daddy", $positionDir);
                 if ($getIdDirectory->execute()) {
