@@ -37,7 +37,7 @@ class CommandHandler implements MessageComponentInterface
 
         $this->data[$conn->resourceId] = new SenderData;
 
-        $conn->send("login as: ");
+        $conn->send("message|login as: ");
     }
 
     public function onMessage(ConnectionInterface $sender, $cmd)
@@ -77,10 +77,10 @@ class CommandHandler implements MessageComponentInterface
                                 $parameters,
                             ]);
                         } else {
-                            $sender->send("<br><span>-bash: " . $cmd . ": command not found</span>");
+                            $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
+                        $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
                         // Push the command into the history
                         History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
@@ -111,29 +111,29 @@ class CommandHandler implements MessageComponentInterface
                                 ];
 
                                 foreach ($greetings as &$greet) {
-                                    $sender->send("<br><span>" . $greet . "</span>");
+                                    $sender->send("message|<br><span>" . $greet . "</span>");
                                 }
 
                                 $this->data[$sender->resourceId]->position = "/";
 
-                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
+                                $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
-                                $sender->send("<br><span>Access denied.</span>");
-                                $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
+                                $sender->send("message|<br><span>Access denied.</span>");
+                                $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                             }
                         } else {
                             $this->data[$sender->resourceId]->user->username = $cmd;
-                            $sender->send("<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
+                            $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                         }
                     }
                 } else {
-                    $sender->send("<br><span>alph: account connection error</span>");
+                    $sender->send("message|<br><span>alph: account connection error</span>");
                 }
             } else {
-                $sender->send("<br><span>alph: terminal connection error</span>");
+                $sender->send("message|<br><span>alph: terminal connection error</span>");
             }
         }
     }

@@ -114,6 +114,7 @@ conn.onopen = (e) => {
     conn.onmessage = e => {
         const data = e.data.split(/\|(.+)/);
 
+        console.log(data);
         if(data[0] == "message") {
             appendTerminal(data[1]);
         } else {

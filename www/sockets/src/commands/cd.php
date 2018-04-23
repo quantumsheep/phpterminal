@@ -53,7 +53,7 @@ class cd implements CommandInterface
 
         // Test if multi argument
         if(isset($path[1])){
-            $sender->send("<br>Error : Multiple argument");
+            $sender->send("message|message|<br>Error : Multiple argument");
             return;
         }
 
@@ -96,7 +96,7 @@ class cd implements CommandInterface
             // Modify position
             $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
         } else {
-            $sender->send("<br>Error : " . $name . " directory doesn't exists");
+            $sender->send("message|message|<br>Error : " . $name . " directory doesn't exists");
         }
         
     

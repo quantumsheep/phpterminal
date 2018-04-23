@@ -72,9 +72,9 @@ class ls implements CommandInterface
                     if (!empty($fetchedDirectories)) {
                         for ($i = 0; $i < count($fetchedDirectories); $i++, $jump++) {
                             if ($jump % 4 == 0) {
-                                $sender->send("<br>");
+                                $sender->send("message|<br>");
                             }
-                            $sender->send($fetchedDirectories[$i]["name"] . "&emsp;");
+                            $sender->send("message|" . $fetchedDirectories[$i]["name"] . "&emsp;");
                         }
                     }
                 }
