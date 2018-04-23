@@ -80,10 +80,6 @@ class mkdir implements CommandInterface
             return;
         }
 
-            }
-            return;
-        }
-
         // Table of new directory with $paramParts
         $paramParts = explode(" ", $parameters);
         if (!empty($paramParts)) {

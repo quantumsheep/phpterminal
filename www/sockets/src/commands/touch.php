@@ -59,32 +59,75 @@ class touch implements CommandInterface
             return;
         } else {
 
-            // if ($data->position == '/') {
-            //     $positionDir = "ok";
-            // } else {
-            //     $position = explode("/", $data->position);
-            //     $positionDir = $position[count($position) - 1];
-            // }
+            if ($data->position == '/') {
+                $positionDir = null;
+            } else {
+                $position = explode("/", $data->position);
+                $positionDir = $position[count($position) - 1];
+            }
+
+            // Get actual directory ID
+            if ($positionDir != null) {
+                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
+                $getIdDirectory->bindParam(":daddy", $positionDir);
+                if ($getIdDirectory->execute()) {
+                    if ($getIdDirectory->rowCount() > 0) {
+                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
+                    }
+                }
+            }
+
+            preg_match_all("/\"[^\"]*\"/", $parameters, $quotedParams);
+
+            var_dump($quotedParams);
+
+            if (!empty($quotedParams[0])) {
+
+                for ($i = 0; $i < sizeof($quotedParams); $i++) {
+                    $tmp[$i] = $quotedParams[0][$i];
+                }
+
+                $str = implode($tmp);
+                $sender->send(" | " . $str);
+
+                foreach ($tmp as $value) {
+                    str_replace($value, "", $parameters);
+                }
+                
+               // $sender->send(" | " . $parameters);
+                $parameters .= " " . $str;
+                // $sender->send(" | " . $parameters);
+            }
 
             // Get parameters
             $paramList = explode(" ", $parameters);
 
-            $name = $paramList[0];
+            foreach ($paramList as $name) {
+                //If file contain a directory
 
-            $dataFile = "OK";
+                //If file is OK
 
-            // Prepare
-            $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+                //If file is not OK
 
-            // Bind parameters put in SQL
-            $stmp->bindParam(":terminal", $terminal_mac);
-            $stmp->bindParam(":parent", $positionDir);
-            $stmp->bindParam(":name", $name);
-            $stmp->bindParam(":data", $dataFile);
-            $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-            $stmp->bindParam(":owner", $data->user->idterminal_user);
+                if (strpos($name, '"')) {
 
-            $stmp->execute();
+                }
+
+                $dataFile = "OK";
+
+                // Prepare
+                $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+                // Bind parameters put in SQL
+                $stmp->bindParam(":terminal", $terminal_mac);
+                $stmp->bindParam(":parent", $positionDir);
+                $stmp->bindParam(":name", $name);
+                $stmp->bindParam(":data", $dataFile);
+                $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+                $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+                $stmp->execute();
+            }
         }
     }
 
