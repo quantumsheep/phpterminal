@@ -55,7 +55,7 @@ class touch implements CommandInterface
 
         // If no params
         if (empty($parameters)) {
-            $sender->send("<br>Opérande manquant<br>Saisissez touch --help pour plus d'information");
+            $sender->send("message|<br>Opérande manquant<br>Saisissez touch --help pour plus d'information");
             return;
         } else {
 
@@ -88,15 +88,15 @@ class touch implements CommandInterface
                 }
 
                 $str = implode($tmp);
-                $sender->send(" | " . $str);
+                $sender->send("message| | " . $str);
 
                 foreach ($tmp as $value) {
                     str_replace($value, "", $parameters);
                 }
                 
-               // $sender->send(" | " . $parameters);
+               // $sender->send("message| | " . $parameters);
                 $parameters .= " " . $str;
-                // $sender->send(" | " . $parameters);
+                // $sender->send("message| | " . $parameters);
             }
 
             // Get parameters
@@ -132,3 +132,4 @@ class touch implements CommandInterface
     }
 
 }
+

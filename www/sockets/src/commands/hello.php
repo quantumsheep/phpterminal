@@ -35,6 +35,6 @@ class hello implements CommandInterface
         for($i = 0;$i<strlen($cmd);$i++){
             $choice = $choice + ord($cmd[$i])%47;
         }
-        $sender->send("World : ".$answer[$choice]);
+        $sender->send("message|World : ".$answer[$choice]);
     }
 }

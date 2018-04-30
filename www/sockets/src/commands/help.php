@@ -97,32 +97,32 @@ class help implements CommandInterface
 
                     // Doing different formating for each info type and sending them to the command sender
                     if ($key == "SHORT_DESCRIPTION" && $option_short) {
-                        $sender->send("<br><span>" . $topic . " - " . $info . "</span>");
+                        $sender->send("message|<br><span>" . $topic . " - " . $info . "</span>");
                     } else if ($key == "USAGE" && !$empty_topics) {
-                        $sender->send("<br><span>" . $topic . ": " . $info . "</span>");
+                        $sender->send("message|<br><span>" . $topic . ": " . $info . "</span>");
                     } else if ($key == "OPTIONS") {
-                        $sender->send("<br><span>Options:</span>");
+                        $sender->send("message|<br><span>Options:</span>");
 
                         // Looping around all the options
                         foreach ($info as $option_key => &$option) {
-                            $sender->send("<br><span>" . $option_key . "        " . $option . "</span>");
+                            $sender->send("message|<br><span>" . $option_key . "        " . $option . "</span>");
                         }
                     } else if ($key == "ARGUMENTS") {
-                        $sender->send("<br><span>Arguments:</span>");
+                        $sender->send("message|<br><span>Arguments:</span>");
 
                         // Looping around all the arguments
                         foreach ($info as $argument_key => &$argument) {
-                            $sender->send("<br><span>" . $argument_key . "   " . $argument . "</span>");
+                            $sender->send("message|<br><span>" . $argument_key . "   " . $argument . "</span>");
                         }
                     } else if ($key == "EXIT_STATUS") {
-                        $sender->send("<br><span>Exit Status:</span>");
-                        $sender->send("<br><span>" . $info . "</span>");
+                        $sender->send("message|<br><span>Exit Status:</span>");
+                        $sender->send("message|<br><span>" . $info . "</span>");
                     } else {
-                        $sender->send("<br><span>" . $info . "</span>");
+                        $sender->send("message|<br><span>" . $info . "</span>");
                     }
 
                     // Send a jump space
-                    $sender->send("");
+                    $sender->send("message|");
 
                     // Defining that there is one topic done
                     $done = true;
@@ -136,7 +136,7 @@ class help implements CommandInterface
             $last_topic = $topics[count($topics) - 1];
 
             // Send an error message for topic not found
-            $sender->send("-bash: help: no help topics match '" . $last_topic . "'. Try 'help help' or 'man -k " . $last_topic . "' or 'info " . $last_topic . "'.");
+            $sender->send("message|-bash: help: no help topics match '" . $last_topic . "'. Try 'help help' or 'man -k " . $last_topic . "' or 'info " . $last_topic . "'.");
         }
     }
 }

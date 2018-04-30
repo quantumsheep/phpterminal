@@ -1,8 +1,44 @@
 USE `alph`;
-DROP function IF EXISTS `GENERATE_PRIVATE_IP`;
+
+DROP FUNCTION IF EXISTS `MACADDRESS`;
+DROP FUNCTION IF EXISTS `GENERATE_PRIVATE_IP`;
+DROP FUNCTION IF EXISTS `GENERATE_PUBLIC_IP`;
+DROP FUNCTION IF EXISTS `SPLIT_STR`;
+DROP FUNCTION IF EXISTS `IdDirectoryFromPath`;
+DROP PROCEDURE IF EXISTS `NewNetwork`;
+DROP PROCEDURE IF EXISTS `NewTerminal`;
 
 DELIMITER $$
-USE `alph`$$
+
+/**
+ * Generate a new random MAC address
+ */
+CREATE DEFINER=`root`@`localhost` FUNCTION `MACADDRESS`() RETURNS char(17) CHARSET utf8
+BEGIN
+RETURN CONCAT(
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+    '-',
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+    '-',
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+    '-',
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+    '-',
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+    '-',
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
+	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1)
+);
+END$$
+
+/**
+ * Generate a new private IP with no conflict between others terminal's private IP
+ */
 CREATE DEFINER=`root`@`localhost` FUNCTION `GENERATE_PRIVATE_IP`(terminal_mac CHAR(17), network_mac CHAR(17)) RETURNS varchar(15) CHARSET utf8
 BEGIN
 DECLARE actual VARCHAR(15);
@@ -30,13 +66,9 @@ ELSE
 END IF;
 END$$
 
-DELIMITER ;
-
-USE `alph`;
-DROP function IF EXISTS `GENERATE_PUBLIC_IP`;
-
-DELIMITER $$
-USE `alph`$$
+/**
+ * Generate a new random public IP
+ */
 CREATE DEFINER=`root`@`localhost` FUNCTION `GENERATE_PUBLIC_IP`() RETURNS varchar(15) CHARSET utf8
 BEGIN
 DECLARE part INT(3);
@@ -59,83 +91,52 @@ RETURN CONCAT(
     '.',
     FLOOR(RAND() * 254)
 );
-END
-$$
+END$$
 
-DELIMITER ;
-
-USE `alph`;
-DROP function IF EXISTS `MACADDRESS`;
-
-DELIMITER $$
-USE `alph`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `MACADDRESS`() RETURNS char(17) CHARSET utf8
+/**
+ * Split a string by a specific delimiter and index
+ */
+CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR`(x VARCHAR(255), delim VARCHAR(12), pos INT) RETURNS varchar(255) CHARSET utf8
 BEGIN
-RETURN CONCAT(
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-    '-',
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-    '-',
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-    '-',
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-    '-',
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-    '-',
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1),
-	SUBSTRING('123456789ABCDEF', FLOOR(RAND() * 15 + 1), 1)
-);
-END
-$$
+RETURN REPLACE(SUBSTRING(
+				SUBSTRING_INDEX(x, delim, pos),
+				CHAR_LENGTH(
+					SUBSTRING_INDEX(x, delim, pos -1)
+				) + 1),
+				delim, "");--
+END$$
 
-DELIMITER ;
-
-USE `alph`;
-DROP procedure IF EXISTS `NewTerminal`;
-
-DELIMITER $$
-USE `alph`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `NewTerminal`(IN idaccount INT, IN network_mac CHAR(17))
+/**
+ * Get a directory's id from an absolute path
+ */
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT) RETURNS text CHARSET utf8
 BEGIN
-    DECLARE moment DATETIME;
-    SET moment = NOW();
+	DECLARE i INT;
+	DECLARE id INT;
+    DECLARE dirname VARCHAR(255);
+    SET i = 2;
     
-	SET @terminal_mac = MACADDRESS();
+    SET dirname = SPLIT_STR(path, '/', 2);
     
-    WHILE @terminal_mac IN (SELECT mac FROM TERMINAL) DO
-		SET @terminal_mac = MACADDRESS();
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname AND parent IS NULL);
+
+	SET i = 3;
+    
+    WHILE dirname <> '' DO
+		SET dirname = SPLIT_STR(path, '/', i);
+
+		IF dirname <> '' THEN
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND `name` = dirname);
+			SET i = i + 1;
+        END IF;
     END WHILE;
     
-	INSERT INTO TERMINAL (mac, account, localnetwork) VALUES(@terminal_mac, idaccount, network_mac);
-    
-    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
-    
-    INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(@terminal_mac, 0, 1, 'root');
-    SET @terminal_group = LAST_INSERT_ID();
-    
-    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(@terminal_mac, 0, @terminal_group, 1, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
-    SET @terminal_user = LAST_INSERT_ID();
-    
-	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(@terminal_user, @terminal_group);
-    
-    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, @terminal_user, @terminal_group, moment, moment);
+    RETURN id;
+END$$
 
-	SELECT @terminal_mac;
-END
-$$
-
-DELIMITER ;
-
-USE `alph`;
-DROP procedure IF EXISTS `NewNetwork`;
-
-DELIMITER $$
-USE `alph`$$
+/**
+ * Generate a new network
+ */
 CREATE DEFINER=`root`@`localhost` PROCEDURE `NewNetwork`()
 BEGIN
 	generateMac: LOOP
@@ -171,73 +172,37 @@ BEGIN
 	INSERT INTO NETWORK (mac, ipv4, ipv6) VALUES (@network_mac, @network_ipv4, @network_ipv6);
     
     SELECT @network_mac;
-END
-$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE FUNCTION SPLIT_STR(
-  x VARCHAR(255),
-  delim VARCHAR(12),
-  pos INT
-)
-RETURNS VARCHAR(255) DETERMINISTIC
-BEGIN 
-    RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
-       LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
-       delim, '');
-END
-$$
-
-DELIMITER ;
-
-USE `alph`;
-DROP function IF EXISTS `SPLIT_STR`;
-
-DELIMITER $$
-USE `alph`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR`(x VARCHAR(255), delim VARCHAR(12), pos INT) RETURNS varchar(255) CHARSET utf8
-BEGIN
-RETURN REPLACE(SUBSTRING(
-				SUBSTRING_INDEX(x, delim, pos),
-				CHAR_LENGTH(
-					SUBSTRING_INDEX(x, delim, pos -1)
-				) + 1),
-				delim, "");--
 END$$
 
-DELIMITER ;
-
-USE `alph`;
-DROP function IF EXISTS `IdDirectoryFromPath`;
-
-DELIMITER $$
-USE `alph`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT) RETURNS text CHARSET utf8
+/**
+ * Generate a new terminal
+ */
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewTerminal`(IN idaccount INT, IN network_mac CHAR(17))
 BEGIN
-	DECLARE i INT;
-	DECLARE id INT;
-    DECLARE dirname VARCHAR(255);
-    SET i = 2;
+    DECLARE moment DATETIME;
+    SET moment = NOW();
     
-    SET dirname = SPLIT_STR(path, '/', 2);
+	SET @terminal_mac = MACADDRESS();
     
-    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname AND parent IS NULL);
-
-	SET i = 3;
-    
-    WHILE dirname <> '' DO
-		SET dirname = SPLIT_STR(path, '/', i);
-
-		IF dirname <> '' THEN
-			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND `name` = dirname);
-			SET i = i + 1;
-        END IF;
+    WHILE @terminal_mac IN (SELECT mac FROM TERMINAL) DO
+		SET @terminal_mac = MACADDRESS();
     END WHILE;
     
-    RETURN id;
+	INSERT INTO TERMINAL (mac, account, localnetwork) VALUES(@terminal_mac, idaccount, network_mac);
+    
+    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
+    
+    INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(@terminal_mac, 0, 1, 'root');
+    SET @terminal_group = LAST_INSERT_ID();
+    
+    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(@terminal_mac, 0, @terminal_group, 1, 'root', (SELECT password FROM ACCOUNT WHERE ACCOUNT.idaccount=idaccount));
+    SET @terminal_user = LAST_INSERT_ID();
+    
+	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(@terminal_user, @terminal_group);
+    
+    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, @terminal_user, @terminal_group, moment, moment);
+
+	SELECT @terminal_mac;
 END$$
 
 DELIMITER ;
