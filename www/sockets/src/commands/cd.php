@@ -96,7 +96,7 @@ class cd implements CommandInterface
             // Modify position
             $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
         } else {
-            $sender->send("message|message|<br>Error : " . $name . " directory doesn't exists");
+            $sender->send("message|<br>Error : " . $name . " directory doesn't exists");
         }
         
     
