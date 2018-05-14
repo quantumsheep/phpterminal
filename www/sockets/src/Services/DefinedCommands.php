@@ -14,6 +14,7 @@ class DefinedCommands
             "touch",
             "ls",
             "clear",
+            "rm",
         ];
     }
 }
