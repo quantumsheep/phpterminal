@@ -44,11 +44,11 @@ class Helpers
         }
     
         for ($j = 0; $j <= $i; $j++) {
-            if ($absolute_parts[$j] == "") {
+            if (isset($absolute_parts[$j]) && $absolute_parts[$j] == "") {
                 \array_splice($absolute_parts, $j, 1);
             }
         }
-    
+
         var_dump($absolute_parts);
     
         return '/' . join('/', $absolute_parts);

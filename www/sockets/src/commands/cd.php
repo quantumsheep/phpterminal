@@ -2,6 +2,7 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
+use Alph\Services\Helpers;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
@@ -52,53 +53,39 @@ class cd implements CommandInterface
         $path = explode(' ', $parameters);
 
         // Test if multi argument
-        if(isset($path[1])){
+        if (isset($path[1])) {
             $sender->send("message|<br>Error : Multiple argument");
             return;
         }
 
-        // 
-        $path = $path[0];
-        if (empty($path)) {
-            return;
-        }
-
         // case parameters is help
-        if ($path == '--help') {
+        if ($path[0] == '--help') {
             $parameters = 'cd';
             return help::call(...\func_get_args());
         }
 
-        // Get each element of path
-        $path = explode('/', $path);
+       
+        //
+        if (empty($path[0])) {
+            return $data->position = "/home";
+        }
 
-        if ($path[0] == '') {
-            $data->position = join('/', $path);
-        } else {
-            if ($path[0] == '.') {
-                $path = array_slice($path, 1);
+        if($path[0] == '/') {
+            return $data->position = "/";
+        }
+
+        // Get absolut Path
+        $absolutePath = Helpers::getAbsolute($data->position, $path[0]);
+
+        $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
+        $stmp->execute([$absolutePath, $terminal_mac]);
+        if ($stmp->rowCount() === 1) {
+            $row = $stmp->fetch(\PDO::FETCH_ASSOC);
+            if ($row["idDirectory"] !== null) {
+                return $data->position = $absolutePath;
             }
         }
 
-        for ($i = 0; $i < count($path); $i++) {
-
-            // Check if directory exists
-            $name = $path[$i];
-            $check = $db->prepare("SELECT name FROM terminal_directory WHERE name = :name");
-            $check->bindParam(":name", $name);
-            $check->execute();
-            if ($check->rowCount() == 0 && $data->position != "/") {
-                $goPath = false;
-            }
-        }
-
-        if($goPath){
-            // Modify position
-            $data->position .= ($data->position[\strlen($data->position) - 1] == '/' ? '' : '/') . join('/', $path);
-        } else {
-            $sender->send("message|<br>Error : " . $name . " directory doesn't exists");
-        }
-        
-    
+        $sender->send("message|<br>Error : " . $path[0] . " directory doesn't exists");
     }
 }
