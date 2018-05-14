@@ -51,6 +51,6 @@ class Helpers
 
         var_dump($absolute_parts);
     
-        return '/' . join('/', $absolute_parts);
+        return join('/', $absolute_parts);
     }
 }
