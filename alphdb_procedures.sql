@@ -109,7 +109,7 @@ END$$
 /**
  * Get a directory's id from an absolute path
  */
-CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT) RETURNS text CHARSET utf8
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT, terminal_mac CHAR(17)) RETURNS text CHARSET utf8
 BEGIN
 	DECLARE i INT;
 	DECLARE id INT;
@@ -118,7 +118,7 @@ BEGIN
     
     SET dirname = SPLIT_STR(path, '/', 2);
     
-    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = dirname AND parent IS NULL);
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND name = dirname AND parent IS NULL);
 
 	SET i = 3;
     
@@ -126,7 +126,7 @@ BEGIN
 		SET dirname = SPLIT_STR(path, '/', i);
 
 		IF dirname <> '' THEN
-			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent = id AND `name` = dirname);
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND parent = id AND `name` = dirname);
 			SET i = i + 1;
         END IF;
     END WHILE;
