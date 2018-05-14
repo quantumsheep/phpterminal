@@ -29,7 +29,7 @@ class Helpers
                     $i--;
                 } else if ($partofpart == "..") {
                     if (!isset($absolute_parts[$i])) {
-                        throw new Exception("Wrong path value.");
+                        throw new \Exception("Wrong path value.");
                         return false;
                     }
     
@@ -48,8 +48,6 @@ class Helpers
                 \array_splice($absolute_parts, $j, 1);
             }
         }
-
-        var_dump($absolute_parts);
     
         return join('/', $absolute_parts);
     }

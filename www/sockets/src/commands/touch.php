@@ -2,6 +2,7 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
+use Alph\Services\Helpers;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
@@ -52,6 +53,7 @@ class touch implements CommandInterface
         $params = "";
         $positionDir = "KO";
         $dataFile = "";
+        $sended_path = "";
 
         // If no params
         if (empty($parameters)) {
@@ -59,27 +61,7 @@ class touch implements CommandInterface
             return;
         } else {
 
-            if ($data->position == '/') {
-                $positionDir = null;
-            } else {
-                $position = explode("/", $data->position);
-                $positionDir = $position[count($position) - 1];
-            }
-
-            // Get actual directory ID
-            if ($positionDir != null) {
-                $getIdDirectory = $db->prepare("SELECT iddir FROM TERMINAL_DIRECTORY WHERE name = :daddy");
-                $getIdDirectory->bindParam(":daddy", $positionDir);
-                if ($getIdDirectory->execute()) {
-                    if ($getIdDirectory->rowCount() > 0) {
-                        $idDirectory = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["iddir"];
-                    }
-                }
-            }
-
             preg_match_all("/\"[^\"]*\"/", $parameters, $quotedParams);
-
-            var_dump($quotedParams);
 
             if (!empty($quotedParams[0])) {
 
@@ -88,39 +70,39 @@ class touch implements CommandInterface
                 }
 
                 $str = implode($tmp);
-                $sender->send("message| | " . $str);
 
                 foreach ($tmp as $value) {
-                    str_replace($value, "", $parameters);
+                    $parameters = str_replace($value, "", $parameters);
                 }
-                
-               // $sender->send("message| | " . $parameters);
+
+                $str = str_replace(" ", "_", $str);
+
                 $parameters .= " " . $str;
-                // $sender->send("message| | " . $parameters);
+
+                $parameters = str_replace('"', "", $parameters);
             }
 
             // Get parameters
             $paramList = explode(" ", $parameters);
 
             foreach ($paramList as $name) {
-                //If file contain a directory
 
-                //If file is OK
+                // Get actual directory ID
+                Helpers::getAbsolute($data->position, $name, "..");
+                $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(':Path', ':Mac') as id");
+                $getIdDirectory->bindParam(":MAC", $terminal_mac);
+                $getIdDirectory->bindParam(":Path", $name);
+                $getIdDirectory->execute();
+                $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
 
-                //If file is not OK
-
-                if (strpos($name, '"')) {
-
-                }
-
-                $dataFile = "OK";
+                var_dump($CurrentDir);
 
                 // Prepare
                 $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $positionDir);
+                $stmp->bindParam(":parent", $dir);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":data", $dataFile);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
@@ -132,4 +114,3 @@ class touch implements CommandInterface
     }
 
 }
-

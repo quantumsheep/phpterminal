@@ -59,10 +59,6 @@ conn.onopen = (e) => {
         }
     });
     
-    function move() {
-        console.log("Move");
-    };
-    
     function click(e) {
         ClickCount++;
         if (ClickCount == 1) {
