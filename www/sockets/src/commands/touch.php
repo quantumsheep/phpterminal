@@ -88,18 +88,26 @@ class touch implements CommandInterface
             foreach ($paramList as $name) {
 
                 // Get actual directory ID
-                $paths = Helpers::getAbsolute($data->position, $name, "..");
-                $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                $getIdDirectory->bindParam(":mac", $terminal_mac);
-                $getIdDirectory->bindParam(":paths", $paths);
-                $getIdDirectory->execute();
-                $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                // if(!strstr($name,"/") ){
+                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                    $getIdDirectory->bindParam(":mac", $terminal_mac);
+                    $getIdDirectory->bindParam(":paths", $data->position);
+                    $getIdDirectory->execute();
+                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                    var_dump($CurrentDir);
+                // }else{
+                //     $paths = Helpers::getAbsolute($data->position, $name, "..");
+                //     $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                //     $getIdDirectory->bindParam(":mac", $terminal_mac);
+                //     $getIdDirectory->bindParam(":paths", $paths);
+                //     $getIdDirectory->execute();
+                //     $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                //     var_dump($CurrentDir);
+                // }
 
                 $pathlist = explode('/', $name);
 
                 $name = $pathlist[count($pathlist) - 1];
-
-                var_dump($name);
 
                 // Prepare
                 $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
