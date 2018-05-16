@@ -5,10 +5,7 @@ use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
-/**
- * template = the name of the commands
- */
-class template implements CommandInterface
+class rm implements CommandInterface
 {
     /**
      * Command's usage
