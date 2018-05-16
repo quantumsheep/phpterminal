@@ -1,7 +1,6 @@
 <?php
 namespace Alph\Commands;
 
-use Alph\Services\Helpers;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
@@ -29,30 +28,44 @@ class ls implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(':Path', ':Mac')");
-        $getIdDirectory->bindParam(":Mac", $terminal_mac);
-        $getIdDirectory->bindParam(":Path", $data->position);
+        $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+        $getIdDirectory->bindParam(":mac", $terminal_mac);
+        $getIdDirectory->bindParam(":paths", $data->position);
         $getIdDirectory->execute();
-        $Path=$getIdDirectory->fetchAll();
+        $Path = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+        $currentPath = $Path[0];
 
-        $getFiles = $db->prepare("SELECT * FROM TERMINAL_FILE WHERE terminal=':Mac' AND parent=':Parent'");
-        $getFiles->bindParam(":Mac", $terminal_mac);
-        $getFiles->bindParam(":Parent", $Path);
-        $getFiles->execute();
-        $files=$getFiles->fetchAll();
+        if (is_null($Path[0])) {
+            $getFiles = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent IS NULL");
+            $getFiles->bindParam(":mac", $terminal_mac);
+            $getFiles->execute();
+            $files = $getFiles->fetchAll(\PDO::FETCH_COLUMN);
 
-        $getDirs = $db->prepare("SELECT * FROM TERMINAL_FILE WHERE terminal=':Mac' AND parent=':Parent'");
-        $getDirs->bindParam(":Mac", $terminal_mac);
-        $getDirs->bindParam(":Parent", $Path);
-        $getDirs->execute();
-        $dirs=$getDirs->fetchAll();
+            $getDirs = $db->prepare("SELECT name FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent IS NULL");
+            $getDirs->bindParam(":mac", $terminal_mac);
+            $getDirs->execute();
+            $dirs = $getDirs->fetchAll(\PDO::FETCH_COLUMN);
+        } else {
+            var_dump($Path[0]);
+            $getFiles = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
+            $getFiles->bindParam(":mac", $terminal_mac);
+            $getFiles->bindParam(":parent", $currentPath);
+            $getFiles->execute();
+            $files = $getFiles->fetchAll(\PDO::FETCH_COLUMN);
 
-        foreach($files as $file){
-            $sender->send("message|file : ".$file);
+            $getDirs = $db->prepare("SELECT name FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent=:parent");
+            $getDirs->bindParam(":mac", $terminal_mac);
+            $getDirs->bindParam(":parent", $currentPath);
+            $getDirs->execute();
+            $dirs = $getDirs->fetchAll(\PDO::FETCH_COLUMN);
         }
-        
-        foreach($dirs as $dir){
-            $sender->send("message|dir : ".$dir);
+
+        foreach ($files as $file) {
+            $sender->send("message|<br>file : " . $file);
+        }
+
+        foreach ($dirs as $dir) {
+            $sender->send("message|<br>dir : " . $dir);
         }
     }
 }

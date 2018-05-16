@@ -88,21 +88,33 @@ class touch implements CommandInterface
             foreach ($paramList as $name) {
 
                 // Get actual directory ID
-                Helpers::getAbsolute($data->position, $name, "..");
-                $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(':Path', ':Mac') as id");
-                $getIdDirectory->bindParam(":MAC", $terminal_mac);
-                $getIdDirectory->bindParam(":Path", $name);
-                $getIdDirectory->execute();
-                $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                // if(!strstr($name,"/") ){
+                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                    $getIdDirectory->bindParam(":mac", $terminal_mac);
+                    $getIdDirectory->bindParam(":paths", $data->position);
+                    $getIdDirectory->execute();
+                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                    var_dump($CurrentDir);
+                // }else{
+                //     $paths = Helpers::getAbsolute($data->position, $name, "..");
+                //     $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                //     $getIdDirectory->bindParam(":mac", $terminal_mac);
+                //     $getIdDirectory->bindParam(":paths", $paths);
+                //     $getIdDirectory->execute();
+                //     $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                //     var_dump($CurrentDir);
+                // }
 
-                var_dump($CurrentDir);
+                $pathlist = explode('/', $name);
+
+                $name = $pathlist[count($pathlist) - 1];
 
                 // Prepare
                 $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
                 // Bind parameters put in SQL
                 $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $dir);
+                $stmp->bindParam(":parent", $CurrentDir);
                 $stmp->bindParam(":name", $name);
                 $stmp->bindParam(":data", $dataFile);
                 $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
