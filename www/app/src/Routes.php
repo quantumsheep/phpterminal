@@ -6,7 +6,7 @@ Route::checkAccess("ErrorController::e403");
 Route::exec(["GET"], "/assets/{filepath*}", "AssetsController::find");
 
 Route::exec(["GET"], "/favicon.ico", function() {
-    echo \Alph\Controllers\AssetsController::find(["filepath" => "favicon.ico"]);
+    return \Alph\Controllers\AssetsController::find(["filepath" => "favicon.ico"]);
 });
 
 Route::exec(["GET"], "/", "HomeController::index");

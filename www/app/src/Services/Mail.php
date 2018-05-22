@@ -13,7 +13,7 @@ class Mail
     /**
      * Create a new mail
      */
-    public function __construct(\PDO $db, string $subject, string $message, $to)
+    public function __construct(\PDO $db, string $subject, string $message, array $to)
     {
         // Create a new PHPMailer instance
         $mail = new PHPMailer;
@@ -76,7 +76,6 @@ class Mail
 
             // Set the HTML core message
             $mail->msgHTML($message);
-
 
             $this->mail = $mail;
         }
