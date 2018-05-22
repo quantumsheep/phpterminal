@@ -118,9 +118,6 @@ class touch implements CommandInterface
                 $getFileDirRecurence2->execute();
                 $existNULL = $getFileDirRecurence2->fetch();
 
-                var_dump($exist);
-                var_dump($existNULL);
-
                 if ($exist == false && $existNULL == false) {
                     // Prepare
                     $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
