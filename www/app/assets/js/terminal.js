@@ -31,6 +31,8 @@ conn.onopen = (e) => {
 
     document.getElementById('terminal-input').addEventListener('keydown', e => {
         if (e.key == "ArrowUp") {
+            e.preventDefault();
+            
             document.getElementById('terminal-input').addEventListener('keydown', e => {
                 if (e.key == "Enter") {
                     HistoryPosition = HistoryCmd.length;

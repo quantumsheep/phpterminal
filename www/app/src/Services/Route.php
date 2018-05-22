@@ -47,7 +47,7 @@ class Route
         // Pre-define the infinite route condition
         $infinite = false;
 
-        if(empty($client_uri[$client_uri_length - 1])) {
+        if (empty($client_uri[$client_uri_length - 1])) {
             unset($client_uri[--$client_uri_length]);
         }
 
@@ -65,7 +65,7 @@ class Route
                         // Add the client URI parts to the array
                         $vars[$varname] .= '/' . $client_uri[$j];
                     }
-                    
+
                     // We are in an infinite URI
                     $infinite = true;
 
@@ -84,7 +84,9 @@ class Route
         }
 
         // Check if URI is infinite and if route is longer than client URI
-        if(!$infinite && $parts_length < $client_uri_length) return false;
+        if (!$infinite && $parts_length < $client_uri_length) {
+            return false;
+        }
 
         self::callback($action, $vars);
         return true;
@@ -94,7 +96,7 @@ class Route
     {
         if (is_callable($action)) {
             // Start the action's callable relative to the route
-            echo call_user_func_array($action, $vars);
+            echo $action(...$vars);
         } else {
             // Start the controller's action relative to the route
             echo call_user_func("\\Alph\\Controllers\\" . $action, $vars);
