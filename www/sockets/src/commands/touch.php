@@ -8,7 +8,7 @@ use Ratchet\ConnectionInterface;
 
 class touch implements CommandInterface
 {
-    const USAGE = "touch [OPTION]... FILE...";
+    const USAGE = "touch [OPTION]... [FILE]...";
 
     const SHORT_DESCRIPTION = "touch - change file timestamps";
 
@@ -31,12 +31,7 @@ class touch implements CommandInterface
         "--version" => "output version information and exit",
     ];
 
-    const ARGUMENTS = [
-        "PATTERN" => "touch: missing file operand.
-                      Try 'touch --help' for more information.",
-    ];
-
-    const EXIT_STATUS = "";
+    const EXIT_STATUS = "Returns exit status of command or success if command is null.";
 
     /**
      * Call the command
@@ -69,58 +64,77 @@ class touch implements CommandInterface
                     $tmp[$i] = $quotedParams[0][$i];
                 }
 
-                $str = implode($tmp);
-
                 foreach ($tmp as $value) {
                     $parameters = str_replace($value, "", $parameters);
                 }
 
-                $str = str_replace(" ", "_", $str);
+                $parameters = str_replace(' ', "*", $parameters);
 
-                $parameters .= " " . $str;
+                foreach ($tmp as $value) {
+                $parameters .= $value;
+                }
 
                 $parameters = str_replace('"', "", $parameters);
+            }else{
+                $parameters = str_replace(' ', "*", $parameters);
             }
 
             // Get parameters
-            $paramList = explode(" ", $parameters);
+            $paramList = explode("*", $parameters);
 
             foreach ($paramList as $name) {
 
                 // Get actual directory ID
-                // if(!strstr($name,"/") ){
+                if (!strstr($name, "/")) {
                     $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
                     $getIdDirectory->bindParam(":mac", $terminal_mac);
                     $getIdDirectory->bindParam(":paths", $data->position);
                     $getIdDirectory->execute();
                     $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+
                     var_dump($CurrentDir);
-                // }else{
-                //     $paths = Helpers::getAbsolute($data->position, $name, "..");
-                //     $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                //     $getIdDirectory->bindParam(":mac", $terminal_mac);
-                //     $getIdDirectory->bindParam(":paths", $paths);
-                //     $getIdDirectory->execute();
-                //     $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-                //     var_dump($CurrentDir);
-                // }
+                } else {
+                    $paths = Helpers::getAbsolute($data->position, $name, "..");
+                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                    $getIdDirectory->bindParam(":mac", $terminal_mac);
+                    $getIdDirectory->bindParam(":paths", $paths);
+                    $getIdDirectory->execute();
+                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                }
 
                 $pathlist = explode('/', $name);
 
                 $name = $pathlist[count($pathlist) - 1];
 
-                // Prepare
-                $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+                //check if file or dir with the same name exist
+                $getFileDirRecurence = $db->prepare("SELECT name FROM terminal_file where name= :name AND parent= :parent");
+                $getFileDirRecurence->bindParam(":name", $name);
+                $getFileDirRecurence->bindParam(":parent", $CurrentDir);
+                $getFileDirRecurence->execute();
+                $exist = $getFileDirRecurence->fetch();
 
-                // Bind parameters put in SQL
-                $stmp->bindParam(":terminal", $terminal_mac);
-                $stmp->bindParam(":parent", $CurrentDir);
-                $stmp->bindParam(":name", $name);
-                $stmp->bindParam(":data", $dataFile);
-                $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-                $stmp->bindParam(":owner", $data->user->idterminal_user);
+                $getFileDirRecurence2 = $db->prepare("SELECT name FROM terminal_file where name= :name AND parent IS NULL");
+                $getFileDirRecurence2->bindParam(":name", $name);
+                $getFileDirRecurence2->execute();
+                $existNULL = $getFileDirRecurence2->fetch();
 
-                $stmp->execute();
+                var_dump($exist);
+                var_dump($existNULL);
+
+                if ($exist == false && $existNULL == false) {
+                    // Prepare
+                    $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+                    // Bind parameters put in SQL
+                    $stmp->bindParam(":terminal", $terminal_mac);
+                    $stmp->bindParam(":parent", $CurrentDir);
+                    $stmp->bindParam(":name", $name);
+                    $stmp->bindParam(":data", $dataFile);
+                    $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+                    $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+                    $stmp->execute();
+                }
             }
         }
     }
