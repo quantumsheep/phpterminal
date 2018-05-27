@@ -2,8 +2,8 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
-use Ratchet\ConnectionInterface;
 use Alph\Services\SenderData;
+use Ratchet\ConnectionInterface;
 
 class history implements CommandInterface
 {
@@ -17,17 +17,6 @@ class history implements CommandInterface
     const OPTIONS = [
         "-c" => "clear the history list by deleting all of the entries",
         "-d" => "offset delete the history entry at position OFFSET.",
-
-        "-a" => "append history lines from this session to the history file",
-        "-n" => "read all history lines not already read from the history file
-                 and append them to the history list",
-        "-r" => "read the history file and append the contents to the history
-                 list",
-        "-w" => "write the current history to the history file",
-
-        "-p" => "perform history expansion on each ARG and display the result
-                 without storing it in the history list",
-        "-s" => "append the ARGs to the history list as a single entry",
     ];
 
     const ARGUMENTS = [
@@ -46,33 +35,30 @@ class history implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        $check = $db->prepare("SELECT command FROM terminal_user_history WHERE terminal_user = :terminal_user");
-        $check->bindParam(":terminal_user", $data->user->idterminal_user);
-        $check->execute();
+        if ($parameters == null) {
+            $check = $db->prepare("SELECT command FROM terminal_user_history WHERE terminal_user = :terminal_user AND status='1'");
+            $check->bindParam(":terminal_user", $data->user->idterminal_user);
+            $check->execute();
 
-        $history = $check->fetchAll();
-        $Counter = count($history);
+            $history = $check->fetchAll();
+            $i = 1;
 
-        if ($parameters != null) {
-            $params_parts = explode(' ', $parameters);
-
-            if (in_array('-c', $params_parts)) {
-                $option_short = true;
-                for ($i = 0; $i < $Counter; $i++) {
-                    $history[$i] = " ";
-                }
-            } else if (in_array('-d', $params_parts)) {
-                if (in_array(preg_match("[0-9]", $params_parts), $params_parts)) {
-                    $option_short = true;
-                    for ($i = 10; $i < $Counter; $i++) {
-                        $history[$i] = " ";
-                    }
-                }
+            foreach ($history as $value) {
+                $sender->send("message|<br>" . $i++ . " " . $value["command"]);
             }
 
-        } else {
-            for ($i = 0; $i < $Counter; $i++) {
-                $sender->send("message|<br>" . ($i + 1) . " " . $history[$i]["command"]);
+        } else if ($parameters != null) {
+            $params_parts = explode(' ', $parameters);
+
+            if (in_array('-c', $params_parts) && \count($params_parts) <= 1) {
+                $check = $db->prepare("UPDATE terminal_user_history SET status=0 WHERE terminal_user = :terminal_user");
+                $check->bindParam(":terminal_user", $data->user->idterminal_user);
+                $check->execute();
+            } else if (in_array('-d', $params_parts) && \count($params_parts) <= 2) {
+                $check = $db->prepare("UPDATE terminal_user_history SET status=0 WHERE status=1 AND terminal_user = :terminal_user ORDER BY idhistory ASC LIMIT :num");
+                $check->bindParam(":terminal_user", $data->user->idterminal_user);
+                $check->bindParam(":num", $params_parts[1], \PDO::PARAM_INT);
+                $check->execute();
             }
         }
     }
