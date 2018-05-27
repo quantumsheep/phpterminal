@@ -15,6 +15,7 @@ class DefinedCommands
             "ls",
             "clear",
             "rm",
+            "nano",
         ];
     }
 }
