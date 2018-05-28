@@ -305,7 +305,7 @@ class AccountManager
                 $row["password"] = null;
 
                 // Store the account properties in the session (casted to an array)
-                $_SESSION["account"] = (array) AccountModel::map($row);
+                $_SESSION["account"] = AccountModel::map($row);
 
                 return true;
             }

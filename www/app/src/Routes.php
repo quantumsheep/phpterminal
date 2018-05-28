@@ -23,7 +23,7 @@ Route::exec(["GET"], "/validate/{code}", "AccountController::validate");
 Route::exec(["GET"], "/terminal", "TerminalController::terminal_list");
 Route::exec(["GET"], "/terminal/{mac}", "TerminalController::terminal");
 
-
+Route::exec(["GET"], "/account","AccountController::accountOption");
 /**
  * Administration routes
  */

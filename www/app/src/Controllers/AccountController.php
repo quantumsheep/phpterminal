@@ -32,6 +32,17 @@ class AccountController
         return $view;
     }
 
+    public static function accountOption(array $params)
+    {
+        $view = (new View("account/accountOption"))->render();
+
+        unset($_SESSION["errors"]);
+        unset($_SESSION["data"]);
+        unset($_SESSION["success"]);
+
+        return $view;
+    }
+
     public static function logout(array $params)
     {
         AccountManager::logout();

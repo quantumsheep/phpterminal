@@ -10,21 +10,21 @@ use Alph\Models\Model;
 class TerminalController
 {
     public static function terminal_list(array $params) {
-        if (empty($_SESSION["account"]["idaccount"])) {
+        if (empty($_SESSION["account"]->idaccount)) {
             return header("Location: /signin");
         }
         
         $db = Database::connect();
         $model = new Model();
 
-        $model->terminals = TerminalManager::getTerminalsByAccount($db, $_SESSION["account"]["idaccount"]);
+        $model->terminals = TerminalManager::getTerminalsByAccount($db, $_SESSION["account"]->idaccount);
 
         return (new View("terminal_list", $model))->render();        
     }
     
     public static function terminal(array $params)
     {
-        if (empty($_SESSION["account"]["idaccount"])) {
+        if (empty($_SESSION["account"]->idaccount)) {
             return header("Location: /signin");
         }
 
