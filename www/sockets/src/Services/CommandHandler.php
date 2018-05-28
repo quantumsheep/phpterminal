@@ -63,9 +63,10 @@ class CommandHandler implements MessageComponentInterface
                         @list($cmd, $parameters) = explode(' ', $cmd, 2);
 
                         // Check if the command exists
-                        if (in_array($cmd, $this->commands)) {
+                        if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
+                            $controller = $this->data[$sender->resourceId]->controller != null ? $this->data[$sender->resourceId]->controller : '\\Alph\\Commands\\' . $cmd . '::call';
                             // Call the command with arguments
-                            \call_user_func_array('\\Alph\\Commands\\' . $cmd . '::call', [
+                            \call_user_func_array($controller, [
                                 $this->db,
                                 $this->clients,
                                 &$this->data[$sender->resourceId],
@@ -80,8 +81,10 @@ class CommandHandler implements MessageComponentInterface
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
-
+                        if(!$this->data[$sender->resourceId]->private_input) {
+                            $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");    
+                        }
+                        
                         // Push the command into the history
                         History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {

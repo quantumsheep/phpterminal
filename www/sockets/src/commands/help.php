@@ -97,28 +97,28 @@ class help implements CommandInterface
 
                     // Doing different formating for each info type and sending them to the command sender
                     if ($key == "SHORT_DESCRIPTION" && $option_short) {
-                        $sender->send("message|<br><span>" . $topic . " - " . $info . "</span>");
+                        $sender->send("message|<br><span>" . htmlentities($topic . " - " . $info) . "</span>");
                     } else if ($key == "USAGE" && !$empty_topics) {
-                        $sender->send("message|<br><span>" . $topic . ": " . $info . "</span>");
+                        $sender->send("message|<br><span>" . htmlentities($topic . ": " . $info) . "</span>");
                     } else if ($key == "OPTIONS") {
                         $sender->send("message|<br><span>Options:</span>");
 
                         // Looping around all the options
                         foreach ($info as $option_key => &$option) {
-                            $sender->send("message|<br><span>" . $option_key . "        " . $option . "</span>");
+                            $sender->send("message|<br><span>" . htmlentities($option_key . "        " . $option) . "</span>");
                         }
                     } else if ($key == "ARGUMENTS") {
                         $sender->send("message|<br><span>Arguments:</span>");
 
                         // Looping around all the arguments
                         foreach ($info as $argument_key => &$argument) {
-                            $sender->send("message|<br><span>" . $argument_key . "   " . $argument . "</span>");
+                            $sender->send("message|<br><span>" . htmlentities($argument_key . "   " . $argument) . "</span>");
                         }
                     } else if ($key == "EXIT_STATUS") {
                         $sender->send("message|<br><span>Exit Status:</span>");
-                        $sender->send("message|<br><span>" . $info . "</span>");
+                        $sender->send("message|<br><span>" . htmlentities($info) . "</span>");
                     } else {
-                        $sender->send("message|<br><span>" . $info . "</span>");
+                        $sender->send("message|<br><span>" . htmlentities($info) . "</span>");
                     }
 
                     // Send a jump space
