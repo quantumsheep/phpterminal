@@ -41,7 +41,7 @@ class mkdir implements CommandInterface
 
         // If no params
         if (empty($parameters)) {
-            $sender->send("message|<br>Opérande manquant<br>Saisissez mkdir --help pour plus d'information");
+            $sender->send("message|<br>Operand missing <br>please enter mkdir --help for more information");
             return;
         } else {
 
