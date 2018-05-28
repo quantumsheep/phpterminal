@@ -86,7 +86,7 @@ class CommandHandler implements MessageComponentInterface
                         }
                         
                         // Push the command into the history
-                        History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]["idaccount"], $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
+                        History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
                         if (!empty($this->data[$sender->resourceId]->user->username) && !isset($this->data[$sender->resourceId]->user->password)) {
                             $stmp = $this->db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
