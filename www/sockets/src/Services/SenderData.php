@@ -12,7 +12,7 @@ class SenderData {
     /**
      * @var bool
      */
-    public $connected;
+    public $connected = false;
 
     /**
      * @var string
@@ -24,8 +24,11 @@ class SenderData {
      */
     public $data;
 
+    public $controller = null;
+
+    public $private_input = false;
+
     public function __construct() {
         $this->user = new Terminal_UserModel;
-        $this->connected = false;
     }
 }
