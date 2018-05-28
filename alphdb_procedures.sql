@@ -199,8 +199,8 @@ BEGIN
     SET @terminal_user = LAST_INSERT_ID();
     
 	INSERT INTO TERMINAL_GROUP_LINK (terminal_user, terminal_group) VALUES(@terminal_user, @terminal_group);
-    
-    INSERT INTO TERMINAL_DIRECTORY (terminal, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, 'home', 644, @terminal_user, @terminal_group, moment, moment);
+
+    INSERT INTO TERMINAL_DIRECTORY (terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES (@terminal_mac, '', 'home', 644, @terminal_user, @terminal_group, moment, moment);
 
 	SELECT @terminal_mac;
 END$$
