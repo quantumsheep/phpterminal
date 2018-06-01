@@ -44,89 +44,84 @@ class touch implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
+        //Var for default CHMOD
         $basicmod = 777;
-        $params = "";
-        $positionDir = "KO";
-        $dataFile = "";
-        $sended_path = "";
 
-        // If no params
+        //Error message if there is no parameters.
         if (empty($parameters)) {
             $sender->send("message|<br>Opérande manquant<br>Saisissez touch --help pour plus d'information");
             return;
         } else {
-
+            //Load all the parameters with quotes in one array
             preg_match_all("/\"[^\"]*\"/", $parameters, $quotedParams);
 
+            //If there's parameters with quotes
             if (!empty($quotedParams[0])) {
 
+                //Load all quoted parameters in a TMP array
                 for ($i = 0; $i < sizeof($quotedParams); $i++) {
                     $tmp[$i] = $quotedParams[0][$i];
                 }
 
+                //Delete all quoted parameters in the complete parameters list
                 foreach ($tmp as $value) {
                     $parameters = str_replace($value, "", $parameters);
                 }
 
+                //Replace all the spaces in complete parameters list by an illegal file name character
                 $parameters = str_replace(' ', "*", $parameters);
 
+                //Adding back all the quoted parameters in the entire parameters list
                 foreach ($tmp as $value) {
-                $parameters .= $value;
+                    $parameters .= $value;
                 }
 
+                //Remove all the quotes
                 $parameters = str_replace('"', "", $parameters);
-            }else{
+            } else {
+                //Replace all the spaces in complete parameters list by an illegal file name character
                 $parameters = str_replace(' ', "*", $parameters);
             }
 
-            // Get parameters
+            //Get all the parameters in an array
             $paramList = explode("*", $parameters);
 
-            foreach ($paramList as $name) {
+            //For each parameters
+            foreach ($paramList as $fileName) {
 
-                // Get actual directory ID
-                if (!strstr($name, "/")) {
-                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                    $getIdDirectory->bindParam(":mac", $terminal_mac);
-                    $getIdDirectory->bindParam(":paths", $data->position);
-                    $getIdDirectory->execute();
-                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-
-                    var_dump($CurrentDir);
-                } else {
-                    $paths = Helpers::getAbsolute($data->position, $name, "..");
-                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                    $getIdDirectory->bindParam(":mac", $terminal_mac);
-                    $getIdDirectory->bindParam(":paths", $paths);
-                    $getIdDirectory->execute();
-                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                //If there's '/' in the parameter, get the actual position directory ID
+                $paths = $data->position;
+                //If there's no '/' in the parameter, get the parameter directory ID
+                if (strstr($fileName, "/")) {
+                    $paths = Helpers::getAbsolute($data->position, $fileName, "..");
                 }
 
-                $pathlist = explode('/', $name);
+                $getDirId = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                $getDirId->bindParam(":mac", $terminal_mac);
+                $getDirId->bindParam(":paths", $paths);
+                $getDirId->execute();
+                $CurrentDir = $getDirId->fetch(\PDO::FETCH_ASSOC)["id"];
 
-                $name = $pathlist[count($pathlist) - 1];
+                //Split the parameters after the path set by the user in an array
+                $pathlist = explode('/', $fileName);
 
-                //check if file or dir with the same name exist
+                //Get the file name set by the user (logically the last string in the actual parameter)
+                $fileName = $pathlist[count($pathlist) - 1];
+
+                //Check if a file or a dir with the same name of the desired string exist in the BDD
                 $getFileDirRecurence = $db->prepare("SELECT name FROM terminal_file where name= :name AND parent= :parent");
-                $getFileDirRecurence->bindParam(":name", $name);
+                $getFileDirRecurence->bindParam(":name", $fileName);
                 $getFileDirRecurence->bindParam(":parent", $CurrentDir);
                 $getFileDirRecurence->execute();
-                $exist = $getFileDirRecurence->fetch();
+                $fileExist = $getFileDirRecurence->fetch();
 
-                $getFileDirRecurence2 = $db->prepare("SELECT name FROM terminal_file where name= :name AND parent IS NULL");
-                $getFileDirRecurence2->bindParam(":name", $name);
-                $getFileDirRecurence2->execute();
-                $existNULL = $getFileDirRecurence2->fetch();
+                //If the file or the dir didn't exist, create the file
+                if ($exist == false) {
+                    $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
-                if ($exist == false && $existNULL == false) {
-                    // Prepare
-                    $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-                    // Bind parameters put in SQL
                     $stmp->bindParam(":terminal", $terminal_mac);
                     $stmp->bindParam(":parent", $CurrentDir);
-                    $stmp->bindParam(":name", $name);
-                    $stmp->bindParam(":data", $dataFile);
+                    $stmp->bindParam(":name", $fileName);
                     $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
                     $stmp->bindParam(":owner", $data->user->idterminal_user);
 
