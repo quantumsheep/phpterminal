@@ -118,7 +118,7 @@ BEGIN
     
     SET dirname = SPLIT_STR(path, '/', 2);
     
-    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND name = dirname AND parent IS NULL);
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND name = dirname AND parent = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent IS NULL AND name = '' AND terminal = terminal_mac));
 
 	SET i = 3;
     
