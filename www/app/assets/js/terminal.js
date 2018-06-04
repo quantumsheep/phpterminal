@@ -9,17 +9,19 @@ let connected = false;
 conn.onopen = (e) => {
     console.log("Connection established!");
 
+    //Get the data send by the user.
     document.getElementById('terminal-input').addEventListener('keydown', (e) => {
-        if (e.key == "Enter") {
+        if (e.key === "Enter") {
             e.preventDefault();
             if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
                 e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
+                //Load the history of actual user
                 if (e.target.innerHTML != HistoryCmd[HystoryLength - 1]) {
                     HistoryCmd[HystoryLength] = e.target.innerHTML;
                     HystoryLength++;
                     HistoryPosition++;
                 }
-                
+
                 conn.send(e.target.innerHTML);
 
                 appendTerminal(e.target.innerHTML);
@@ -29,10 +31,11 @@ conn.onopen = (e) => {
         }
     });
 
+    //All the events for setting the actual position of history, ARROWUP and ARROWDOWN
     document.getElementById('terminal-input').addEventListener('keydown', e => {
         if (e.key == "ArrowUp") {
             e.preventDefault();
-            
+
             document.getElementById('terminal-input').addEventListener('keydown', e => {
                 if (e.key == "Enter") {
                     HistoryPosition = HistoryCmd.length;
@@ -60,16 +63,18 @@ conn.onopen = (e) => {
             document.getElementById('terminal-input').innerHTML = "";
         }
     });
-    
+
+
+    //Function for the click, select text and double click event listener
     function click(e) {
         ClickCount++;
         if (ClickCount == 1) {
             singleClickTimer = setTimeout(f => {
                 const input = document.getElementById('terminal-input');
-    
+
                 let range;
                 let selection;
-    
+
                 if (document.createRange) //Firefox, Chrome, Opera, Safari, IE 9+
                 {
                     range = document.createRange();
@@ -78,8 +83,7 @@ conn.onopen = (e) => {
                     selection = window.getSelection();
                     selection.removeAllRanges();
                     selection.addRange(range);
-                }
-                else if (document.selection) //IE 8 and lower
+                } else if (document.selection) //IE 8 and lower
                 {
                     range = document.body.createTextRange();
                     range.moveToElementText(input);
@@ -93,27 +97,29 @@ conn.onopen = (e) => {
             ClickCount = 0;
         }
     };
-    
+
+    //Event listener for the focus on the span
     termContainer.addEventListener("click", click, false);
-    
+
     termContainer.addEventListener("mousedown", e => {
         termContainer.addEventListener("click", click, false);
         mouseDown = setTimeout(f => {
+
             termContainer.addEventListener("mousemove", move, false);
             termContainer.removeEventListener("click", click, false);
-    
+
         }, 200);
         termContainer.addEventListener("mouseup", e => {
             clearTimeout(mouseDown);
             termContainer.removeEventListener("mousemove", move, false);
         });
     });
-    
+
+    //socket response
     conn.onmessage = e => {
         const data = e.data.split(/\|(.+)/);
 
-        console.log(data);
-        if(data[0] == "message") {
+        if (data[0] == "message") {
             appendTerminal(data[1]);
         } else {
             action(data[1]);
@@ -121,9 +127,9 @@ conn.onopen = (e) => {
 
         termContainer.scrollTo(0, termContainer.scrollHeight);
     };
-    
+
     function action(action) {
-        if(action == "clear") {
+        if (action == "clear") {
             document.getElementById("terminal-content-user").innerHTML = null;
         }
     }
@@ -131,8 +137,8 @@ conn.onopen = (e) => {
     function appendTerminal(text, line_jump = true) {
         document.getElementById("terminal-content-user").innerHTML += text;
     }
-    
-    if(document.querySelector('#account-select option[selected]')) {
+
+    if (document.querySelector('#account-select option[selected]')) {
         document.querySelector('#account-select option[selected]').removeAttribute("selected");
         document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
     }

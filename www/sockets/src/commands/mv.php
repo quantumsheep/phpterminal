@@ -5,59 +5,38 @@ use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
-class rm implements CommandInterface
+/**
+ * template = the name of the commands
+ */
+class mv implements CommandInterface
 {
     /**
      * Command's usage
      */
-    const USAGE = "rm [OPTION]... [FILE]...";
+    const USAGE = "mv [OPTION]... [-T] SOURCE DEST
+    or:  mv [OPTION]... SOURCE... DIRECTORY
+    or:  mv [OPTION]... -t DIRECTORY SOURCE...";
 
     /**
      * Command's short description
      */
-    const SHORT_DESCRIPTION = "Remove (unlink) the FILE(s).";
+    const SHORT_DESCRIPTION = "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
+
+    Mandatory arguments to long options are mandatory for short options too.";
 
     /**
      * Command's full description
      */
-    const FULL_DESCRIPTION = "By default, rm does not remove directories.  Use the --recursive (-r or -R)
-    option to remove each listed directory, too, along with all of its contents.
-
-    To remove a file whose name starts with a '-', for example '-foo',
-    use one of these commands:
-      rm -- -foo
-
-      rm ./-foo
-
-    Note that if you use rm to remove a file, it might be possible to recover
-    some of its contents, given sufficient expertise and/or time.  For greater
-    assurance that the contents are truly unrecoverable, consider using shred.
-
-    GNU coreutils online help: <http://www.gnu.org/software/coreutils/>
-    Full documentation at: <http://www.gnu.org/software/coreutils/rm>
-    or available locally via: info '(coreutils) rm invocation'";
+    const FULL_DESCRIPTION = "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.";
 
     /**
      * Command's options
      */
     const OPTIONS = [
-        "-f, --force" => "ignore nonexistent files and arguments, never prompt",
-        "-i" => "prompt before every removal",
-        "-I" => "prompt once before removing more than three files, or
-        when removing recursively; less intrusive than -i,
-        while still giving protection against most mistakes
---interactive[=WHEN]  prompt according to WHEN: never, once (-I), or
-        always (-i); without WHEN, prompt always
---one-file-system  when removing a hierarchy recursively, skip any
-        directory that is on a file system different from
-        that of the corresponding command line argument
---no-preserve-root  do not treat '/' specially
---preserve-root   do not remove '/' (default)",
-        "-r, -R, --recursive" => "remove directories and their contents recursively",
-        "-d, --dir" => "remove empty directories",
-        "-v" => "explain what is being done",
-        "--help" => "display this help and exit",
-        "--version" => "output version information and exit",
+        "-b" => "make a backup of each existing destination file, like --backup but does not accept an argument",
+        "-f, --force" => "do not prompt before overwriting",
+        "-i, --interactive" => "prompt before overwrite",
+        "-n, --no-clobber" => "do not overwrite an existing file",
     ];
 
     /**
@@ -144,18 +123,14 @@ class rm implements CommandInterface
                 $getFileDirRecurence->execute();
                 $fileExist = $getFileDirRecurence->fetch();
 
-                // Prepare
-                $stmp1 = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+                $check = $db->prepare("UPDATE terminal_user_history SET parent = :parent WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
                 //If the file or the dir didn't exist, delete the file
                 $stmp1->bindParam(":terminal", $terminal_mac);
                 $stmp1->bindParam(":parent", $CurrentDir);
                 $stmp1->bindParam(":name", $name);
                 $stmp1->bindParam(":owner", $data->user->idterminal_user);
-
-                $stmp1->execute();
             }
         }
     }
-
 }
