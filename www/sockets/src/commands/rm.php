@@ -123,7 +123,7 @@ class rm implements CommandInterface
                 $paths = $data->position;
                 //If there's no '/' in the parameter, get the parameter directory ID
                 if (strstr($fileName, "/")) {
-                    $paths = Helpers::getAbsolute($data->position, $fileName, "..");
+                    $paths = CommandAsset::getAbsolute($data->position, $fileName, "..");
                 }
 
                 $getDirId = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
