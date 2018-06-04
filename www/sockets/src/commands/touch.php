@@ -2,9 +2,9 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
-use Alph\Services\Helpers;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
 
 class touch implements CommandInterface
 {
@@ -89,11 +89,22 @@ class touch implements CommandInterface
             //For each parameters
             foreach ($paramList as $fileName) {
 
-                //If there's '/' in the parameter, get the actual position directory ID
-                $paths = $data->position;
-                //If there's no '/' in the parameter, get the parameter directory ID
-                if (strstr($fileName, "/")) {
-                    $paths = Helpers::getAbsolute($data->position, $fileName, "..");
+                // Get actual directory ID
+                if (!strstr($name, "/")) {
+                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                    $getIdDirectory->bindParam(":mac", $terminal_mac);
+                    $getIdDirectory->bindParam(":paths", $data->position);
+                    $getIdDirectory->execute();
+                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+
+                    var_dump($CurrentDir);
+                } else {
+                    $paths = CommandAsset::getAbsolute($data->position, $name, "..");
+                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
+                    $getIdDirectory->bindParam(":mac", $terminal_mac);
+                    $getIdDirectory->bindParam(":paths", $paths);
+                    $getIdDirectory->execute();
+                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
                 }
 
                 $getDirId = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");

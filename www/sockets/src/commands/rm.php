@@ -4,6 +4,7 @@ namespace Alph\Commands;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
 
 class rm implements CommandInterface
 {   
@@ -124,7 +125,7 @@ class rm implements CommandInterface
                     $getIdDirectory->execute();
                     $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
                 } else {
-                    $paths = Helpers::getAbsolute($data->position, $name, "..");
+                    $paths = CommandAsset::getAbsolute($data->position, $name, "..");
                     $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
                     $getIdDirectory->bindParam(":mac", $terminal_mac);
                     $getIdDirectory->bindParam(":paths", $paths);
