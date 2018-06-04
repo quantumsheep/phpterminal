@@ -49,7 +49,7 @@ class touch implements CommandInterface
 
         //Error message if there is no parameters.
         if (empty($parameters)) {
-            $sender->send("message|<br>Opérande manquant<br>Saisissez touch --help pour plus d'information");
+            $sender->send("touch: missing file operand, Try 'touch --help' for more information.");
             return;
         } else {
             //Load all the parameters with quotes in one array
@@ -113,10 +113,10 @@ class touch implements CommandInterface
                 $getFileDirRecurence->bindParam(":name", $fileName);
                 $getFileDirRecurence->bindParam(":parent", $CurrentDir);
                 $getFileDirRecurence->execute();
-                $fileExist = $getFileDirRecurence->fetch();
+                $exist = $getFileDirRecurence->rowCount() > 0;
 
                 //If the file or the dir didn't exist, create the file
-                if ($exist == false) {
+                if (!$exist) {
                     $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
                     $stmp->bindParam(":terminal", $terminal_mac);

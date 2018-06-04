@@ -8,11 +8,9 @@
 @section('content')
     <div class="terminal container" id="terminal-container">
         <span class="terminal-content" id="terminal-content-user">
-        
+
         </span>
-        <span id="terminal-content-response">
-            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
-        </span>
+            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false">
     </div>
 @endsection
 
