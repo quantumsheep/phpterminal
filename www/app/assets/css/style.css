@@ -11,27 +11,38 @@ html {
 body {
     height: 100%;
     margin: 0;
-    background-color: #1A1A1A;
     display: flex;
     flex-direction: column;
     color: #ffffff;
     overflow-x: hidden;
+    background-color: #808080;
 }
 
-header nav ul li {
-    display: inline;
+nav {
+    height: 64px;
 }
 
-.navbar-brand {
-    padding-top: 0;
-    padding-bottom: 0;
+nav ul.bg-dark {
+    background-color: initial !important;
 }
 
-.logo {
-    height: 48px;
+header {
+    box-shadow: 0px 0px 14px 0px #424242;
+    background-color: #20222a;
 }
 
-.cmd{
+header {
+    margin-bottom: 16px;
+}
+
+div, img {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.cmd {
     margin-left: 10px;
 }
 
@@ -43,34 +54,6 @@ footer {
     line-height: 60px;
 }
 
-.form-control:focus {
-    border-color: #555555 !important;
-    box-shadow: 0 0 0 .2rem #333333 !important;
-}
-
-.btn-primary {
-    color: #000;
-    background-color: #fcfcfc;
-    border-color: #eaeaea;
-}
-
-.btn-primary:hover {
-    color: #fff;
-    background-color: #3e3e3e;
-    border-color: #3b3b3b;
-}
-
-.btn-primary:focus {
-    border-color: #555555 !important;
-    box-shadow: 0 0 0 .2rem #333333 !important;
-}
-
-.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
-    color: #fff;
-    background-color: #3e3e3e;
-    border-color: #3b3b3b;
-}
-
 .lh-normal {
     line-height: normal;
 }
@@ -80,7 +63,7 @@ footer {
     text-align: center;
     color: white !important;
     text-decoration: none !important;
-    background: #333333;
+    background: rgba(51, 51, 51, 0.3);
     border-radius: 3px;
 }
 
@@ -91,4 +74,17 @@ footer {
 
 .flex-1 {
     flex: 1;
+}
+
+.custom-file-control::placeholder, .form-control::placeholder {
+    color: #cfcfcf;
+    opacity: 1;
+}
+
+.custom-file-control, .form-control {
+    color: #fff;
+}
+
+.custom-file-control:focus, .form-control:focus {
+    color: rgb(231, 231, 231);
 }
