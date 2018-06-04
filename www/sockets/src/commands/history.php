@@ -35,14 +35,17 @@ class history implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
+        //If history is enter without parameters
         if ($parameters == null) {
+            //Get all the history from the BDD
             $check = $db->prepare("SELECT command FROM terminal_user_history WHERE terminal_user = :terminal_user AND status='1'");
             $check->bindParam(":terminal_user", $data->user->idterminal_user);
             $check->execute();
-
             $history = $check->fetchAll();
+
             $i = 1;
 
+            //Send all the history at 1 to the size of the history
             foreach ($history as $value) {
                 $sender->send("message|<br>" . $i++ . " " . $value["command"]);
             }
@@ -50,10 +53,13 @@ class history implements CommandInterface
         } else if ($parameters != null) {
             $params_parts = explode(' ', $parameters);
 
+            //If the user type '-c' after history, set the status to 0 for all the history
             if (in_array('-c', $params_parts) && \count($params_parts) <= 1) {
                 $check = $db->prepare("UPDATE terminal_user_history SET status=0 WHERE terminal_user = :terminal_user");
                 $check->bindParam(":terminal_user", $data->user->idterminal_user);
                 $check->execute();
+
+                //If the user type '-d' and a number after history, set the status to 0 for all the number set by the user
             } else if (in_array('-d', $params_parts) && \count($params_parts) <= 2) {
                 $check = $db->prepare("UPDATE terminal_user_history SET status=0 WHERE status=1 AND terminal_user = :terminal_user ORDER BY idhistory ASC LIMIT :num");
                 $check->bindParam(":terminal_user", $data->user->idterminal_user);
