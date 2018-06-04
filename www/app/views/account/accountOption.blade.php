@@ -6,12 +6,21 @@
     
     <h2>Account Information</h2>
     <div class="container">
-        <div>
-            username : {{ $_SESSION["account"]->username}}
+        <div class="row">
+            <p >
+            Username : {{ $_SESSION["account"]->username}}
+            </p>
+            
         </div>
-        <div>
-            email : {{ $_SESSION["account"]->email }}
+        <div class="row">
+        <p>
+
+            Email : {{ $_SESSION["account"]->email }}
+        </p>
+            
         </div>
     </div>
+        
+        
 </div>
 @endsection
