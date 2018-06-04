@@ -36,10 +36,10 @@
                 <label for="password2">Password</label>
                 <input type="password" required="required" class="form-control" id="password2" name="password2" placeholder="Retype password">
             </div>
-            <div class="text-muted">By clicking on Sign up, you agree to <a href="/about/tos" target="blank">SMN's terms & conditions</a></div>
+            <div>By clicking on Sign up, you agree to <a href="/about/tos" target="blank">SMN's terms & conditions</a></div>
 
             <br>
-            <button type="submit" class="btn btn-primary col-12">Sign Up</button>
+            <button type="submit" class="btn text-white bg-primary col-12">Sign Up</button>
             <a href="/signin">Or login to your account here.</a>
         </form>
     </div>

@@ -30,7 +30,7 @@
             </div>
 
             <br>
-            <button type="submit" class="btn btn-primary col-12">Sign In</button>
+            <button type="submit" class="btn text-white bg-primary col-12">Sign In</button>
             <a href="/signup">Or create a new account here.</a>
         </form>
     </div>

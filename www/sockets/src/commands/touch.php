@@ -89,22 +89,11 @@ class touch implements CommandInterface
             //For each parameters
             foreach ($paramList as $fileName) {
 
-                // Get actual directory ID
-                if (!strstr($name, "/")) {
-                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                    $getIdDirectory->bindParam(":mac", $terminal_mac);
-                    $getIdDirectory->bindParam(":paths", $data->position);
-                    $getIdDirectory->execute();
-                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-
-                    var_dump($CurrentDir);
-                } else {
-                    $paths = CommandAsset::getAbsolute($data->position, $name, "..");
-                    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                    $getIdDirectory->bindParam(":mac", $terminal_mac);
-                    $getIdDirectory->bindParam(":paths", $paths);
-                    $getIdDirectory->execute();
-                    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
+                //If there's '/' in the parameter, get the actual position directory ID
+                $paths = $data->position;
+                //If there's no '/' in the parameter, get the parameter directory ID
+                if (strstr($fileName, "/")) {
+                    $paths = Helpers::getAbsolute($data->position, $fileName, "..");
                 }
 
                 $getDirId = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
@@ -124,9 +113,10 @@ class touch implements CommandInterface
                 $getFileDirRecurence->bindParam(":name", $fileName);
                 $getFileDirRecurence->bindParam(":parent", $CurrentDir);
                 $getFileDirRecurence->execute();
+                $fileExist = $getFileDirRecurence->fetch();
 
                 //If the file or the dir didn't exist, create the file
-                if ($getFileDirRecurence->rowCount() === 0) {
+                if ($exist == false) {
                     $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
                     $stmp->bindParam(":terminal", $terminal_mac);
