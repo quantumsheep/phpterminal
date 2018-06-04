@@ -37,7 +37,7 @@
             </div>
             <div id="terminal-content-response-exemple">
             <div id="terminal-user-exemple" class="shy" >anonymous@demoterminal:~ $
-                <span class="terminal-input" id="terminal-input-exemple" contenteditable="true" spellcheck="false"></span>
+                <span class="terminal-input" id="terminal-input-exemple" contenteditable="true" spellcheck="false">
             </div>
         </div>
     </div>

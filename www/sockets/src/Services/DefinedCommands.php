@@ -16,7 +16,7 @@ class DefinedCommands
             "clear",
             "rm",
             "nano",
-            "test",
+            "mv",
         ];
     }
 }
