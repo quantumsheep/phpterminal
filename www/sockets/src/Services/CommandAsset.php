@@ -22,7 +22,7 @@ class CommandAsset
         if (!empty($quotedParameters[1])) {
             foreach ($quotedParameters[1] as $quotedParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $quotedParameter, "", $parameters);
+                $parameters = str_replace(" " . $quotedParameter, "", " " . $parameters);
 
                 $fullPathQuotedParameters[] = self::GetAbsolute($position, str_replace('"', "", $quotedParameter));
             }
@@ -46,7 +46,7 @@ class CommandAsset
         if (!empty($options[1])) {
             foreach ($options[1] as $option) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $option, "", $parameters);
+                $parameters = str_replace(" " . $option, "", " " . $parameters);
                 // remove "-" from option for easiest treatment
                 $finalOptions[] = str_replace("-", "", $option);
             }
@@ -98,7 +98,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace($pathParameter, "", $parameters);
             }
             return $pathParameters[1];
         }
@@ -122,7 +122,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace($pathParameter, "", $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -189,14 +189,95 @@ class CommandAsset
     }
 
     /**
-     * Generate new directories from array of Full Path given
+     * Generate new directories from array of Full Paths
      */
-    public static function createNewDirectories(array $fullPathNewDirectories, \PDO $db, ConnectionInterface $sender, string $terminal_mac, SenderData &$data){
+    public static function stageCreateNewDirectories(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewDirectories)
+    {
+        foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
+            // get Full Path of Parent directory
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewDirectory);
 
+            if ($parentId != null) {
+                // Get name from created directory
+                $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
+
+                // Check if directory already exists
+                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false) {
+                    // Create directory
+                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectoryName, $parentId);
+                } else {
+
+                    $sender->send("message|<br>" . $newDirectoryName . " : directory already exists");
+                }
+            } else {
+                $sender->send("message|<br> Path not found");
+            }
+        }
     }
 
+    /**
+     * return ID of parent from the absolute path given, directory or file as last element
+     */
+    public static function getParentId(\PDO $db, ConnectionInterface $sender, string $terminal_mac, SenderData &$data, string $absolutePath)
+    {
+        // Treat fullPath of created directory to get parent Directory
+        $directorySplited = explode("/", $absolutePath);
+        array_pop($directorySplited);
+        array_shift($directorySplited);
+        $parentPath = "/" . implode("/", $directorySplited);
+        if ($parentPath != "/") {
+            return self::getIdDirectory($db, $terminal_mac, $parentPath);
+        }
+        return 1;   
+    }
 
+    /**
+     * Check if absolute Path does exist and provide ID in case it does. Return Null otherwise
+     */
+    public static function getIdDirectory(\PDO $db, string $terminal_mac, string $path)
+    {
+        $stmp = $db->prepare("SELECT IdDirectoryFromPath(:absolutePath, :mac) as id");
+        $stmp->bindParam(":mac", $terminal_mac);
+        var_dump($terminal_mac);
+        $stmp->bindParam(":absolutePath", $path);
+        var_dump($path);
+        $stmp->execute();
+        $idDirectory = $stmp->fetch(\PDO::FETCH_ASSOC)["id"];
+        return $idDirectory;
+    }
 
+    /**
+     * Check if a directory exist from its Absolute Path
+     */
+    public static function checkDirectoryExistence(string $directoryName, int $parentId, \PDO $db)
+    {
+        $stmp = $db->prepare("SELECT * FROM TERMINAL_DIRECTORY WHERE name= :name AND parent= :parent");
+        $stmp->bindParam(":name", $directoryName);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->execute();
+        $count = $stmp->rowCount();
+        if ($count > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * generate a new directory
+     */
+    public static function createNewDirectory(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    {
+        $basicmod = 777;
+        $stmp = $db->prepare("INSERT INTO TERMINAL_DIRECTORY(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+    }
 
     /**
      * Automatically generate directory if it doesn't exist
@@ -215,7 +296,9 @@ class CommandAsset
         $fullPathParameters = [];
         if (!empty($parameters)) {
             foreach ($parameters as $parameter) {
+                if($parameter != ""){
                 $fullPathParameters[] = self::getAbsolute($position, $parameter);
+                }
             }
             return $fullPathParameters;
         }

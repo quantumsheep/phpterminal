@@ -124,10 +124,9 @@ class touch implements CommandInterface
                 $getFileDirRecurence->bindParam(":name", $fileName);
                 $getFileDirRecurence->bindParam(":parent", $CurrentDir);
                 $getFileDirRecurence->execute();
-                $fileExist = $getFileDirRecurence->fetch();
 
                 //If the file or the dir didn't exist, create the file
-                if ($exist == false) {
+                if ($getFileDirRecurence->rowCount() === 0) {
                     $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
                     $stmp->bindParam(":terminal", $terminal_mac);

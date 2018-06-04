@@ -19,9 +19,7 @@ class test implements CommandInterface
 
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        $j = ["a","bc"];
-        $i = ["j","kb"];
-        CommandAsset::concatenateParameters($j, $i);
-        \var_dump($j);
+        var_dump(CommandAsset::getIdDirectory($db, $terminal_mac,  $parameters));
+        
     }
 }
