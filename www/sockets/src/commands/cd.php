@@ -2,7 +2,7 @@
 namespace Alph\Commands;
 
 use Alph\Services\CommandInterface;
-use Alph\Services\Helpers;
+use Alph\Services\CommandAsset;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
@@ -75,7 +75,7 @@ class cd implements CommandInterface
         }
 
         // Get absolut Path
-        $absolutePath = Helpers::getAbsolute($data->position, $path[0]);
+        $absolutePath = CommandAsset::getAbsolute($data->position, $path[0]);
 
         $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
         $stmp->execute([$absolutePath, $terminal_mac]);
