@@ -11,7 +11,7 @@ class CommandAsset
     /**
      * get quoted Parameters and return full Path of those
      */
-    public static function getQuotedParameters(string &$parameters, $position)
+    public static function getQuotedParameters(string &$parameters, string $position)
     {
         $pattern = "/(\"([^\"]+)\") /";
         $fullPathQuotedParameters = [];

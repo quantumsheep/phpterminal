@@ -140,10 +140,13 @@ class ls implements CommandInterface
         //Get the curent id form the actual position of the user in a var
         $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
         $getIdDirectory->bindParam(":mac", $terminal_mac);
+        var_dump($terminal_mac);
         $getIdDirectory->bindParam(":paths", $data->position);
+        var_dump($data->position);
         $getIdDirectory->execute();
         $Path = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
         $currentPath = $Path[0];
+        var_dump($currentPath);
 
         //Get the files in the actual directory in an array
         $getFiles = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
