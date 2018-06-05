@@ -1,10 +1,10 @@
 <?php
 namespace Alph\Commands;
 
-use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
 
 class test implements CommandInterface
 {
@@ -19,7 +19,7 @@ class test implements CommandInterface
 
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        var_dump(CommandAsset::getIdDirectory($db, $terminal_mac,  $parameters));
-        
+        CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $parameters);
+
     }
 }

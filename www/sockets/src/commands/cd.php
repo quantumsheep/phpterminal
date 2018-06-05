@@ -44,13 +44,17 @@ class cd implements CommandInterface
     {
         $goPath = true;
 
-        // cd by himself return to root
+        // cd by himself return to /home
         if (empty($parameters)) {
-            return $data->position = '/';
+            return $data->position = '/home';
         }
 
-        // Get element
+        $quotedParameters = CommandAsset::getQuotedParameters($parameters,$data->position);
+
         $path = explode(' ', $parameters);
+
+        CommandAsset::concatenateParameters($path, $quotedParameters);
+        var_dump($path);
 
         // Test if multi argument
         if (isset($path[1])) {
@@ -64,11 +68,6 @@ class cd implements CommandInterface
             return help::call(...\func_get_args());
         }
 
-       
-        //
-        if (empty($path[0])) {
-            return $data->position = "/home";
-        }
 
         if($path[0] == '/') {
             return $data->position = "/";
