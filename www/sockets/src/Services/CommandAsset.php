@@ -280,21 +280,6 @@ class CommandAsset
     }
     //GLOBAL USAGES FUNCTIONS -- END
 
-    //CD USAGES FUNCTIONS -- START
-    //CD USAGES FUNCTIONS -- END
-
-    //CLEAR USAGES FUNCTIONS -- START
-    //CLEAR USAGES FUNCTIONS -- END
-
-    //HELLO USAGES FUNCTIONS -- START
-    //HELLO USAGES FUNCTIONS -- END
-
-    //HELP USAGES FUNCTIONS -- START
-    //HELP USAGES FUNCTIONS -- END
-
-    //HISTORY USAGES FUNCTIONS -- START
-    //HISTORY USAGES FUNCTIONS -- END
-
     //LS USAGES FUNCTIONS -- START
     /**
      * Get the files in the actual directory in an array
@@ -387,12 +372,6 @@ class CommandAsset
 
     }
     //MKDIR USAGES FUNCTIONS -- END
-
-    //MV USAGES FUNCTIONS -- START
-    //MV USAGES FUNCTIONS -- END
-
-    //NANO USAGES FUNCTIONS -- START
-    //NANO USAGES FUNCTIONS -- END
 
     //RM USAGES FUNCTIONS -- START
     public static function stageDeleteFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathFiles)
