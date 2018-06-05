@@ -57,14 +57,16 @@ class mkdir implements CommandInterface
         
 
         if (!empty($options)) {
-            if (!null(\array_count_values($options["d"])) && \array_count_values($options)["d"] > 0) {
+            if (\in_array("p",$options)) {
                 CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
-                $NewDirectories = array_merge($newDirectories, $quotedParameters);
+                $NewDirectories = CommandAsset::concatenateParameters($newDirectories, $quotedParameters);
+                var_dump($newDirectories);
+                return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
             }
+                
         }
-        var_dump($newDirectories);
+        
         CommandAsset::concatenateParameters($newDirectories, $pathParameters, $quotedParameters);
-        var_dump($newDirectories);
         return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
 
         // Get parameters from

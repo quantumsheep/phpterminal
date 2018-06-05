@@ -9,7 +9,7 @@ class CommandAsset
 {
     //GLOBAL USAGES FUNCTIONS -- START
     /**
-     * get quoted Parameters and return full Path of those
+     * get quoted Parameters and return full Path of those in an array
      */
     public static function getQuotedParameters(string &$parameters, $position)
     {
@@ -32,7 +32,7 @@ class CommandAsset
     }
 
     /**
-     * get command options
+     * get command options and return it as an array
      */
     public static function getOptions(string &$parameters)
     {
@@ -56,7 +56,7 @@ class CommandAsset
     }
 
     /**
-     * get path parameters and return full path of both relative and absolute one
+     * get path parameters and return full path of both relative and absolute one in an array
      */
     public static function getPathParameters(string &$parameters, string $position)
     {
@@ -85,7 +85,7 @@ class CommandAsset
     }
 
     /**
-     * get absolute path parameters
+     * get absolute path parameters and retuen it in an array
      */
     public static function getAbsolutePathParameters(string &$parameters)
     {
@@ -108,7 +108,7 @@ class CommandAsset
     }
 
     /**
-     * localize relative path parameters and return absolute path
+     * localize relative path parameters and return absolute path of those in an array
      */
     public static function getRelativePathParameters(string &$parameters, string $position)
     {
@@ -319,6 +319,7 @@ class CommandAsset
     //LS USAGES FUNCTIONS -- END
 
     //MKDIR USAGES FUNCTIONS -- START
+
     /**
      * Generate new directories from array of Full Paths
      */
@@ -333,12 +334,12 @@ class CommandAsset
                 $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
 
                 // Check if directory already exists
-                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false) {
+                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false && self::checkFileExistence($newDirectoryName, $parentId, $db) === false) {
                     // Create directory
                     self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectoryName, $parentId);
                 } else {
 
-                    $sender->send("message|<br>" . $newDirectoryName . " : directory already exists");
+                    $sender->send("message|<br>" . $newDirectoryName . " : already exists");
                 }
             } else {
                 $sender->send("message|<br> Path not found");
@@ -369,7 +370,21 @@ class CommandAsset
      */
     public static function mkdirDOption(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathParameters)
     {
-        $sender->send("message|salt");
+        foreach ($fullPathParameters as $fullPathParameter) {
+            $parentId = 1;
+            $parentPath = "";
+            // Get whole directory name
+            $directorySplited = explode("/", $fullPathParameter);
+            array_shift($directorySplited);
+            foreach ($directorySplited as $directoryName) {
+                if (self::checkDirectoryExistence($directoryName, $parentId, $db) === false) {
+                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $directoryName, $parentId);
+                }
+                $parentPath = $parentPath . "/" . $directoryName;
+                $parentId = self::getIdDirectory($db, $terminal_mac, $parentPath);
+            }
+        }
+
     }
     //MKDIR USAGES FUNCTIONS -- END
 
@@ -427,6 +442,9 @@ class CommandAsset
     //RM USAGES FUNCTIONS -- END
 
     //TOUCH USAGES FUNCTIONS -- START
+    /**
+     * Full stage of creating new files
+     */
     public static function stageCreateNewFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewFiles)
     {
         foreach ($fullPathNewFiles as $fullPathNewFile) {
