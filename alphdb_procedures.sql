@@ -109,7 +109,7 @@ END$$
 /**
  * Get a directory's id from an absolute path
  */
-CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT, terminal_mac CHAR(17)) RETURNS INT CHARSET utf8
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdDirectoryFromPath`(path TEXT, terminal_mac CHAR(17)) RETURNS text CHARSET utf8
 BEGIN
 	DECLARE i INT;
 	DECLARE id INT;

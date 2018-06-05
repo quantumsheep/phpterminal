@@ -1,6 +1,7 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
@@ -138,29 +139,13 @@ class ls implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
         //Get the curent id form the actual position of the user in a var
-        $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-        $getIdDirectory->bindParam(":mac", $terminal_mac);
-        var_dump($terminal_mac);
-        $getIdDirectory->bindParam(":paths", $data->position);
-        var_dump($data->position);
-        $getIdDirectory->execute();
-        $Path = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-        $currentPath = $Path[0];
+        $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
         var_dump($currentPath);
-
         //Get the files in the actual directory in an array
-        $getFiles = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
-        $getFiles->bindParam(":mac", $terminal_mac);
-        $getFiles->bindParam(":parent", $currentPath);
-        $getFiles->execute();
-        $files = $getFiles->fetchAll(\PDO::FETCH_COLUMN);
+        $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
 
         //Get the dirs in the actual directory in an array
-        $getDirs = $db->prepare("SELECT name FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent=:parent");
-        $getDirs->bindParam(":mac", $terminal_mac);
-        $getDirs->bindParam(":parent", $currentPath);
-        $getDirs->execute();
-        $dirs = $getDirs->fetchAll(\PDO::FETCH_COLUMN);
+        $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
 
         //Return the files and the dirs to the user
         foreach ($files as $file) {

@@ -211,9 +211,7 @@ class CommandAsset
     {
         $stmp = $db->prepare("SELECT IdDirectoryFromPath(:absolutePath, :mac) as id");
         $stmp->bindParam(":mac", $terminal_mac);
-        var_dump($terminal_mac);
         $stmp->bindParam(":absolutePath", $path);
-        var_dump($path);
         $stmp->execute();
         $idDirectory = $stmp->fetch(\PDO::FETCH_ASSOC)["id"];
         return $idDirectory;
@@ -298,6 +296,26 @@ class CommandAsset
     //HISTORY USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
+    /**
+     * Get the files in the actual directory in an array
+     */
+    public static function getFiles(\PDO $db, string $terminal_mac, $currentPath)
+    {
+        $stmp = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
+        $stmp->bindParam(":mac", $terminal_mac);
+        $stmp->bindParam(":parent", $currentPath);
+        $stmp->execute();
+        return $stmp->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    public static function getDirectories(\PDO $db, string $terminal_mac, $currentPath)
+    {
+        $stmp = $db->prepare("SELECT name FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent=:parent");
+        $stmp->bindParam(":mac", $terminal_mac);
+        $stmp->bindParam(":parent", $currentPath);
+        $stmp->execute();
+        return $stmp->fetchAll(\PDO::FETCH_COLUMN);
+    }
     //LS USAGES FUNCTIONS -- END
 
     //MKDIR USAGES FUNCTIONS -- START
