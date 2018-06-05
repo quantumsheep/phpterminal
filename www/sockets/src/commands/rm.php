@@ -1,10 +1,10 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
-use Alph\Services\CommandAsset;
 
 class rm implements CommandInterface
 {
@@ -77,86 +77,28 @@ class rm implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
     {
-        //Parameters variable
-        $params = "";
-
-        // If no params send an error message
+        // If no params
         if (empty($parameters)) {
-            $sender->send("rm: missing file operand, Try 'rm --help' for more information.");
+            $sender->send("message|<br>Operand missing <br>please enter rm --help for more information");
             return;
-        } else {
-            //Get all the parameters with quotes in one array
-            preg_match_all("/\"[^\"]*\"/", $parameters, $quotedParams);
+        }
+        $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
+        $options = CommandAsset::getOptions($parameters);
+        $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
 
-            //If parameters with quotes are existing
-            if (!empty($quotedParams[0])) {
+        // Change simple parameters into array for further treatement
+        $Files = explode(" ", $parameters);
+        if (!empty($Files)) {
+            $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
+        }
 
-                //Create a temporary array of all the quoted parameters
-                for ($i = 0; $i < sizeof($quotedParams); $i++) {
-                    $tmp[$i] = $quotedParams[0][$i];
-                }
-
-                //Delete all quoted parameters in the complete parameters list
-                foreach ($tmp as $value) {
-                    $parameters = str_replace($value, "", $parameters);
-                }
-
-                //Replace all the spaces in complete parameters list by an illegal file name character
-                $parameters = str_replace(' ', "*", $parameters);
-
-                //Adding back all the quoted parameters in the entire parameters list
-                foreach ($tmp as $value) {
-                    $parameters .= $value;
-                }
-
-                //Remove all the quotes
-                $parameters = str_replace('"', "", $parameters);
-            } else {
-                //Replace all the spaces in complete parameters list by an illegal file name character
-                $parameters = str_replace(' ', "*", $parameters);
-            }
-
-            //For each parameters
-            foreach ($paramList as $fileName) {
-
-                //If there's '/' in the parameter, get the actual position directory ID
-                $paths = $data->position;
-                //If there's no '/' in the parameter, get the parameter directory ID
-                if (strstr($fileName, "/")) {
-                    $paths = CommandAsset::getAbsolute($data->position, $fileName, "..");
-                }
-
-                $getDirId = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-                $getDirId->bindParam(":mac", $terminal_mac);
-                $getDirId->bindParam(":paths", $paths);
-                $getDirId->execute();
-                $CurrentDir = $getDirId->fetch(\PDO::FETCH_ASSOC)["id"];
-
-                //Split the parameters after the path set by the user in an array
-                $pathlist = explode('/', $fileName);
-
-                //Get the file name set by the user (logically the last string in the actual parameter)
-                $fileName = $pathlist[count($pathlist) - 1];
-
-                //Check if a file or a dir with the same name of the desired string exist in the BDD
-                $getFileDirRecurence = $db->prepare("SELECT name FROM terminal_file where name= :name AND parent= :parent");
-                $getFileDirRecurence->bindParam(":name", $fileName);
-                $getFileDirRecurence->bindParam(":parent", $CurrentDir);
-                $getFileDirRecurence->execute();
-                $fileExist = $getFileDirRecurence->fetch();
-
-                // Prepare
-                $stmp1 = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
-
-                //If the file or the dir didn't exist, delete the file
-                $stmp1->bindParam(":terminal", $terminal_mac);
-                $stmp1->bindParam(":parent", $CurrentDir);
-                $stmp1->bindParam(":name", $name);
-                $stmp1->bindParam(":owner", $data->user->idterminal_user);
-
-                $stmp1->execute();
+        if (!empty($options)) {
+            if (!null(\array_count_values($options["d"])) && \array_count_values($options)["d"] > 0) {
+                CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
+                $Files = array_merge($Files, $quotedParameters);
             }
         }
+        CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
+        return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files);
     }
-
 }
