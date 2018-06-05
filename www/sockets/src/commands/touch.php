@@ -5,7 +5,6 @@ use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
-use Alph\Services\CommandAsset;
 
 class touch implements CommandInterface
 {
