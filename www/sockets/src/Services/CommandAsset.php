@@ -7,7 +7,7 @@ use Ratchet\ConnectionInterface;
 
 class CommandAsset
 {
-
+    //GLOBAL USAGES FUNCTIONS -- START
     /**
      * get quoted Parameters and return full Path of those
      */
@@ -189,33 +189,6 @@ class CommandAsset
     }
 
     /**
-     * Generate new directories from array of Full Paths
-     */
-    public static function stageCreateNewDirectories(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewDirectories)
-    {
-        foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
-            // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewDirectory);
-
-            if ($parentId != null) {
-                // Get name from created directory
-                $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
-
-                // Check if directory already exists
-                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false) {
-                    // Create directory
-                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectoryName, $parentId);
-                } else {
-
-                    $sender->send("message|<br>" . $newDirectoryName . " : directory already exists");
-                }
-            } else {
-                $sender->send("message|<br> Path not found");
-            }
-        }
-    }
-
-    /**
      * return ID of parent from the absolute path given, directory or file as last element
      */
     public static function getParentId(\PDO $db, ConnectionInterface $sender, string $terminal_mac, SenderData &$data, string $absolutePath)
@@ -228,7 +201,7 @@ class CommandAsset
         if ($parentPath != "/") {
             return self::getIdDirectory($db, $terminal_mac, $parentPath);
         }
-        return 1;   
+        return 1;
     }
 
     /**
@@ -261,6 +234,99 @@ class CommandAsset
         }
         return false;
     }
+    /**
+     * Check if a file exist from its Absolute Path
+     */
+    public static function checkFileExistence(string $FileName, int $parentId, \PDO $db)
+    {
+        $stmp = $db->prepare("SELECT * FROM TERMINAL_FILE WHERE name= :name AND parent= :parent");
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->execute();
+        $count = $stmp->rowCount();
+        if ($count > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * return array of fullPath from array of parameters
+     */
+    public static function fullPathFromParameters(array $parameters, string $position)
+    {
+        $fullPathParameters = [];
+        if (!empty($parameters)) {
+            foreach ($parameters as $parameter) {
+                if ($parameter != "") {
+                    $fullPathParameters[] = self::getAbsolute($position, $parameter);
+                }
+            }
+            return $fullPathParameters;
+        }
+        return;
+    }
+
+    /**
+     * Concatenate Parameters
+     */
+    public static function concatenateParameters(array &$hostArray, array...$parameters)
+    {
+        if (!empty($parameters)) {
+            for ($i = 0; $i < count($parameters); $i++) {
+                for ($j = 0; $j < count($parameters[$i]); $j++) {
+                    $hostArray[] = $parameters[$i][$j];
+                }
+            }
+        }
+    }
+    //GLOBAL USAGES FUNCTIONS -- END
+
+    //CD USAGES FUNCTIONS -- START
+    //CD USAGES FUNCTIONS -- END
+
+    //CLEAR USAGES FUNCTIONS -- START
+    //CLEAR USAGES FUNCTIONS -- END
+
+    //HELLO USAGES FUNCTIONS -- START
+    //HELLO USAGES FUNCTIONS -- END
+
+    //HELP USAGES FUNCTIONS -- START
+    //HELP USAGES FUNCTIONS -- END
+
+    //HISTORY USAGES FUNCTIONS -- START
+    //HISTORY USAGES FUNCTIONS -- END
+
+    //LS USAGES FUNCTIONS -- START
+    //LS USAGES FUNCTIONS -- END
+
+    //MKDIR USAGES FUNCTIONS -- START
+    /**
+     * Generate new directories from array of Full Paths
+     */
+    public static function stageCreateNewDirectories(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewDirectories)
+    {
+        foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
+            // get Full Path of Parent directory
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewDirectory);
+
+            if ($parentId != null) {
+                // Get name from created directory
+                $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
+
+                // Check if directory already exists
+                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false) {
+                    // Create directory
+                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectoryName, $parentId);
+                } else {
+
+                    $sender->send("message|<br>" . $newDirectoryName . " : directory already exists");
+                }
+            } else {
+                $sender->send("message|<br> Path not found");
+            }
+        }
+    }
 
     /**
      * generate a new directory
@@ -287,35 +353,57 @@ class CommandAsset
     {
         $sender->send("message|salt");
     }
+    //MKDIR USAGES FUNCTIONS -- END
 
-    /**
-     * return array of fullPath from array of parameters
-     */
-    public static function fullPathFromParameters(array $parameters, string $position)
+    //MV USAGES FUNCTIONS -- START
+    //MV USAGES FUNCTIONS -- END
+
+    //NANO USAGES FUNCTIONS -- START
+    //NANO USAGES FUNCTIONS -- END
+
+    //RM USAGES FUNCTIONS -- START
+    //RM USAGES FUNCTIONS -- END
+
+    //TOUCH USAGES FUNCTIONS -- START
+    public static function stageCreateNewFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewFiles)
     {
-        $fullPathParameters = [];
-        if (!empty($parameters)) {
-            foreach ($parameters as $parameter) {
-                if($parameter != ""){
-                $fullPathParameters[] = self::getAbsolute($position, $parameter);
+        foreach ($fullPathNewFiles as $fullPathNewFile) {
+            // get Full Path of Parent directory
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewFile);
+
+            if ($parentId != null) {
+                // Get name from created directory
+                $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
+
+                // Check if directory already exists
+                if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
+                    // Create directory
+                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
+                } else {
+
+                    $sender->send("message|<br>" . $newFileName . " : already exists");
                 }
+            } else {
+                $sender->send("message|<br> Path not found");
             }
-            return $fullPathParameters;
         }
-        return;
     }
 
     /**
-     * Concatenate Parameters
+     * generate a new directory
      */
-    public static function concatenateParameters(array &$hostArray, array...$parameters)
+    public static function createNewFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
-        if (!empty($parameters)) {
-            for ($i = 0; $i < count($parameters); $i++) {
-                for ($j = 0; $j < count($parameters[$i]); $j++) {
-                    $hostArray[] = $parameters[$i][$j];
-                }
-            }
-        }
+        $basicmod = 777;
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
     }
+    //TOUCH USAGES FUNCTIONS -- END
 }
