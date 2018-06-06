@@ -7,10 +7,8 @@
 
 @section('content')
     <div class="terminal container" id="terminal-container">
-        <span class="terminal-content" id="terminal-content-user">
-
-        </span>
-            <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false">
+        <span class="terminal-content" id="terminal-content-user"></span>
+        <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
     </div>
 @endsection
 
