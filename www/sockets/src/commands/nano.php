@@ -4,6 +4,7 @@ namespace Alph\Commands;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
 
 class nano implements CommandInterface
 {
@@ -69,5 +70,13 @@ class nano implements CommandInterface
     {
         $data->controller = "\\Alph\\Commands\\nano::call";
         $data->private_input = true;
+
+        $content = "";
+
+        if($parameters) {
+            // Get parameters, options and shit
+        }
+
+        $sender->send('action|nano|' . $content);
     }
 }

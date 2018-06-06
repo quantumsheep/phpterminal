@@ -1,16 +1,21 @@
 const conn = new WebSocket(`ws://${window.location.hostname}${location.port ? ':' + location.port : ''}`);
-let HistoryCmd = [""];
-let HistoryPosition = 0;
-let HystoryLength = 0;
-const termContainer = document.getElementById("terminal-container");
-let ClickCount = 0;
-let connected = false;
 
 conn.onopen = (e) => {
+    const HistoryCmd = [""];
+    let HistoryPosition = 0;
+    let HystoryLength = 0;
+    const termContainer = document.getElementById("terminal-container");
+    let ClickCount = 0;
+    let connected = false;
+
+    const pressedKeys = {};
+
     console.log("Connection established!");
 
     //Get the data send by the user.
-    document.getElementById('terminal-input').addEventListener('keydown', (e) => {
+    document.getElementById('terminal-input').addEventListener('keydown', e => {
+        pressedKeys[e.key] = true;
+
         if (e.key === "Enter") {
             e.preventDefault();
             if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
@@ -29,6 +34,10 @@ conn.onopen = (e) => {
                 e.target.innerHTML = "";
             }
         }
+    });
+
+    document.getElementById('terminal-input').addEventListener('keyup', e => {
+        pressedKeys[e.key] = false;
     });
 
     //All the events for setting the actual position of history, ARROWUP and ARROWDOWN
@@ -129,8 +138,14 @@ conn.onopen = (e) => {
     };
 
     function action(action) {
+        const parameters = action.split(/\|(.*)/);
+
+        console.log(parameters);
+
         if (action == "clear") {
             document.getElementById("terminal-content-user").innerHTML = null;
+        } else if (parameters[0] == 'nano') {
+            nanoMode(parameters[1] ? parameters[1] : '');
         }
     }
 
@@ -141,5 +156,37 @@ conn.onopen = (e) => {
     if (document.querySelector('#account-select option[selected]')) {
         document.querySelector('#account-select option[selected]').removeAttribute("selected");
         document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
+    }
+
+    function nanoMode(content = "") {
+        document.getElementById('nano-content').innerText = content;
+
+        document.getElementById('terminal-content-user').classList.add('d-none');
+        document.getElementById('terminal-input').classList.add('d-none');
+
+        document.getElementById('nano').classList.remove('d-none');
+        document.getElementById('nano').classList.add('d-flex');
+
+        for (let key in pressedKeys) {
+            pressedKeys[key] = false;
+        }
+
+        const nano = {
+            message: document.getElementById('nano-message').innerHTML
+        }
+
+        document.getElementById('nano-content').addEventListener('keydown', e => {
+            pressedKeys[e.key] = true;
+
+            if (pressedKeys['Ctrl'] && pressedKeys['x']) {
+                console.log('yes');
+
+                nano.message = "yo";
+            }
+        });
+
+        document.getElementById('nano-content').addEventListener('keyup', e => {
+            pressedKeys[e.key] = false;
+        });
     }
 };
