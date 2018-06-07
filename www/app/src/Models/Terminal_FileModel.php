@@ -1,7 +1,7 @@
 <?php
 namespace Alph\Models;
 
-class Terminal_UserModel {
+class Terminal_FileModel {
     public $idfile;
     public $terminal;
     public $parent;
