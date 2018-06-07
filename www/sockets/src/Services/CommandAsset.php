@@ -329,20 +329,30 @@ class CommandAsset
      */
     public static function getFiles(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, length(data), username FROM terminal_file,terminal_user WHERE terminal_file.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
-        return $stmp->fetchAll(\PDO::FETCH_COLUMN);
+        $files = [];
+
+        while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+            $files[] = Terminal_FileModel::map($row);
+        }
+        return $files;
     }
 
     public static function getDirectories(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent=:parent");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, username FROM terminal_directory,terminal_user WHERE terminal_directory.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
-        return $stmp->fetchAll(\PDO::FETCH_COLUMN);
+        $dirs = [];
+
+        while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+            $dirs[] = Terminal_FileModel::map($row);
+        }
+        return $dirs;
     }
     //LS USAGES FUNCTIONS -- END
 
