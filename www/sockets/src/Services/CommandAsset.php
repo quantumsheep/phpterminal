@@ -427,7 +427,7 @@ class CommandAsset
     //MKDIR USAGES FUNCTIONS -- END
 
     //RM USAGES FUNCTIONS -- START
-    public static function stageDeleteFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathFiles)
+    public static function stageDeleteFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathFiles, string $type)
     {
         foreach ($fullPathFiles as $fullPathFile) {
             // get Full Path of Parent directory
@@ -441,8 +441,13 @@ class CommandAsset
                 if (self::checkDirectoryExistence($FileName, $parentId, $db) === false && self::checkFileExistence($FileName, $parentId, $db) === false) {
                     $sender->send("message|<br>" . $FileName . " : didn't exists");
                 } else {
-                    // Delete file
-                    self::deleteFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                    if ($type == 'file') {
+                        // Delete file
+                        self::deleteFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                    } else if ($type == 'dir') {
+                        // Delete file
+                        self::deleteDir($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                    }
                 }
             } else {
                 $sender->send("message|<br> Path not found");
@@ -455,15 +460,44 @@ class CommandAsset
      */
     public static function deleteFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
-        $stmp1 = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
         //If the file or the dir exist, delete the file
-        $stmp1->bindParam(":terminal", $terminal_mac);
-        $stmp1->bindParam(":parent", $parentId);
-        $stmp1->bindParam(":name", $name);
-        $stmp1->bindParam(":owner", $data->user->idterminal_user);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        $stmp1->execute();
+        $stmp->execute();
+    }
+
+    /**
+     * delete a Directory
+     */
+    public static function deleteDir(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    {
+        $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        //If the file or the dir exist, delete the file
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+
+        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        //If the file or the dir exist, delete the file
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+        if ($stmp->fetch()['name']) {
+            $sender->send("message|<br> Directory not empty.");
+        };
     }
     //RM USAGES FUNCTIONS -- END
 

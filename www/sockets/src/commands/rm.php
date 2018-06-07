@@ -82,6 +82,7 @@ class rm implements CommandInterface
             $sender->send("message|<br>Operand missing <br>please enter rm --help for more information");
             return;
         }
+
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
         $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
@@ -99,6 +100,6 @@ class rm implements CommandInterface
             }
         }
         CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
-        return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files);
+        return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files, 'file');
     }
 }
