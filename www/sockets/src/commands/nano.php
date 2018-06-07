@@ -92,7 +92,7 @@ class nano implements CommandInterface
                     }
                 }
             }
-            $file = CommandAsset::getFile($db, CommandAsset::getAbsolute($data->data["nano"]->pending[0]), $terminal_mac);
+            $file = CommandAsset::getFile($db, CommandAsset::getAbsolute($data->position, $data->data["nano"]->pending[0]), $terminal_mac);
 
             $sender->send('action|nano|' . (!empty($file->data) ? $file->data : ''));
         }
