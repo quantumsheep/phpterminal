@@ -444,6 +444,9 @@ class CommandAsset
                     } else if ($type == 'dir') {
                         // Delete file
                         self::deleteDir($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                    } else {
+                        self::deleteFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                        self::deleteDir($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
                     }
                 }
             } else {
@@ -457,7 +460,7 @@ class CommandAsset
      */
     public static function deleteFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
-        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
         //If the file or the dir exist, delete the file
         $stmp->bindParam(":terminal", $terminal_mac);
@@ -466,6 +469,20 @@ class CommandAsset
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
         $stmp->execute();
+        if ($stmp->fetch()['name']) {
+            $sender->send("message|<br>rm: cannot remove '" . $name . "': Is a directory");
+        } else {
+
+            $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+            //If the file or the dir exist, delete the file
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":parent", $parentId);
+            $stmp->bindParam(":name", $name);
+            $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+            $stmp->execute();
+        };
     }
 
     /**
