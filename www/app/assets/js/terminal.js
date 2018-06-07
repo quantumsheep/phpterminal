@@ -107,6 +107,11 @@ conn.onopen = (e) => {
         }
     };
 
+    function move() {
+        clearTimeout(singleClickTimer);
+        ClickCount = 0;
+    };
+
     //Event listener for the focus on the span
     termContainer.addEventListener("click", click, false);
 

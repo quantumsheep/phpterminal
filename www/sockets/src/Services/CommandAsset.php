@@ -295,14 +295,28 @@ class CommandAsset
     //CLEAR USAGES FUNCTIONS -- START
     //CLEAR USAGES FUNCTIONS -- END
 
-    //HELLO USAGES FUNCTIONS -- START
-    //HELLO USAGES FUNCTIONS -- END
+    /**
+     * Get the CHMOD of the sended file/dir
+     */
+    public static function getChmod(\PDO $db, string $terminal_mac, string $name)
+    {
+        $stmp = $db->prepare("SELECT chmod FROM terminal_file WHERE name= :name AND terminal= :terminal");
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":name", $name);
+        $stmp->execute();
+        $chmod = $stmp->fetch(\PDO::FETCH_COLUMN);
 
-    //HELP USAGES FUNCTIONS -- START
-    //HELP USAGES FUNCTIONS -- END
+        if ($chmod == false) {
+            $stmp2 = $db->prepare("SELECT chmod FROM terminal_directory WHERE name= :name AND terminal= :terminal");
+            $stmp2->bindParam(":terminal", $terminal_mac);
+            $stmp2->bindParam(":name", $name);
+            $stmp2->execute();
+            $chmod = $stmp2->fetch(\PDO::FETCH_COLUMN);
+        }
 
-    //HISTORY USAGES FUNCTIONS -- START
-    //HISTORY USAGES FUNCTIONS -- END
+        return $chmod;
+    }
+    //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
     /**
@@ -397,12 +411,6 @@ class CommandAsset
     }
     //MKDIR USAGES FUNCTIONS -- END
 
-    //MV USAGES FUNCTIONS -- START
-    //MV USAGES FUNCTIONS -- END
-
-    //NANO USAGES FUNCTIONS -- START
-    //NANO USAGES FUNCTIONS -- END
-
     //RM USAGES FUNCTIONS -- START
     public static function stageDeleteFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathFiles)
     {
@@ -432,12 +440,6 @@ class CommandAsset
      */
     public static function deleteFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
-        $basicmod = 777;
-        var_dump($terminal_mac);
-        var_dump($parentId);
-        var_dump($name);
-        var_dump($data->user->idterminal_user);
-
         $stmp1 = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
         //If the file or the dir exist, delete the file
