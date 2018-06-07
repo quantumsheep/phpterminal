@@ -18,6 +18,7 @@ class DefinedCommands
             "nano",
             "mv",
             "test",
+            "rmdir",
         ];
     }
 }
