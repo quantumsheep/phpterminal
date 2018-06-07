@@ -1,9 +1,9 @@
 <?php
 namespace Alph\Services;
 
+use Alph\Models\Terminal_FileModel;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
-use Alph\Models\Terminal_FileModel;
 
 class CommandAsset
 {
@@ -146,6 +146,10 @@ class CommandAsset
             return "/";
         }
 
+        if ($path[0][0] !== '/') {
+            throw new \Exception("The first path given to getAbsolute function must be an absolute path.");
+        }
+
         $i = 0;
 
         foreach ($path as $p) {
@@ -275,18 +279,19 @@ class CommandAsset
         }
     }
 
-    public static function getFile(\PDO $db, string $path, string $terminal_mac): Terminal_FileModel {
+    public static function getFile(\PDO $db, string $path, string $terminal_mac): Terminal_FileModel
+    {
         $stmp = $db->prepare("SELECT idfile, terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate FROM TERMINAl_FILE WHERE idfile = IdFileFromPath(:path, :terminal);");
         $stmp->bindParam(':path', $path);
         $stmp->bindParam(':terminal', $terminal_mac);
-    
+
         $stmp->execute();
-        
+
         $data = $stmp->fetch(\PDO::FETCH_ASSOC);
 
         return Terminal_FileModel::map($data !== false ? $data : []);
     }
-    
+
     //GLOBAL USAGES FUNCTIONS -- END
 
     //CD USAGES FUNCTIONS -- START
