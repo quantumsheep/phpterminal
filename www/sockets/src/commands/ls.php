@@ -62,13 +62,19 @@ class ls implements CommandInterface
         //Return the files and the dirs to the user
         foreach ($files as $file) {
             $chmod = CommandAsset::getChmod($db, $terminal_mac, $file);
-            var_dump($chmod);
-            $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;">' . $file . '</span>';
+            if ($chmod == 777) {
+                $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:yellow;">' . $file . '</span></span>';
+            } else {
+                $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;">' . $file . '</span>';
+            }
         }
         foreach ($dirs as $dir) {
             $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir);
-            $str = $str . '<span style="color:blue; padding-left: 0; padding-top: 20px; padding-right:20px;">' . $dir . ' </span>';
-            var_dump($chmod);
+            if ($chmod == 777) {
+                $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:blue; background-color:green;">' . $dir . ' </span></span>';
+            } else {
+                $str = $str . '<span style="color:blue; padding-left: 0; padding-top: 20px; padding-right:20px;">' . $dir . ' </span>';
+            }
         }
 
         if ($files !== null || $dir !== null) {
