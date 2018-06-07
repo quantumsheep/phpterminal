@@ -62,6 +62,8 @@ class CommandHandler implements MessageComponentInterface
                         // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
                         @list($cmd, $parameters) = explode(' ', $cmd, 2);
 
+                        $lineReturn = true;
+
                         // Check if the command exists
                         if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
                             $controller = $this->data[$sender->resourceId]->controller != null ? $this->data[$sender->resourceId]->controller : '\\Alph\\Commands\\' . $cmd . '::call';
@@ -76,13 +78,16 @@ class CommandHandler implements MessageComponentInterface
                                 $parsed_cookies[0]["terminal"],
                                 $cmd,
                                 $parameters,
+                                &$lineReturn,
                             ]);
                         } else {
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
+                        echo $lineReturn;
+
                         if(!$this->data[$sender->resourceId]->private_input) {
-                            $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");    
+                            $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");    
                         }
                         
                         // Push the command into the history
@@ -121,6 +126,8 @@ class CommandHandler implements MessageComponentInterface
 
                                 $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
+                                $sender->send("action|show input");
+
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
@@ -129,6 +136,8 @@ class CommandHandler implements MessageComponentInterface
                             }
                         } else {
                             $this->data[$sender->resourceId]->user->username = $cmd;
+                            
+                            $sender->send("action|hide input");
                             $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                         }
                     }

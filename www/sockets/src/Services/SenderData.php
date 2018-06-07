@@ -22,7 +22,7 @@ class SenderData {
     /**
      * @var array
      */
-    public $data;
+    public $data = [];
 
     public $controller = null;
 

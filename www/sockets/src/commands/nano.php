@@ -4,6 +4,8 @@ namespace Alph\Commands;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
+use Alph\Models\Model;
 
 class nano implements CommandInterface
 {
@@ -65,9 +67,34 @@ class nano implements CommandInterface
      * @param string $sess_id
      * @param string $cmd
      */
-    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters)
+    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        $data->controller = "\\Alph\\Commands\\nano::call";
-        $data->private_input = true;
+        if(!empty($data->data["nano"]->pending)) {
+             echo $cmd;
+        } else {
+            $data->controller = "\\Alph\\Commands\\nano::call";
+            $data->private_input = true;
+    
+            $content = "";
+    
+            if($parameters) {
+                $data->data["nano"] = new Model();
+                $data->data["nano"]->pending = [];
+
+                $data->data["nano"]->pending = CommandAsset::getPathParameters($parameters, $data->position);
+                $options = CommandAsset::getOptions($parameters);
+    
+                if(!empty($parameters)) {
+                    $remaining = explode(' ', $parameters);
+                    
+                    foreach($remaining as &$part) {
+                        $data->data["nano"]->pending[] = trim($part);
+                    }
+                }
+            }
+            $file = CommandAsset::getFile($db, CommandAsset::getAbsolute($data->position, $data->data["nano"]->pending[0]), $terminal_mac);
+
+            $sender->send('action|nano|' . (!empty($file->data) ? $file->data : ''));
+        }
     }
 }
