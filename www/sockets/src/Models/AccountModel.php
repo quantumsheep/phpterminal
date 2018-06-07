@@ -17,7 +17,7 @@ class AccountModel {
      * @param array $data
      * @return self;
      */
-    public static function map(array $data) {
+    public static function map(array $data): self {
         $row = new self;
 
         $row->idaccount = $data["idaccount"] ?? null;

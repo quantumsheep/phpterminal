@@ -12,7 +12,7 @@ class NetworkModel {
      * @param array $data
      * @return self;
      */
-    public static function map(array $data) {
+    public static function map(array $data): self {
         $row = new self;
 
         $row->mac = $data["mac"] ?? null;
