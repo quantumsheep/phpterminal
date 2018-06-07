@@ -126,6 +126,8 @@ class CommandHandler implements MessageComponentInterface
 
                                 $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
+                                $sender->send("action|show input");
+
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
@@ -134,6 +136,8 @@ class CommandHandler implements MessageComponentInterface
                             }
                         } else {
                             $this->data[$sender->resourceId]->user->username = $cmd;
+                            
+                            $sender->send("action|hide input");
                             $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                         }
                     }

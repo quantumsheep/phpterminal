@@ -29,7 +29,9 @@ conn.onopen = (e) => {
 
                 conn.send(e.target.innerHTML);
 
-                appendTerminal(e.target.innerHTML);
+                if(document.getElementById('terminal-input').style.visibility !== 'hidden') {
+                    appendTerminal(e.target.innerHTML);
+                }
 
                 e.target.innerHTML = "";
             }
@@ -149,6 +151,10 @@ conn.onopen = (e) => {
 
         if (action == "clear") {
             document.getElementById("terminal-content-user").innerHTML = null;
+        } else if(action == "hide input") {
+            document.getElementById('terminal-input').style.visibility = "hidden";
+        } else if(action == 'show input') {
+            document.getElementById('terminal-input').style.visibility = "";
         } else if (parameters[0] == 'nano') {
             nanoMode(parameters[1] ? parameters[1] : '');
         }
