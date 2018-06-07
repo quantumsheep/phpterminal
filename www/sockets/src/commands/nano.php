@@ -1,11 +1,11 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Models\Model;
+use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
-use Alph\Services\CommandAsset;
-use Alph\Models\Model;
 
 class nano implements CommandInterface
 {
@@ -69,32 +69,55 @@ class nano implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        if(!empty($data->data["nano"]->pending)) {
-             echo $cmd;
+        if ($cmd == "exit") {
+            $data->controller = null;
+            $data->private_input = false;
+
+            $data->data["nano"]->pending = [];
+
+            return;
+        }
+
+        if (!empty($data->data["nano"]->pending)) {
+            do {
+                $absolute_path = CommandAsset::getAbsolute($data->position, $data->data["nano"]->pending[0]);
+                $file = CommandAsset::getFile($db, $absolute_path, $terminal_mac);
+
+                $file->name = $absolute_path;
+
+                $sender->send('action|nano|' . \json_encode($file));
+
+                \array_shift($data->data["nano"]->pending);
+            } while (empty($file->idfile) && !empty($data->data["nano"]->pending) && isset($data->data["nano"]->pending[0]));
         } else {
             $data->controller = "\\Alph\\Commands\\nano::call";
             $data->private_input = true;
-    
-            $content = "";
-    
-            if($parameters) {
-                $data->data["nano"] = new Model();
-                $data->data["nano"]->pending = [];
 
+            if ($parameters) {
+                $data->data["nano"] = new Model();
                 $data->data["nano"]->pending = CommandAsset::getPathParameters($parameters, $data->position);
+
                 $options = CommandAsset::getOptions($parameters);
-    
-                if(!empty($parameters)) {
+
+                if (!empty($parameters)) {
                     $remaining = explode(' ', $parameters);
-                    
-                    foreach($remaining as &$part) {
+
+                    foreach ($remaining as &$part) {
                         $data->data["nano"]->pending[] = trim($part);
                     }
                 }
-            }
-            $file = CommandAsset::getFile($db, CommandAsset::getAbsolute($data->position, $data->data["nano"]->pending[0]), $terminal_mac);
 
-            $sender->send('action|nano|' . (!empty($file->data) ? $file->data : ''));
+                do {
+                    $absolute_path = CommandAsset::getAbsolute($data->position, $data->data["nano"]->pending[0]);
+                    $file = CommandAsset::getFile($db, $absolute_path, $terminal_mac);
+
+                    $file->name = $absolute_path;
+
+                    $sender->send('action|nano|' . \json_encode($file));
+
+                    \array_shift($data->data["nano"]->pending);
+                } while (empty($file->idfile) && !empty($data->data["nano"]->pending) && isset($data->data["nano"]->pending[0]));
+            }
         }
     }
 }

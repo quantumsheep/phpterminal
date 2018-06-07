@@ -10,10 +10,10 @@
         <span class="terminal-content" id="terminal-content-user"></span>
         <span class="terminal-input" id="terminal-input" contenteditable="true" spellcheck="false"></span>
         <div id="nano" class="nano d-none flex-column h-100 w-100">
-            <div class="nano-header">File: /etc/apt/sources.list</div>
+            <div class="nano-header" id="nano-header">File: </div>
             <textarea id="nano-content" class="w-100 h-100 nano-content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
             <div class="nano-controls mt-2">
-                <div id="nano-message" class="nano-message"></div>
+                <div id="nano-message" class="nano-message d-flex"></div>
                 <div class="d-flex flex-wrap">
                     <div class="col-sm-2"><span class="nano-badge">^G</span> Get help</div>
                     <div class="col-sm-2"><span class="nano-badge">^O</span> Write Out</div>
