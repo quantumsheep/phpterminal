@@ -198,10 +198,7 @@ class CommandAsset
         array_pop($directorySplited);
         array_shift($directorySplited);
         $parentPath = "/" . implode("/", $directorySplited);
-        if ($parentPath != "/") {
-            return self::getIdDirectory($db, $terminal_mac, $parentPath);
-        }
-        return 1;
+        return self::getIdDirectory($db, $terminal_mac, $parentPath);
     }
 
     /**
