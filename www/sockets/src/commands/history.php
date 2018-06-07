@@ -33,7 +33,7 @@ class history implements CommandInterface
     /**
      * Call the command
      */
-    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool $lineReturn)
+    public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         //If history is enter without parameters
         if ($parameters == null) {
