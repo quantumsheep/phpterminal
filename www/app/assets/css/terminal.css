@@ -10,6 +10,10 @@
     color: #dbdbdb;
     padding: 10px;
     word-break: break-all;
+    user-select: initial;
+    -webkit-user-select: initial;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
 }
 
 html {

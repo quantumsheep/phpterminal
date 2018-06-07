@@ -142,6 +142,50 @@ BEGIN
     RETURN id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` FUNCTION `IdFileFromPath`(path TEXT, terminal_mac CHAR(17)) RETURNS text CHARSET utf8
+BEGIN
+	DECLARE i INT;
+	DECLARE id INT;
+    DECLARE lastid INT;
+    DECLARE fileid INT;
+    DECLARE dirname VARCHAR(255);
+    DECLARE rootid INT;
+    
+    SET i = 2;
+    
+    SET rootid = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE parent IS NULL AND name = '' AND terminal = terminal_mac);
+    
+    SET dirname = SPLIT_STR(path, '/', 2);
+    
+    SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND name = dirname AND parent = rootid);
+
+	IF id IS NULL THEN
+		SET fileid = (SELECT idfile FROM TERMINAL_FILE WHERE terminal = terminal_mac AND `name` = dirname AND parent = rootid);
+        
+        RETURN fileid;
+    END IF;
+
+	SET i = 3;
+    
+    WHILE dirname <> '' DO
+		SET dirname = SPLIT_STR(path, '/', i);
+
+		IF dirname <> '' THEN
+			SET lastid = id;
+			SET id = (SELECT iddir FROM TERMINAL_DIRECTORY WHERE terminal = terminal_mac AND parent = id AND `name` = dirname);
+            
+            IF id IS NULL THEN
+				SET fileid = (SELECT idfile FROM TERMINAL_FILE WHERE terminal = terminal_mac AND `name` = dirname AND parent = lastid);
+				
+				RETURN fileid;
+			END IF;
+			SET i = i + 1;
+        END IF;
+    END WHILE;
+    
+    RETURN null;
+END$$
+
 /**
  * Generate a new network
  */

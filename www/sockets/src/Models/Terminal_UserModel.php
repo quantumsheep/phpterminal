@@ -16,7 +16,7 @@ class Terminal_UserModel {
      * @param array $data
      * @return self;
      */
-    public static function map(array $data) {
+    public static function map(array $data): self {
         $row = new self;
 
         $row->idterminal_user = $data["idterminal_user"] ?? null;
