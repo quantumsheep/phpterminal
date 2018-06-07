@@ -7,7 +7,7 @@
     border-radius: 3px;
     cursor: text;
     overflow-y: auto;
-    color: #FFFFFF;
+    color: #dbdbdb;
     padding: 10px;
     word-break: break-all;
 }
@@ -37,9 +37,34 @@ body {
 
 .terminal-content {
     padding: 0;
-    color: #DBDBDB;
+    color: #dbdbdb;
 }
 
 .terminal-content br:last-child {
     display:none;
+}
+
+.nano-content {
+    background-color: transparent;
+    border: 0;
+    resize: none;
+    color: #dbdbdb;
+}
+
+.nano-header {
+    background-color: #fff;
+
+    text-align: center;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.nano-message {
+    background-color: #fff;
+    color: #000;
+}
+
+.nano-badge {
+    background-color: #fff;
+    color: #000;
 }

@@ -1,7 +1,6 @@
 <?php
 namespace Alph\Services;
 
-use Alph\Services\CommandAsset;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
