@@ -1,7 +1,8 @@
 <?php
 namespace Alph\Models;
 
-class Terminal_FileModel {
+class Terminal_FileModel
+{
     public $idfile;
     public $terminal;
     public $parent;
@@ -11,15 +12,16 @@ class Terminal_FileModel {
     public $owner;
     public $group;
     public $createddate;
-    public $editedddate;
-    
+    public $editeddate;
+
     /**
      * Map to a new TerminalModel
-     * 
+     *
      * @param array $data
      * @return self;
      */
-    public static function map(array $data): self {
+    public static function map(array $data): self
+    {
         $row = new self;
 
         $row->idfile = $data["idfile"] ?? null;
@@ -31,7 +33,7 @@ class Terminal_FileModel {
         $row->owner = $data["owner"] ?? null;
         $row->group = $data["group"] ?? null;
         $row->createddate = $data["createddate"] ?? null;
-        $row->editedddate = $data["editedddate"] ?? null;
+        $row->editeddate = $data["editeddate"] ?? null;
 
         return $row;
     }
