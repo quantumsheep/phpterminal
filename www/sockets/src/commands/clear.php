@@ -14,5 +14,6 @@ class clear implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         $sender->send("action|clear");
+        $lineReturn = false;
     }
 }
