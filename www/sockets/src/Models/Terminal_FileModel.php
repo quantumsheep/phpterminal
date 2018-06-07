@@ -13,6 +13,7 @@ class Terminal_FileModel
     public $group;
     public $createddate;
     public $editeddate;
+    public $username;
 
     /**
      * Map to a new TerminalModel
@@ -34,6 +35,7 @@ class Terminal_FileModel
         $row->group = $data["group"] ?? null;
         $row->createddate = $data["createddate"] ?? null;
         $row->editeddate = $data["editeddate"] ?? null;
+        $row->username = $data["username"] ?? null;
 
         return $row;
     }

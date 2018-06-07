@@ -67,7 +67,7 @@ class ls implements CommandInterface
             foreach ($files as $file) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
                 if ($chmod == 777) {
-                    $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:yellow;">' . $file->name . '</span></span>';
+                    $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#e6ce00;">' . $file->name . '</span></span>';
                 } else {
                     $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;">' . $file->name . '</span>';
                 }
@@ -75,9 +75,9 @@ class ls implements CommandInterface
             foreach ($dirs as $dir) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
                 if ($chmod == 777) {
-                    $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:blue; background-color:green;">' . $dir->name . ' </span></span>';
+                    $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#343862; background-color:#449544;">' . $dir->name . ' </span></span>';
                 } else {
-                    $str = $str . '<span style="color:blue; padding-left: 0; padding-top: 20px; padding-right:20px;">' . $dir->name . ' </span>';
+                    $str = $str . '<span style="color:#6871C4; padding-left: 0; padding-top: 20px; padding-right:20px;">' . $dir->name . ' </span>';
                 }
             }
             if ($files !== null || $dir !== null) {
@@ -86,20 +86,28 @@ class ls implements CommandInterface
             $sender->send("message|" . $str);
         } else if (\in_array("l", $options)) {
             if ($files !== null || $dir !== null) {
-                $str = $str . "<br><tr style='padding: 0;'>";
+                $str = $str . "<br><table>";
             }
             //Return the files and the dirs to the user
             foreach ($files as $file) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
-                $str = $str . '<td style="padding-right: 0;">' . $file->chmod . $file->chmod . $file->owner . $file->owner . $file->owner . $file->editeddate . $file->name . '</td><br>';
+                if ($chmod == 777) {
+                    $str = $str . '<tr><td class="pr-2">frwxrwxrwx</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
+                } else if ($chmod == 644) {
+                    $str = $str . '<tr><td class="pr-2">frw-r--r--</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span>' . $file->name . '</span></td></tr>';
+                }
             }
             foreach ($dirs as $dir) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
-                $str = $str . '<td style="padding-right: 0;">' . $dir->chmod . $dir->chmod . $dir->owner . $dir->owner . $dir->owner . $dir->editeddate . $dir->name . ' </td><br>';
+                if ($chmod == 777) {
+                    $str = $str . '<tr><td class="pr-2">drwxrwxrwx</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
+                } else if ($chmod == 644) {
+                    $str = $str . '<tr><td class="pr-2">drw-r--r--</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#6871C4;">' . $dir->name . '</span></td></tr>';
+                }
             }
 
             if ($files !== null || $dir !== null) {
-                $str = $str . '</tr>';
+                $str = $str . '</table>';
             }
             $sender->send("message|" . $str);
         }

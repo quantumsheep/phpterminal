@@ -329,7 +329,7 @@ class CommandAsset
      */
     public static function getFiles(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name,chmod,editeddate,length(data),owner FROM TERMINAL_FILE WHERE terminal=:mac AND parent=:parent");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, length(data), username FROM terminal_file,terminal_user WHERE terminal_file.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
@@ -343,7 +343,7 @@ class CommandAsset
 
     public static function getDirectories(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name,chmod,editeddate,owner FROM TERMINAL_DIRECTORY WHERE terminal=:mac AND parent=:parent");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, username FROM terminal_directory,terminal_user WHERE terminal_directory.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
