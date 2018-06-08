@@ -84,8 +84,6 @@ class CommandHandler implements MessageComponentInterface
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        echo $lineReturn;
-
                         if(!$this->data[$sender->resourceId]->private_input) {
                             $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");    
                         }
@@ -127,7 +125,7 @@ class CommandHandler implements MessageComponentInterface
                                 $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
                                 $sender->send("action|show input");
-
+                                
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {

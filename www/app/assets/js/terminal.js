@@ -29,7 +29,7 @@ conn.onopen = (e) => {
 
                 conn.send(e.target.innerHTML);
 
-                if(document.getElementById('terminal-input').style.visibility !== 'hidden') {
+                if (document.getElementById('terminal-input').style.visibility !== 'hidden') {
                     appendTerminal(e.target.innerHTML);
                 }
 
@@ -81,26 +81,7 @@ conn.onopen = (e) => {
         ClickCount++;
         if (ClickCount == 1) {
             singleClickTimer = setTimeout(f => {
-                const input = document.getElementById('terminal-input');
-
-                let range;
-                let selection;
-
-                if (document.createRange) //Firefox, Chrome, Opera, Safari, IE 9+
-                {
-                    range = document.createRange();
-                    range.selectNodeContents(input);
-                    range.collapse(false);
-                    selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                } else if (document.selection) //IE 8 and lower
-                {
-                    range = document.body.createTextRange();
-                    range.moveToElementText(input);
-                    range.collapse(false);
-                    range.select();
-                }
+                selectInput();
                 ClickCount = 0;
             }, 200);
         } else if (ClickCount > 1) {
@@ -108,6 +89,29 @@ conn.onopen = (e) => {
             ClickCount = 0;
         }
     };
+
+    function selectInput() {
+        const input = document.getElementById('terminal-input');
+
+        let range;
+        let selection;
+
+        if (document.createRange) //Firefox, Chrome, Opera, Safari, IE 9+
+        {
+            range = document.createRange();
+            range.selectNodeContents(input);
+            range.collapse(false);
+            selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else if (document.selection) //IE 8 and lower
+        {
+            range = document.body.createTextRange();
+            range.moveToElementText(input);
+            range.collapse(false);
+            range.select();
+        }
+    }
 
     function move() {
         clearTimeout(singleClickTimer);
@@ -147,16 +151,14 @@ conn.onopen = (e) => {
     function action(action) {
         const parameters = action.split(/\|(.*)/);
 
-        console.log(parameters);
-
         if (action == "clear") {
             document.getElementById("terminal-content-user").innerHTML = null;
-        } else if(action == "hide input") {
+        } else if (action == "hide input") {
             document.getElementById('terminal-input').style.visibility = "hidden";
-        } else if(action == 'show input') {
+        } else if (action == 'show input') {
             document.getElementById('terminal-input').style.visibility = "";
         } else if (parameters[0] == 'nano') {
-            nanoMode(parameters[1] ? parameters[1] : '');
+            nanoMode(JSON.parse(parameters[1]));
         }
     }
 
@@ -169,8 +171,25 @@ conn.onopen = (e) => {
         document.getElementById("account-select").selectedIndex = [].indexOf.call(document.getElementById("account-select").children, document.querySelector('#account-select option[selected]'));
     }
 
-    function nanoMode(content = "") {
-        document.getElementById('nano-content').innerText = content;
+    /**
+     * Switch to nano
+     * 
+     * @param {Object} filedata 
+     * @param {number} filedata.idfile
+     * @param {string} filedata.terminal
+     * @param {number} filedata.parent
+     * @param {string} filedata.name
+     * @param {string} filedata.data
+     * @param {number} filedata.chmod
+     * @param {number} filedata.owner
+     * @param {number} filedata.group
+     * @param {string} filedata.createddate
+     * @param {string} filedata.editedddate
+     */
+    function nanoMode(filedata) {
+        document.getElementById('nano-header').innerText = 'File: ' + filedata.name;
+        document.getElementById('nano-content').innerText = filedata.data;
+        document.getElementById('nano-content').focus();
 
         document.getElementById('terminal-content-user').classList.add('d-none');
         document.getElementById('terminal-input').classList.add('d-none');
@@ -183,16 +202,48 @@ conn.onopen = (e) => {
         }
 
         const nano = {
-            message: document.getElementById('nano-message').innerHTML
+            message: document.getElementById('nano-message')
         }
 
         document.getElementById('nano-content').addEventListener('keydown', e => {
             pressedKeys[e.key] = true;
 
-            if (pressedKeys['Ctrl'] && pressedKeys['x']) {
-                console.log('yes');
+            if (pressedKeys['Control'] && pressedKeys['o']) {
+                e.preventDefault();
 
-                nano.message = "yo";
+                const input = document.createElement('input');
+
+                input.value = filedata.name;
+                input.style.border = 0;
+                input.style.padding = 0;
+                input.style.flex = '100';
+
+                const div = document.createElement('div');
+                div.innerText = "File Name to Write: ";
+
+                nano.message.appendChild(div);
+                nano.message.appendChild(input);
+
+                input.focus();
+            } else if (pressedKeys['Control'] && pressedKeys['x']) {
+                console.log(document.getElementById('nano-content').value);
+                console.log(filedata.data);
+                if (document.getElementById('nano-content').value !== filedata.data) {
+                    nano.message.innerText = 'Save modified buffer?  (Answering "No" will DISCARD changes.)';
+                } else {
+                    conn.send('exit');
+
+                    document.getElementById('nano').classList.add('d-none');
+                    document.getElementById('nano').classList.remove('d-flex');
+
+                    document.getElementById('terminal-content-user').classList.remove('d-none');
+                    document.getElementById('terminal-input').classList.remove('d-none');
+
+                    document.getElementById('nano-header').innerText = "File: ";
+                    document.getElementById('nano-content').innerText = '';
+
+                    selectInput();
+                }
             }
         });
 
