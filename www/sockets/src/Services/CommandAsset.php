@@ -608,6 +608,12 @@ class CommandAsset
         $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
         
 
+    /**
+     * Create or update files
+     */
+    public static function createOrUpdateFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $path, string $terminal_mac, string $content = ""): bool
+    {
+        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
         $fullPathPossibilities = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
 
     }
