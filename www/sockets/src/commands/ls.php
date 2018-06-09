@@ -49,6 +49,7 @@ class ls implements CommandInterface
         $str = "";
         $lineReturn = false;
 
+        $parentId = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
         $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
         $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
         $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
@@ -64,7 +65,7 @@ class ls implements CommandInterface
 
             foreach ($files as $file) {
                 if ($file->name[0] !== '.') {
-                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
+                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $parentId);
                     if ($chmod == 777) {
                         $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#e6ce00;">' . $file->name . '</span></span>';
                     } else {
@@ -75,7 +76,7 @@ class ls implements CommandInterface
 
             foreach ($dirs as $dir) {
                 if ($dir->name[0] !== '.') {
-                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
+                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $parentId);
                     if ($chmod == 777) {
                         $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#343862; background-color:#449544;">' . $dir->name . ' </span></span>';
                     } else {
@@ -96,7 +97,7 @@ class ls implements CommandInterface
 
             foreach ($files as $file) {
                 if ($file->name[0] !== '.') {
-                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
+                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $parentId);
                     if ($chmod == 777) {
                         $str = $str . '<tr><td class="pr-2">frwxrwxrwx</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
                     } else if ($chmod == 644) {
@@ -107,7 +108,7 @@ class ls implements CommandInterface
 
             foreach ($dirs as $dir) {
                 if ($dir->name[0] !== '.') {
-                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
+                    $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $parentId);
                     if ($chmod == 777) {
                         $str = $str . '<tr><td class="pr-2">drwxrwxrwx</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
                     } else if ($chmod == 644) {
@@ -127,7 +128,7 @@ class ls implements CommandInterface
             }
 
             foreach ($files as $file) {
-                $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
+                $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $parentId);
                 if ($chmod == 777) {
                     $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#e6ce00;">' . $file->name . '</span></span>';
                 } else {
@@ -136,7 +137,7 @@ class ls implements CommandInterface
             }
 
             foreach ($dirs as $dir) {
-                $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
+                $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $parentId);
                 if ($chmod == 777) {
                     $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#343862; background-color:#449544;">' . $dir->name . ' </span></span>';
                 } else {
@@ -155,7 +156,7 @@ class ls implements CommandInterface
             }
 
             foreach ($files as $file) {
-                $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name);
+                $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $parentId);
                 if ($chmod == 777) {
                     $str = $str . '<tr><td class="pr-2">frwxrwxrwx</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
                 } else if ($chmod == 644) {
@@ -164,7 +165,7 @@ class ls implements CommandInterface
             }
 
             foreach ($dirs as $dir) {
-                $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name);
+                $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $parentId);
                 if ($chmod == 777) {
                     $str = $str . '<tr><td class="pr-2">drwxrwxrwx</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
                 } else if ($chmod == 644) {

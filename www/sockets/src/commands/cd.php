@@ -1,8 +1,8 @@
 <?php
 namespace Alph\Commands;
 
-use Alph\Services\CommandInterface;
 use Alph\Services\CommandAsset;
+use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
@@ -49,12 +49,11 @@ class cd implements CommandInterface
             return $data->position = '/home';
         }
 
-        $quotedParameters = CommandAsset::getQuotedParameters($parameters,$data->position);
+        $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
 
         $path = explode(' ', $parameters);
 
         CommandAsset::concatenateParameters($path, $quotedParameters);
-        var_dump($path);
 
         // Test if multi argument
         if (isset($path[1])) {
@@ -68,8 +67,7 @@ class cd implements CommandInterface
             return help::call(...\func_get_args());
         }
 
-
-        if($path[0] == '/') {
+        if ($path[0] == '/') {
             return $data->position = "/";
         }
 

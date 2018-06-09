@@ -56,13 +56,6 @@ class rmdir implements CommandInterface
         if (!empty($Files)) {
             $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
         }
-
-        if (!empty($options)) {
-            if (!null(\array_count_values($options["d"])) && \array_count_values($options)["d"] > 0) {
-                CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
-                $Files = array_merge($Files, $quotedParameters);
-            }
-        }
         CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
         return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files, 'dir');
     }
