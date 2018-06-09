@@ -49,16 +49,15 @@ class mkdir implements CommandInterface
             $newDirectories = CommandAsset::fullPathFromParameters($newDirectories, $data->position);
         }
         
-
         if (!empty($options)) {
-            if (\in_array("p",$options)) {
+            if (\in_array("p", $options)) {
                 CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
                 $NewDirectories = CommandAsset::concatenateParameters($newDirectories, $quotedParameters);
                 return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
             }
-                
+
         }
-        
+
         CommandAsset::concatenateParameters($newDirectories, $pathParameters, $quotedParameters);
         return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
     }
