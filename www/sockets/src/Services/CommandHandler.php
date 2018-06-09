@@ -84,10 +84,10 @@ class CommandHandler implements MessageComponentInterface
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
 
-                        if(!$this->data[$sender->resourceId]->private_input) {
-                            $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");    
+                        if (!$this->data[$sender->resourceId]->private_input) {
+                            $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
                         }
-                        
+
                         // Push the command into the history
                         History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
@@ -125,7 +125,7 @@ class CommandHandler implements MessageComponentInterface
                                 $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
 
                                 $sender->send("action|show input");
-                                
+
                                 $this->data[$sender->resourceId]->connected = true;
                                 $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
                             } else {
@@ -134,7 +134,7 @@ class CommandHandler implements MessageComponentInterface
                             }
                         } else {
                             $this->data[$sender->resourceId]->user->username = $cmd;
-                            
+
                             $sender->send("action|hide input");
                             $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
                         }

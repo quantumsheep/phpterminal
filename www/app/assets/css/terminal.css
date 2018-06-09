@@ -26,15 +26,15 @@ body {
     height: 100%;
 }
 
-#term1{
+#term1 {
     transform: translateY(250px);
 }
 
-.shy{
+.shy {
     display: none !important;
 }
 
-.term1{
+.term1 {
     transition-delay: 2s;
     filter: blur(8px);
 }
@@ -45,7 +45,7 @@ body {
 }
 
 .terminal-content br:last-child {
-    display:none;
+    display: none;
 }
 
 .nano-content {
@@ -57,7 +57,6 @@ body {
 
 .nano-header {
     background-color: #fff;
-
     text-align: center;
     color: #000;
     margin-bottom: 10px;

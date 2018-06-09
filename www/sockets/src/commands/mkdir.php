@@ -52,7 +52,7 @@ class mkdir implements CommandInterface
         if (!empty($newDirectories)) {
             $newDirectories = CommandAsset::fullPathFromParameters($newDirectories, $data->position);
         }
-
+        
         if (!empty($options)) {
             if (\in_array("p", $options)) {
                 CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
