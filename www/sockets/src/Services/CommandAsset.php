@@ -7,37 +7,36 @@ use Ratchet\ConnectionInterface;
 
 class CommandAsset
 {
-    //GLOBAL USAGES FUNCTIONS -- START 
-    
-    
+    //GLOBAL USAGES FUNCTIONS -- START
+
     //Note for GetDirFileName : This function was generate as an new function and use other functionality to get element's pur name (cleaning quoted)
     /**
      * Get name from parameters and return an array filled with
      */
-    public static function getDirFileName(&$parameters, $position){
+    public static function getDirFileName(&$parameters, $position)
+    {
         $quotedParametersName = [];
         $finalDirNames = [];
         // Get Quoted parameters name
         $quotedParameters = self::getQuotedParameters($parameters, $position);
-        foreach($quotedParameters as $fullPathQuotedParameters){
-            $partQuotedParameters = explode("/",$fullPathQuotedParameters);
+        foreach ($quotedParameters as $fullPathQuotedParameters) {
+            $partQuotedParameters = explode("/", $fullPathQuotedParameters);
             $quotedParametersName[] = $partQuotedParameters[1];
         }
         // concatenate table if $parameters is not empty after quoted removal
-        if(!empty($parameters)){
+        if (!empty($parameters)) {
             // RISK generate empty parameters in array
             $dirFileNames = explode(" ", $parameters);
-            foreach($dirFileNames as $dirFileName){
+            foreach ($dirFileNames as $dirFileName) {
                 // treat empty parameters potentially generate
-                if($dirFileName != ""){
-                    $finalDirNames[] = $dirFileName; 
+                if ($dirFileName != "") {
+                    $finalDirNames[] = $dirFileName;
                 }
             }
         }
-        
-        // 
-        self::concatenateParameters($finalDirNames,$quotedParametersName);
-        var_dump($finalDirNames);
+
+        //
+        self::concatenateParameters($finalDirNames, $quotedParametersName);
         return $finalDirNames;
     }
 
@@ -594,7 +593,7 @@ class CommandAsset
 
         return $stmp->execute();
     }
-    
+
     /**
      * Create or update files
      */
@@ -612,7 +611,6 @@ class CommandAsset
             }
         }
     }
-
 
     public static function updateFile(\PDO $db, string $path, string $terminal_mac, string $content): bool
     {
@@ -647,26 +645,26 @@ class CommandAsset
             return false;
         }
     }
-    
+
     //TOUCH USAGES FUNCTIONS -- END
 
-    
     //LOCATE USAGE FUNCTIONS -- START
 
     /**
      * return array full of paths leading to file
      */
-    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac){
+    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
+    {
 
         $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
 
-        $fullPathPossibilities = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac); 
-        
+        return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
     }
     /**
      * return IDs from $name
      */
-    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac){
+    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac)
+    {
         $fileIds = [];
 
         $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
@@ -676,26 +674,44 @@ class CommandAsset
         $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
 
         // remove multiple size array, for easier further treatment
-        foreach($fileIdsArray as $fileIdArray){
+        foreach ($fileIdsArray as $fileIdArray) {
             $fileIds[] = $fileIdArray[0];
         }
 
         return $fileIds;
     }
-    
+
     /**
      * From an array of id file, return an array of full path
      */
-    public static function getFullPathFromIdFile(\PDO $db,array $fileIds, string $terminal_mac){
+    public static function getFullPathFromIdFile(\PDO $db, array $fileIds, string $terminal_mac)
+    {
         $reversedPaths = [];
-        foreach($fileIds as $fileId){
+        $realFullPaths = [];
+
+        // Get reversed full Path as an intermediary stage
+        foreach ($fileIds as $fileId) {
             $stmp = $db->prepare("SELECT GET_REVERSED_FULL_PATH_FROM_FILE_ID(:id, :terminal_mac);");
             $stmp->bindParam(":id", $fileId);
             $stmp->bindParam(":terminal_mac", $terminal_mac);
             $stmp->execute();
-            $reversedPaths[] = $stmp->fetch();
+            $reversedPaths[] = $stmp->fetch(\PDO::FETCH_ASSOC)["GET_REVERSED_FULL_PATH_FROM_FILE_ID('" . $fileId . "', '" . $terminal_mac . "')"];
         }
-        var_dump($reversedPaths);
+
+        // Reverse Paths to have true Full paths
+        foreach ($reversedPaths as $reversedPath) {
+
+            $realFullPath = "";
+            $interArray = explode("/", $reversedPath);
+            array_pop($interArray);
+
+            // Concatenate and reverse array into strings
+            for ($i = count($interArray) - 1; $i >= 0; $i--) {
+                $realFullPath = $realFullPath . "/" . $interArray[$i];
+            }
+            $realFullPaths[] = $realFullPath;
+        }
+        return $realFullPaths;
     }
 
     //LOCATE USAGE FUNCTIONS --END
