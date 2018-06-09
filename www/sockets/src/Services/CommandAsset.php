@@ -300,11 +300,12 @@ class CommandAsset
     /**
      * Get the CHMOD of the sended file/dir
      */
-    public static function getChmod(\PDO $db, string $terminal_mac, string $name)
+    public static function getChmod(\PDO $db, string $terminal_mac, string $name, string $parentId)
     {
-        $stmp = $db->prepare("SELECT chmod FROM terminal_file WHERE name= :name AND terminal= :terminal");
+        $stmp = $db->prepare("SELECT chmod FROM terminal_file WHERE name= :name AND terminal= :terminal AND parent= :parent");
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":parent", $parentId);
         $stmp->execute();
         $chmod = $stmp->fetch(\PDO::FETCH_COLUMN);
 
