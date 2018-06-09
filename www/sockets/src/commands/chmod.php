@@ -69,6 +69,6 @@ class chmod implements CommandInterface
         var_dump($quotedParameters);
         var_dump($pathParameters);
 
-        $sender->send($quotedParameters)
+        $sender->send($quotedParameters);
     }
 }

@@ -7,42 +7,38 @@ use Ratchet\ConnectionInterface;
 
 class CommandAsset
 {
-    //GLOBAL USAGES FUNCTIONS -- START 
-    
-    
+    //GLOBAL USAGES FUNCTIONS -- START
+
     //Note for GetDirFileName : This function was generate as an new function and use other functionality to get element's pur name (cleaning quoted)
     /**
      * Get name from parameters and return an array filled with
      */
-    public static function getDirFileName(&$parameters, $position){
+    public static function getDirFileName(&$parameters, $position)
+    {
         $quotedParametersName = [];
         $finalDirNames = [];
         // Get Quoted parameters name
         $quotedParameters = self::getQuotedParameters($parameters, $position);
-        foreach($quotedParameters as $fullPathQuotedParameters){
-            $partQuotedParameters = explode("/",$fullPathQuotedParameters);
+        foreach ($quotedParameters as $fullPathQuotedParameters) {
+            $partQuotedParameters = explode("/", $fullPathQuotedParameters);
             $quotedParametersName[] = $partQuotedParameters[1];
         }
         // concatenate table if $parameters is not empty after quoted removal
-        if(!empty($parameters)){
+        if (!empty($parameters)) {
             // RISK generate empty parameters in array
             $dirFileNames = explode(" ", $parameters);
-            foreach($dirFileNames as $dirFileName){
+            foreach ($dirFileNames as $dirFileName) {
                 // treat empty parameters potentially generate
-                if($dirFileName != ""){
-                    $finalDirNames[] = $dirFileName; 
+                if ($dirFileName != "") {
+                    $finalDirNames[] = $dirFileName;
                 }
             }
         }
-        
-        // 
-        self::concatenateParameters($finalDirNames,$quotedParametersName);
-        var_dump($finalDirNames);
+
+        //
+        self::concatenateParameters($finalDirNames, $quotedParametersName);
         return $finalDirNames;
     }
-
-
-
 
     /**
      * get quoted Parameters and return full Path of those in an array
@@ -569,7 +565,7 @@ class CommandAsset
                 // Check if file already exists
                 if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
                     // Create file
-                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
+                    self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId);
                 } else {
 
                     $sender->send("message|<br>" . $newFileName . " : already exists");
@@ -583,66 +579,7 @@ class CommandAsset
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
-    {
-        $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        $stmp->execute();
-    }
-    
-    //TOUCH USAGES FUNCTIONS -- END
-
-    
-    //LOCATE USAGE FUNCTIONS -- START
-
-    /**
-     * return array full of paths leading to file
-     */
-    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac){
-
-        $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
-        
-
-        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
-        
-    /**
-     * Create or update files
-     */
-    public static function createOrUpdateFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $path, string $terminal_mac, string $content = ""): bool
-    {
-        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
-        $fullPathPossibilities = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
-
-    }
-    
-    /**
-     * return IDs from $name
-     */
-    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac){
-        $fileIds = [];
-
-        $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
-        $stmp->bindParam(":file_name", $fileName);
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->execute();
-        $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
-
-        // remove multiple size array, for easier further treatment
-        foreach($fileIdsArray as $fileIdArray){
-            $fileIds[] = $fileIdArray[0];
-        }
-
-        return $fileIds;
-    }
-    
-    /**public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
     {
         $basicmod = 777;
         $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
@@ -657,25 +594,12 @@ class CommandAsset
         return $stmp->execute();
     }
 
-    public static function updateFile(\PDO $db, string $path, string $terminal_mac, string $content): bool
-    {
-        $stmp = $db->prepare("UPDATE TERMINAL_FILE SET data = :content WHERE idfile = IdFileFromPath(:path, :terminal_mac);");
-
-        $stmp->bindParam(":content", $content);
-        $stmp->bindParam(":path", $path);
-        $stmp->bindParam(":terminal_mac", $terminal_mac);
-
-        return $stmp->execute();
-    }
-
     /**
      * Create or update files
      */
     public static function createOrUpdateFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $path, string $terminal_mac, string $content = ""): bool
     {
         $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
-
-        echo $parent;
 
         if ($parent != null) {
             $file = self::getFile($db, $path, $terminal_mac);
@@ -687,20 +611,107 @@ class CommandAsset
             }
         }
     }
+
+    public static function updateFile(\PDO $db, string $path, string $terminal_mac, string $content): bool
+    {
+        $stmp = $db->prepare("UPDATE TERMINAL_FILE SET data = :content WHERE idfile = IdFileFromPath(:path, :terminal_mac);");
+
+        $stmp->bindParam(":content", $content);
+        $stmp->bindParam(":path", $path);
+        $stmp->bindParam(":terminal_mac", $terminal_mac);
+
+        return $stmp->execute();
+    }
+
+    public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
+    {
+        // get Full Path of Parent directory
+        $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewFile);
+
+        if ($parentId != null) {
+            // Get name from created file
+            $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
+
+            // Check if file already exists
+            if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
+                // Create file
+                return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
+            } else {
+                $sender->send("message|<br>" . $newFileName . " : already exists");
+                return false;
+            }
+        } else {
+            $sender->send("message|<br> Path not found");
+            return false;
+        }
+    }
+
     //TOUCH USAGES FUNCTIONS -- END
+
+    //LOCATE USAGE FUNCTIONS -- START
+
+    /**
+     * return array full of paths leading to file
+     */
+    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
+    {
+
+        $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
+
+        return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
+    }
+    /**
+     * return IDs from $name
+     */
+    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac)
+    {
+        $fileIds = [];
+
+        $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
+        $stmp->bindParam(":file_name", $fileName);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->execute();
+        $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
+
+        // remove multiple size array, for easier further treatment
+        foreach ($fileIdsArray as $fileIdArray) {
+            $fileIds[] = $fileIdArray[0];
+        }
+
+        return $fileIds;
+    }
+
     /**
      * From an array of id file, return an array of full path
      */
-    public static function getFullPathFromIdFile(\PDO $db,array $fileIds, string $terminal_mac){
+    public static function getFullPathFromIdFile(\PDO $db, array $fileIds, string $terminal_mac)
+    {
         $reversedPaths = [];
-        foreach($fileIds as $fileId){
+        $realFullPaths = [];
+
+        // Get reversed full Path as an intermediary stage
+        foreach ($fileIds as $fileId) {
             $stmp = $db->prepare("SELECT GET_REVERSED_FULL_PATH_FROM_FILE_ID(:id, :terminal_mac);");
             $stmp->bindParam(":id", $fileId);
             $stmp->bindParam(":terminal_mac", $terminal_mac);
             $stmp->execute();
-            $reversedPaths[] = $stmp->fetch();
+            $reversedPaths[] = $stmp->fetch(\PDO::FETCH_ASSOC)["GET_REVERSED_FULL_PATH_FROM_FILE_ID('" . $fileId . "', '" . $terminal_mac . "')"];
         }
-        var_dump($reversedPaths);
+
+        // Reverse Paths to have true Full paths
+        foreach ($reversedPaths as $reversedPath) {
+
+            $realFullPath = "";
+            $interArray = explode("/", $reversedPath);
+            array_pop($interArray);
+
+            // Concatenate and reverse array into strings
+            for ($i = count($interArray) - 1; $i >= 0; $i--) {
+                $realFullPath = $realFullPath . "/" . $interArray[$i];
+            }
+            $realFullPaths[] = $realFullPath;
+        }
+        return $realFullPaths;
     }
 
     //LOCATE USAGE FUNCTIONS --END
