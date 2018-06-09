@@ -42,7 +42,6 @@ class cd implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        $goPath = true;
         $path = [];
 
         // cd by himself return to /home

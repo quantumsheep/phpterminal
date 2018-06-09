@@ -8,18 +8,13 @@ use Ratchet\ConnectionInterface;
 
 class mkdir implements CommandInterface
 {
-    const USAGE = "help [-dms] [pattern ...]";
+    const USAGE = "mkdir [OPTION]... DIRECTORY...";
 
-    const SHORT_DESCRIPTION = "Display information about builtin commands.";
-    const FULL_DESCRIPTION = "Displays brief summaries of builtin commands.  If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise the list of help topics is printed.";
+    const SHORT_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist.";
+    const FULL_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist. If paths are provided, do NOT create directory if the path provided is wrong.";
 
     const OPTIONS = [
-        "-d" => "output short description for each topic",
-        "-s" => "output only a short usage synopsis for each topic matching PATTERN",
-    ];
-
-    const ARGUMENTS = [
-        "PATTERN" => "Pattern specifiying a help topic",
+        "-p" => "Create directory from paths provided in case of the directories doesn't exist",
     ];
 
     const EXIT_STATUS = "Returns exit status of command or success if command is null.";
