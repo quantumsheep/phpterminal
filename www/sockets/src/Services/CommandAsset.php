@@ -596,8 +596,10 @@ class CommandAsset
 
         $stmp->execute();
     }
+    
     //TOUCH USAGES FUNCTIONS -- END
 
+    
     //LOCATE USAGE FUNCTIONS -- START
 
     /**
@@ -608,6 +610,14 @@ class CommandAsset
         $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
         
 
+        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
+        
+    /**
+     * Create or update files
+     */
+    public static function createOrUpdateFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $path, string $terminal_mac, string $content = ""): bool
+    {
+        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
         $fullPathPossibilities = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
 
     }
@@ -632,6 +642,52 @@ class CommandAsset
         return $fileIds;
     }
     
+    /**public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    {
+        $basicmod = 777;
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":data", $content);
+        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        return $stmp->execute();
+    }
+
+    public static function updateFile(\PDO $db, string $path, string $terminal_mac, string $content): bool
+    {
+        $stmp = $db->prepare("UPDATE TERMINAL_FILE SET data = :content WHERE idfile = IdFileFromPath(:path, :terminal_mac);");
+
+        $stmp->bindParam(":content", $content);
+        $stmp->bindParam(":path", $path);
+        $stmp->bindParam(":terminal_mac", $terminal_mac);
+
+        return $stmp->execute();
+    }
+
+    /**
+     * Create or update files
+     */
+    public static function createOrUpdateFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $path, string $terminal_mac, string $content = ""): bool
+    {
+        $parent = self::getIdDirectory($db, $terminal_mac, self::getAbsolute($path, '..'));
+
+        echo $parent;
+
+        if ($parent != null) {
+            $file = self::getFile($db, $path, $terminal_mac);
+
+            if ($file->idfile != null) {
+                return self::updateFile($db, $path, $terminal_mac, $content);
+            } else {
+                return self::stageCreateNewFile($db, $data, $sender, $terminal_mac, $path, $content);
+            }
+        }
+    }
+    //TOUCH USAGES FUNCTIONS -- END
     /**
      * From an array of id file, return an array of full path
      */
