@@ -259,5 +259,28 @@ BEGIN
 
 	SELECT @terminal_mac;
 END$$
+DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
+
+
+/** 
+ * Give reversed Full Path from ID
+ */
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_REVERSED_FULL_PATH_FROM_FILE_ID`(id INT, terminal_mac CHAR(17)) RETURNS TEXT CHARSET utf8
+BEGIN
+	DECLARE parentId INT;
+    DECLARE fullPath TEXT;
+    DECLARE parentName VARCHAR(255);
+    
+    set parentId = (SELECT parent FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac);
+    SET fullPath = CONCAT((SELECT name FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac),'/');
+    
+    WHILE parentId IS NOT null DO
+		SET parentName = (SELECT name FROM TERMINAL_DIRECTORY WHERE iddir = parentId AND terminal = terminal_mac);
+		SET fullPath = CONCAT(fullPath, parentName, '/');
+		SET parentId = (SELECT parent FROM TERMINAL_DIRECTORY where iddir = parentId AND terminal = terminal_mac);
+	END WHILE;
+    
+    RETURN  LEFT(fullPath, length(fullpath)-2);
+END$$
 
 DELIMITER ;

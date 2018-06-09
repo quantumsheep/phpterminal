@@ -8,18 +8,13 @@ use Ratchet\ConnectionInterface;
 
 class mkdir implements CommandInterface
 {
-    const USAGE = "help [-dms] [pattern ...]";
+    const USAGE = "mkdir [OPTION]... DIRECTORY...";
 
-    const SHORT_DESCRIPTION = "Display information about builtin commands.";
-    const FULL_DESCRIPTION = "Displays brief summaries of builtin commands.  If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise the list of help topics is printed.";
+    const SHORT_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist.";
+    const FULL_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist. If paths are provided, do NOT create directory if the path provided is wrong.";
 
     const OPTIONS = [
-        "-d" => "output short description for each topic",
-        "-s" => "output only a short usage synopsis for each topic matching PATTERN",
-    ];
-
-    const ARGUMENTS = [
-        "PATTERN" => "Pattern specifiying a help topic",
+        "-p" => "Create directory from paths provided in case of the directories doesn't exist",
     ];
 
     const EXIT_STATUS = "Returns exit status of command or success if command is null.";
@@ -49,7 +44,8 @@ class mkdir implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $newDirectories = explode(" ", $parameters);
-        if (!empty($newDirectories)) {
+        
+        if(!empty($newDirectories)){
             $newDirectories = CommandAsset::fullPathFromParameters($newDirectories, $data->position);
         }
         
@@ -64,38 +60,5 @@ class mkdir implements CommandInterface
 
         CommandAsset::concatenateParameters($newDirectories, $pathParameters, $quotedParameters);
         return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
-
-        // Get parameters from
-
-        /*
-    // Get parameters
-
-    foreach ($paramList as $name) {
-
-    // Get actual directory ID
-    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-    $getIdDirectory->bindParam(":mac", $terminal_mac);
-    $getIdDirectory->bindParam(":paths", $data->position);
-    $getIdDirectory->execute();
-    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-
-    $pathlist = explode('/', $name);
-
-    $name = $pathlist[count($pathlist) - 1];
-
-    // Prepare
-    $stmp = $db->prepare("INSERT INTO terminal_directory(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-    // Bind parameters put in SQL
-    $stmp->bindParam(":terminal", $terminal_mac);
-    $stmp->bindParam(":parent", $CurrentDir);
-    $stmp->bindParam(":name", $name);
-    $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-    $stmp->bindParam(":owner", $data->user->idterminal_user);
-    -
-    $stmp->execute();
-
-    }
-     */
     }
 }
