@@ -48,19 +48,17 @@ class mkdir implements CommandInterface
         $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
 
         // Change simple parameters into array for further treatement
-        var_dump($parameters);
         $newDirectories = explode(" ", $parameters);
+        
         if(!empty($newDirectories)){
             $newDirectories = CommandAsset::fullPathFromParameters($newDirectories, $data->position);
         }
-        var_dump($newDirectories);
         
 
         if (!empty($options)) {
             if (\in_array("p",$options)) {
                 CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
                 $NewDirectories = CommandAsset::concatenateParameters($newDirectories, $quotedParameters);
-                var_dump($newDirectories);
                 return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
             }
                 
@@ -68,38 +66,5 @@ class mkdir implements CommandInterface
         
         CommandAsset::concatenateParameters($newDirectories, $pathParameters, $quotedParameters);
         return CommandAsset::stageCreateNewDirectories($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectories);
-
-        // Get parameters from
-
-        /*
-    // Get parameters
-
-    foreach ($paramList as $name) {
-
-    // Get actual directory ID
-    $getIdDirectory = $db->prepare("SELECT IdDirectoryFromPath(:paths, :mac) as id");
-    $getIdDirectory->bindParam(":mac", $terminal_mac);
-    $getIdDirectory->bindParam(":paths", $data->position);
-    $getIdDirectory->execute();
-    $CurrentDir = $getIdDirectory->fetch(\PDO::FETCH_ASSOC)["id"];
-
-    $pathlist = explode('/', $name);
-
-    $name = $pathlist[count($pathlist) - 1];
-
-    // Prepare
-    $stmp = $db->prepare("INSERT INTO terminal_directory(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-    // Bind parameters put in SQL
-    $stmp->bindParam(":terminal", $terminal_mac);
-    $stmp->bindParam(":parent", $CurrentDir);
-    $stmp->bindParam(":name", $name);
-    $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-    $stmp->bindParam(":owner", $data->user->idterminal_user);
-    -
-    $stmp->execute();
-
-    }
-     */
     }
 }
