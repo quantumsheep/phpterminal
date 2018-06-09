@@ -19,6 +19,8 @@ class DefinedCommands
             "mv",
             "test",
             "rmdir",
+            "chmod",
+            "locate",
         ];
     }
 }
