@@ -54,7 +54,6 @@ class cd implements CommandInterface
         $path = explode(' ', $parameters);
 
         CommandAsset::concatenateParameters($path, $quotedParameters);
-        var_dump($path);
 
         // Test if multi argument
         if (isset($path[1])) {

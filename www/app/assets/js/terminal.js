@@ -187,6 +187,8 @@ conn.onopen = (e) => {
      * @param {string} filedata.editedddate
      */
     function nanoMode(filedata) {
+        let controlled = false;
+
         document.getElementById('nano-header').innerText = 'File: ' + filedata.name;
         document.getElementById('nano-content').innerText = filedata.data;
         document.getElementById('nano-content').focus();
@@ -205,48 +207,89 @@ conn.onopen = (e) => {
             message: document.getElementById('nano-message')
         }
 
-        document.getElementById('nano-content').addEventListener('keydown', e => {
+        const exit = () => {
+            conn.send('exit');
+
+            document.getElementById('nano').classList.add('d-none');
+            document.getElementById('nano').classList.remove('d-flex');
+
+            document.getElementById('terminal-content-user').classList.remove('d-none');
+            document.getElementById('terminal-input').classList.remove('d-none');
+
+            document.getElementById('nano-header').innerText = "File: ";
+            document.getElementById('nano-content').innerText = '';
+
+            selectInput();
+        }
+
+        const nano_controller = e => {
             pressedKeys[e.key] = true;
 
-            if (pressedKeys['Control'] && pressedKeys['o']) {
-                e.preventDefault();
+            if (!controlled) {
+                if (pressedKeys['Control'] && pressedKeys['o']) {
+                    e.preventDefault();
 
-                const input = document.createElement('input');
+                    const input = document.createElement('input');
 
-                input.value = filedata.name;
-                input.style.border = 0;
-                input.style.padding = 0;
-                input.style.flex = '100';
+                    input.value = filedata.name;
+                    input.style.border = 0;
+                    input.style.padding = 0;
+                    input.style.flex = '100';
 
-                const div = document.createElement('div');
-                div.innerText = "File Name to Write: ";
+                    const div = document.createElement('div');
+                    div.innerText = "File Name to Write: ";
 
-                nano.message.appendChild(div);
-                nano.message.appendChild(input);
+                    nano.message.appendChild(div);
+                    nano.message.appendChild(input);
 
-                input.focus();
-            } else if (pressedKeys['Control'] && pressedKeys['x']) {
-                console.log(document.getElementById('nano-content').value);
-                console.log(filedata.data);
-                if (document.getElementById('nano-content').value !== filedata.data) {
-                    nano.message.innerText = 'Save modified buffer?  (Answering "No" will DISCARD changes.)';
-                } else {
-                    conn.send('exit');
+                    input.addEventListener('keydown', e => {
+                        if (e.key == 'Enter') {
+                            conn.send('save ' + input.value + '|' + document.getElementById('nano-content').value);
 
-                    document.getElementById('nano').classList.add('d-none');
-                    document.getElementById('nano').classList.remove('d-flex');
+                            exit();
+                        }
+                    });
 
-                    document.getElementById('terminal-content-user').classList.remove('d-none');
-                    document.getElementById('terminal-input').classList.remove('d-none');
+                    input.focus();
+                } else if (pressedKeys['Control'] && pressedKeys['x']) {
+                    console.log(document.getElementById('nano-content').value);
+                    console.log(filedata.data);
+                    if (document.getElementById('nano-content').value !== filedata.data) {
+                        nano.message.innerText = 'Save modified buffer?  (Answering "No" will DISCARD changes.)';
 
-                    document.getElementById('nano-header').innerText = "File: ";
-                    document.getElementById('nano-content').innerText = '';
+                        controlled = true;
 
-                    selectInput();
+                        const saveornot = e => {
+                            e.preventDefault();
+
+                            pressedKeys[e.key] = true;
+
+                            if (pressedKeys['y']) {
+                                conn.send('save ' + filedata.name + '|' + document.getElementById('nano-content').value);
+
+                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
+
+                                exit();
+                            } else if (pressedKeys['n']) {
+                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
+
+                                exit();
+                            } else if (pressedKeys['Control'] && pressedKeys['c']) {
+                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
+                                document.getElementById('nano-content').addEventListener('keydown', nano_controller);
+                            }
+                        }
+
+                        document.getElementById('nano-content').removeEventListener('keydown', nano_controller);
+                        document.getElementById('nano-content').addEventListener('keydown', saveornot);
+                    } else {
+                        exit();
+                    }
                 }
             }
-        });
+        }
 
+        document.getElementById('nano-content').addEventListener('keydown', nano_controller);
         document.getElementById('nano-content').addEventListener('keyup', e => {
             pressedKeys[e.key] = false;
         });
