@@ -30,6 +30,7 @@ class locate implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
+        $path = [];
         // locate by himself return an error
         if (empty($parameters)) {
             return $sender->send("message|<br> You must enter a file or a directory to be found");
@@ -42,7 +43,7 @@ class locate implements CommandInterface
         if(isset($fullNames[1])){
             return $sender->send("message|<br> multiple argument entered. Locate only support one argument");
         }
-
+      
         $localisations = CommandAsset::locateFile($db, $fullNames, $terminal_mac);
         
         if(!empty($localisations)){
@@ -53,6 +54,5 @@ class locate implements CommandInterface
         } else {
             return $sender->send("message|<br>Can't locate file passed.");
         }
-        
     }
 }
