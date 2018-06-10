@@ -59,6 +59,6 @@ class touch implements CommandInterface
             $newFiles = CommandAsset::fullPathFromParameters($newFiles, $data->position);
         }
         CommandAsset::concatenateParameters($newFiles, $pathParameters, $quotedParameters);
-        return CommandAsset::stageCreateNewFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFiles);
+        return CommandAsset::stageCreateNewFiles($db, $data, $sender, $terminal_mac, $newFiles);
     }
 }

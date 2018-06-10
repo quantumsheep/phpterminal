@@ -72,7 +72,7 @@ class mv implements CommandInterface
 
         if (!empty($options)) {
             if (!null(\array_count_values($options["d"])) && \array_count_values($options)["d"] > 0) {
-                CommandAsset::mkdirDOption($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
+                CommandAsset::mkdirDOption($db, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
                 $newFiles = array_merge($newFiles, $quotedParameters);
             }
         }

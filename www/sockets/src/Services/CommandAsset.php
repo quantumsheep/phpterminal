@@ -223,7 +223,7 @@ class CommandAsset
     /**
      * return ID of parent from the absolute path given, directory or file as last element
      */
-    public static function getParentId(\PDO $db, ConnectionInterface $sender, string $terminal_mac, SenderData &$data, string $absolutePath)
+    public static function getParentId(\PDO $db, string $terminal_mac, string $absolutePath)
     {
         // Treat fullPath of created directory to get parent Directory
         $directorySplited = explode("/", $absolutePath);
@@ -339,7 +339,7 @@ class CommandAsset
             $stmp2->bindParam(":terminal", $terminal_mac);
             $stmp2->bindParam(":name", $name);
             $stmp2->bindParam(":parentId", $parentId);
-            
+
             $stmp2->execute();
             $chmod = $stmp2->fetch(\PDO::FETCH_COLUMN);
         }
@@ -386,11 +386,11 @@ class CommandAsset
     /**
      * Generate new directories from array of Full Paths
      */
-    public static function stageCreateNewDirectories(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewDirectories)
+    public static function stageCreateNewDirectories(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathNewDirectories)
     {
         foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
             // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewDirectory);
+            $parentId = self::getParentId($db, $terminal_mac, $fullPathNewDirectory);
 
             if ($parentId != null) {
                 // Get name from created directory
@@ -399,7 +399,7 @@ class CommandAsset
                 // Check if directory already exists
                 if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false && self::checkFileExistence($newDirectoryName, $parentId, $db) === false) {
                     // Create directory
-                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newDirectoryName, $parentId);
+                    self::createNewDirectory($db, $data, $terminal_mac, $newDirectoryName, $parentId);
                 } else {
 
                     $sender->send("message|<br>" . $newDirectoryName . " : already exists");
@@ -413,7 +413,7 @@ class CommandAsset
     /**
      * generate a new directory
      */
-    public static function createNewDirectory(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    public static function createNewDirectory(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId)
     {
         $basicmod = 777;
         $stmp = $db->prepare("INSERT INTO TERMINAL_DIRECTORY(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
@@ -431,7 +431,7 @@ class CommandAsset
      * Automatically generate directory if it doesn't exist
      * -d's mkdir option
      */
-    public static function mkdirDOption(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathParameters)
+    public static function mkdirDOption(\PDO $db, SenderData &$data, string $terminal_mac, $fullPathParameters)
     {
         foreach ($fullPathParameters as $fullPathParameter) {
             $parentId = 1;
@@ -442,7 +442,7 @@ class CommandAsset
 
             foreach ($directorySplited as $directoryName) {
                 if (self::checkDirectoryExistence($directoryName, $parentId, $db) === false) {
-                    self::createNewDirectory($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $directoryName, $parentId);
+                    self::createNewDirectory($db, $data, $terminal_mac, $directoryName, $parentId);
                 }
                 $parentPath = $parentPath . "/" . $directoryName;
                 $parentId = self::getIdDirectory($db, $terminal_mac, $parentPath);
@@ -453,11 +453,11 @@ class CommandAsset
     //MKDIR USAGES FUNCTIONS -- END
 
     //RM USAGES FUNCTIONS -- START
-    public static function stageDeleteFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathFiles, string $type)
+    public static function stageDeleteFiles(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, array $fullPathFiles, string $type)
     {
         foreach ($fullPathFiles as $fullPathFile) {
             // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathFile);
+            $parentId = self::getParentId($db, $terminal_mac, $fullPathFile);
 
             if ($parentId != null) {
                 // Get name from created file
@@ -469,13 +469,13 @@ class CommandAsset
                 } else {
                     if ($type == 'file') {
                         // Delete file
-                        self::deleteFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                        self::deleteFile($db, $data, $sender, $terminal_mac, $FileName, $parentId);
                     } else if ($type == 'dir') {
                         // Delete file
-                        self::deleteDir($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                        self::deleteDir($db, $data, $sender, $terminal_mac, $FileName, $parentId);
                     } else {
-                        self::deleteFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
-                        self::deleteDir($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $FileName, $parentId);
+                        self::deleteFile($db, $data, $sender, $terminal_mac, $FileName, $parentId);
+                        self::deleteDir($db, $data, $sender, $terminal_mac, $FileName, $parentId);
                     }
                 }
             } else {
@@ -487,7 +487,7 @@ class CommandAsset
     /**
      * delete a File
      */
-    public static function deleteFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $name, int $parentId)
     {
         $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
@@ -517,7 +517,7 @@ class CommandAsset
     /**
      * delete a Directory
      */
-    public static function deleteDir(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    public static function deleteDir(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId)
     {
         $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
@@ -548,34 +548,17 @@ class CommandAsset
     /**
      * Full stage of creating new files
      */
-    public static function stageCreateNewFiles(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $fullPathNewFiles)
+    public static function stageCreateNewFiles(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, array $fullPathNewFiles)
     {
         foreach ($fullPathNewFiles as $fullPathNewFile) {
-            // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewFile);
-
-            if ($parentId != null) {
-                // Get name from created file
-                $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
-
-                // Check if file already exists
-                if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
-                    // Create file
-                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
-                } else {
-
-                    $sender->send("message|<br>" . $newFileName . " : already exists");
-                }
-            } else {
-                $sender->send("message|<br> Path not found");
-            }
+            self::stageCreateNewFile($db, $data, $sender, $terminal_mac, $fullPathNewFile);
         }
     }
 
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId): bool
     {
         $basicmod = 777;
         $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
@@ -586,6 +569,7 @@ class CommandAsset
         $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
+        return
         $stmp->execute();
     }
 
@@ -621,7 +605,7 @@ class CommandAsset
     public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
     {
         // get Full Path of Parent directory
-        $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathNewFile);
+        $parentId = self::getParentId($db, $terminal_mac, $fullPathNewFile);
 
         if ($parentId != null) {
             // Get name from created file
@@ -715,7 +699,7 @@ class CommandAsset
     {
         foreach ($fullPathFiles as $fullPathFile) {
             // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathFile);
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $fullPathFile);
 
             if ($parentId != null) {
                 // Get name from created file
@@ -732,7 +716,7 @@ class CommandAsset
             }
         }
     }
-              
+
     public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
     {
         $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
