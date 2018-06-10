@@ -335,7 +335,7 @@ class CommandAsset
         $chmod = $stmp->fetch(\PDO::FETCH_COLUMN);
 
         if ($chmod == false) {
-            $stmp2 = $db->prepare("SELECT chmod FROM terminal_directory WHERE name= :name AND terminal= :terminal AND parent= :parentId");
+            $stmp2 = $db->prepare("SELECT chmod FROM terminal_directory WHERE name=:name AND terminal=:terminal AND parent=:parentId");
             $stmp2->bindParam(":terminal", $terminal_mac);
             $stmp2->bindParam(":name", $name);
             $stmp2->bindParam(":parentId", $parentId);
