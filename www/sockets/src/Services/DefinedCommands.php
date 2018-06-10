@@ -21,6 +21,7 @@ class DefinedCommands
             "rmdir",
             "chmod",
             "locate",
+            "adduser",
         ];
     }
 }
