@@ -560,7 +560,7 @@ class CommandAsset
                 // Check if file already exists
                 if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
                     // Create file
-                    -         self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId);
+                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
                 } else {
 
                     $sender->send("message|<br>" . $newFileName . " : already exists");
@@ -574,19 +574,18 @@ class CommandAsset
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    public static function createNewFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
         $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":data", $content);
         $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        return $stmp->execute();
+        $stmp->execute();
     }
 
     /**
