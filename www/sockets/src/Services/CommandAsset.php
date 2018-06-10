@@ -560,7 +560,7 @@ class CommandAsset
                 // Check if file already exists
                 if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
                     // Create file
-                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
+                    -         self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId);
                 } else {
 
                     $sender->send("message|<br>" . $newFileName . " : already exists");
