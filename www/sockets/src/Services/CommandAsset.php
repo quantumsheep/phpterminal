@@ -7,42 +7,39 @@ use Ratchet\ConnectionInterface;
 
 class CommandAsset
 {
-    //GLOBAL USAGES FUNCTIONS -- START 
-    
-    
+    //GLOBAL USAGES FUNCTIONS -- START
+
     //Note for GetDirFileName : This function was generate as an new function and use other functionality to get element's pur name (cleaning quoted)
     /**
      * Get name from parameters and return an array filled with
      */
-    public static function getDirFileName(&$parameters, $position){
+    public static function getDirFileName(&$parameters, $position)
+    {
         $quotedParametersName = [];
         $finalDirNames = [];
         // Get Quoted parameters name
         $quotedParameters = self::getQuotedParameters($parameters, $position);
-        foreach($quotedParameters as $fullPathQuotedParameters){
-            $partQuotedParameters = explode("/",$fullPathQuotedParameters);
+        foreach ($quotedParameters as $fullPathQuotedParameters) {
+            $partQuotedParameters = explode("/", $fullPathQuotedParameters);
             $quotedParametersName[] = $partQuotedParameters[1];
         }
         // concatenate table if $parameters is not empty after quoted removal
-        if(!empty($parameters)){
+        if (!empty($parameters)) {
             // RISK generate empty parameters in array
             $dirFileNames = explode(" ", $parameters);
-            foreach($dirFileNames as $dirFileName){
+            foreach ($dirFileNames as $dirFileName) {
                 // treat empty parameters potentially generate
-                if($dirFileName != ""){
-                    $finalDirNames[] = $dirFileName; 
+                if ($dirFileName != "") {
+                    $finalDirNames[] = $dirFileName;
                 }
             }
         }
-        
-        // 
-        self::concatenateParameters($finalDirNames,$quotedParametersName);
+
+        //
+        self::concatenateParameters($finalDirNames, $quotedParametersName);
         var_dump($finalDirNames);
         return $finalDirNames;
     }
-
-
-
 
     /**
      * get quoted Parameters and return full Path of those in an array
@@ -325,14 +322,6 @@ class CommandAsset
         return Terminal_FileModel::map($data !== false ? $data : []);
     }
 
-    //GLOBAL USAGES FUNCTIONS -- END
-
-    //CD USAGES FUNCTIONS -- START
-    //CD USAGES FUNCTIONS -- END
-
-    //CLEAR USAGES FUNCTIONS -- START
-    //CLEAR USAGES FUNCTIONS -- END
-
     /**
      * Get the CHMOD of the sended file/dir
      */
@@ -603,19 +592,20 @@ class CommandAsset
     /**
      * return array full of paths leading to file
      */
-    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac){
+    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
+    {
 
         $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
-        
 
         $fullPathPossibilities = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
 
     }
-    
+
     /**
      * return IDs from $name
      */
-    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac){
+    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac)
+    {
         $fileIds = [];
 
         $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
@@ -625,19 +615,20 @@ class CommandAsset
         $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
 
         // remove multiple size array, for easier further treatment
-        foreach($fileIdsArray as $fileIdArray){
+        foreach ($fileIdsArray as $fileIdArray) {
             $fileIds[] = $fileIdArray[0];
         }
 
         return $fileIds;
     }
-    
+
     /**
      * From an array of id file, return an array of full path
      */
-    public static function getFullPathFromIdFile(\PDO $db,array $fileIds, string $terminal_mac){
+    public static function getFullPathFromIdFile(\PDO $db, array $fileIds, string $terminal_mac)
+    {
         $reversedPaths = [];
-        foreach($fileIds as $fileId){
+        foreach ($fileIds as $fileId) {
             $stmp = $db->prepare("SELECT GET_REVERSED_FULL_PATH_FROM_FILE_ID(:id, :terminal_mac);");
             $stmp->bindParam(":id", $fileId);
             $stmp->bindParam(":terminal_mac", $terminal_mac);
@@ -648,4 +639,52 @@ class CommandAsset
     }
 
     //LOCATE USAGE FUNCTIONS --END
+
+    //CHMOD USAGE FUNCTIONS --END
+
+    public static function stageChangeChmod(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathFiles, int $askedChmod)
+    {
+        foreach ($fullPathFiles as $fullPathFile) {
+            // get Full Path of Parent directory
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathFile);
+
+            if ($parentId != null) {
+                // Get name from created file
+                $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
+
+                // Check if file exists
+                if (self::checkDirectoryExistence($FileName, $parentId, $db) === false && self::checkFileExistence($FileName, $parentId, $db) === false) {
+                    $sender->send("message|<br>" . $FileName . " : didn't exists");
+                } else {
+                    self::changeChmod($db, $data, $terminal_mac, $FileName, $askedChmod, $parentId);
+                }
+            } else {
+                $sender->send("message|<br> Path not found");
+            }
+        }
+    }
+
+    public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
+    {
+        $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+
+        $stmp = $db->prepare("UPDATE terminal_directory SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+    }
+    //CHMOD USAGE FUNCTIONS --END
 }
