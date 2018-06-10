@@ -64,11 +64,29 @@ class chmod implements CommandInterface
         }
 
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
+        $options = CommandAsset::getOptions($parameters);
         $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
 
-        var_dump($quotedParameters);
-        var_dump($pathParameters);
+        // Change simple parameters into array for further treatement
+        $Files = explode(" ", $parameters);
 
-        $sender->send($quotedParameters);
+        for($i=0;$i<count($options);$i++){
+            unset($Files[$i]);
+        }
+
+        $askedChmod = $Files[count($options)];
+        unset($Files[count($options)]);
+        
+        if (is_numeric($askedChmod)) {
+            if (!empty($Files)) {
+                $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
+            }
+            CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
+            if (empty($options)) {
+                return CommandAsset::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
+            }
+        } else {
+            $sender->send("message|<br>chmod: missing operand after ‘".$askedChmod."’<br>Try 'chmod --help' for more information.");
+        }
     }
 }

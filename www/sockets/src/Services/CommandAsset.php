@@ -321,29 +321,24 @@ class CommandAsset
         return Terminal_FileModel::map($data !== false ? $data : []);
     }
 
-    //GLOBAL USAGES FUNCTIONS -- END
-
-    //CD USAGES FUNCTIONS -- START
-    //CD USAGES FUNCTIONS -- END
-
-    //CLEAR USAGES FUNCTIONS -- START
-    //CLEAR USAGES FUNCTIONS -- END
-
     /**
      * Get the CHMOD of the sended file/dir
      */
-    public static function getChmod(\PDO $db, string $terminal_mac, string $name)
+    public static function getChmod(\PDO $db, string $terminal_mac, string $name, int $parentId)
     {
-        $stmp = $db->prepare("SELECT chmod FROM terminal_file WHERE name= :name AND terminal= :terminal");
+        $stmp = $db->prepare("SELECT chmod FROM terminal_file WHERE name= :name AND terminal= :terminal AND parent= :parentId");
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":parentId", $parentId);
+
         $stmp->execute();
         $chmod = $stmp->fetch(\PDO::FETCH_COLUMN);
 
         if ($chmod == false) {
-            $stmp2 = $db->prepare("SELECT chmod FROM terminal_directory WHERE name= :name AND terminal= :terminal");
+            $stmp2 = $db->prepare("SELECT chmod FROM terminal_directory WHERE name= :name AND terminal= :terminal AND parent= :parentId");
             $stmp2->bindParam(":terminal", $terminal_mac);
             $stmp2->bindParam(":name", $name);
+            $stmp->bindParam(":parentId", $parentId);
             $stmp2->execute();
             $chmod = $stmp2->fetch(\PDO::FETCH_COLUMN);
         }
@@ -565,7 +560,7 @@ class CommandAsset
                 // Check if file already exists
                 if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
                     // Create file
-                    self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId);
+                    self::createNewFile($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFileName, $parentId);
                 } else {
 
                     $sender->send("message|<br>" . $newFileName . " : already exists");
@@ -579,19 +574,18 @@ class CommandAsset
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    public static function createNewFile(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, string $name, int $parentId)
     {
         $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, data, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :data, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":data", $content);
         $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        return $stmp->execute();
+        $stmp->execute();
     }
 
     /**
@@ -645,14 +639,13 @@ class CommandAsset
             return false;
         }
     }
-
     //TOUCH USAGES FUNCTIONS -- END
 
     //LOCATE USAGE FUNCTIONS -- START
-
     /**
      * return array full of paths leading to file
      */
+
     public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
     {
 
@@ -713,6 +706,53 @@ class CommandAsset
         }
         return $realFullPaths;
     }
-
     //LOCATE USAGE FUNCTIONS --END
+
+    //CHMOD USAGE FUNCTIONS --END
+
+    public static function stageChangeChmod(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathFiles, int $askedChmod)
+    {
+        foreach ($fullPathFiles as $fullPathFile) {
+            // get Full Path of Parent directory
+            $parentId = self::getParentId($db, $sender, $terminal_mac, $data, $fullPathFile);
+
+            if ($parentId != null) {
+                // Get name from created file
+                $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
+
+                // Check if file exists
+                if (self::checkDirectoryExistence($FileName, $parentId, $db) === false && self::checkFileExistence($FileName, $parentId, $db) === false) {
+                    $sender->send("message|<br>" . $FileName . " : didn't exists");
+                } else {
+                    self::changeChmod($db, $data, $terminal_mac, $FileName, $askedChmod, $parentId);
+                }
+            } else {
+                $sender->send("message|<br> Path not found");
+            }
+        }
+    }
+              
+    public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
+    {
+        $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+
+        $stmp = $db->prepare("UPDATE terminal_directory SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+    }
+    //CHMOD USAGE FUNCTIONS --END
 }
