@@ -1,10 +1,10 @@
 <?php
 namespace Alph\Commands;
 
-use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
+use Alph\Services\CommandAsset;
 
 /**
  * chmod

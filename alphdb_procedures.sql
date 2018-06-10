@@ -260,6 +260,7 @@ BEGIN
 
 	SELECT @terminal_mac;
 END$$
+DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
 
 /** 
  * Give reversed Full Path from ID
