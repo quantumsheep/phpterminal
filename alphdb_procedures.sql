@@ -301,7 +301,7 @@ BEGIN
     
     INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(terminal_mac, @gid, @terminal_group, 1, 'root', password);
     
-    SELECT @gid;
+    SELECT @gid as gid;
 END$$
 
 DELIMITER ;
