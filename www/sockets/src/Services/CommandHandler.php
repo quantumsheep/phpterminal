@@ -4,6 +4,7 @@ namespace Alph\Services;
 use Alph\Services\History;
 use Alph\Services\SenderData;
 use Alph\Services\Session;
+use Alph\Models\Model;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
@@ -115,6 +116,8 @@ class CommandHandler implements MessageComponentInterface
                                     "permitted by applicable law.",
                                     "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
                                 ];
+
+                                $this->data[$sender->resourceId]->data = new Model();
 
                                 foreach ($greetings as &$greet) {
                                     $sender->send("message|<br><span>" . $greet . "</span>");
