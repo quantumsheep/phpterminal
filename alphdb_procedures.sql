@@ -264,6 +264,19 @@ BEGIN
 	SELECT @terminal_mac;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewUser`(IN terminal_mac CHAR(17), IN nickname TEXT, IN password VARCHAR(255))
+BEGIN
+	SET @terminal_mac = MACADDRESS();
+    SET @gid = (SELECT GREATEST(MAX(TERMINAL_GROUP.gid), MAX(TERMINAL_USER.uid)) + 1 FROM TERMINAL_GROUP, TERMINAL_USER WHERE TERMINAL_GROUP.terminal = terminal_mac AND TERMINAL_USER.terminal = terminal_mac);
+
+	INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(terminal_mac, @gid, 1, 'root');
+    SET @terminal_group = LAST_INSERT_ID();
+    
+    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(terminal_mac, @gid, @terminal_group, 1, 'root', password);
+    
+    SELECT @gid;
+END$$
+
 /** 
  * Give reversed Full Path from ID
  */
