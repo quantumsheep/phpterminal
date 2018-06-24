@@ -66,11 +66,12 @@ class adduser implements CommandInterface
 
                     $sender->send('message|<br><span>Enter new UNIX password: </span>');
                 } else {
+                    $password = \password_hash($cmd, PASSWORD_BCRYPT);
                     $stmp = $db->prepare('CALL NewUser(:terminal_mac, :nickname, :password);');
 
                     $stmp->bindParam(':terminal_mac', $terminal_mac);
                     $stmp->bindParam(':nickname', $data->data->adduser['nickname']);
-                    $stmp->bindParam(':password', $cmd);
+                    $stmp->bindParam(':password', $password);
 
                     $stmp->execute();
 

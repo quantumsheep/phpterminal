@@ -296,10 +296,10 @@ BEGIN
 	SET @terminal_mac = MACADDRESS();
     SET @gid = (SELECT GREATEST(MAX(TERMINAL_GROUP.gid), MAX(TERMINAL_USER.uid)) + 1 FROM TERMINAL_GROUP, TERMINAL_USER WHERE TERMINAL_GROUP.terminal = terminal_mac AND TERMINAL_USER.terminal = terminal_mac);
 
-	INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(terminal_mac, @gid, 1, 'root');
+	INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(terminal_mac, @gid, 1, nickname);
     SET @terminal_group = LAST_INSERT_ID();
     
-    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(terminal_mac, @gid, @terminal_group, 1, 'root', password);
+    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(terminal_mac, @gid, @terminal_group, 1, nickname, password);
     
     SELECT @gid as gid;
 END$$
