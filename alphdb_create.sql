@@ -4,6 +4,7 @@ USE alph;
 CREATE TABLE `ACCOUNT` (
 	`idaccount` int NOT NULL AUTO_INCREMENT,
 	`status` bit NOT NULL,
+	`hyperpower` bit NOT NULL,
 	`email` varchar(254) NOT NULL UNIQUE,
 	`username` varchar(36) NOT NULL UNIQUE,
 	`password` varchar(60) NOT NULL,
