@@ -75,7 +75,7 @@ class AccountManager
     public static function createAccount(\PDO $db, string $username, string $email, string $password)
     {
         // Prepare the SQL row insert
-        $stmp = $db->prepare("INSERT INTO ACCOUNT (status, email, username, password, code, createddate, editeddate) VALUES(0, :email, :username, :password, :code, NOW(),  NOW())");
+        $stmp = $db->prepare("INSERT INTO ACCOUNT (status, hyperpower, email, username, password, code, createddate, editeddate) VALUES(0, 0, :email, :username, :password, :code, NOW(),  NOW())");
 
         // Get a new alphanumeric code
         $code = randomAlphanumeric(100);
@@ -188,7 +188,7 @@ class AccountManager
     public static function getAccountsById(\PDO $db, array $idaccounts)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT idaccount, status, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
+        $stmp = $db->prepare("SELECT idaccount, status, hyperpower, email, username, createddate, editeddate FROM ACCOUNT WHERE idaccount = :idaccount;");
 
         $accounts = [];
 
@@ -289,7 +289,7 @@ class AccountManager
     public static function identificateAccount(\PDO $db, string $email, string $password)
     {
         // Prepare SQL row selection
-        $stmp = $db->prepare("SELECT idaccount, email, username, password, createddate, editeddate FROM ACCOUNT WHERE email = :email AND status=1;");
+        $stmp = $db->prepare("SELECT hyperpower, idaccount, email, username, password, createddate, editeddate FROM ACCOUNT WHERE email = :email AND status=1;");
 
         // Bind email parameter
         $stmp->bindParam(":email", $email);

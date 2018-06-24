@@ -197,23 +197,24 @@ conn.onopen = (e) => {
     function nanoMode(filedata) {
         let controlled = false;
 
+        for (let key in pressedKeys) {
+            pressedKeys[key] = false;
+        }
+
+        const nano = {
+            message: document.getElementById('nano-message'),
+            content: document.getElementById('nano-content')
+        }
+
         document.getElementById('nano-header').innerText = 'File: ' + filedata.name;
-        document.getElementById('nano-content').innerText = filedata.data;
-        document.getElementById('nano-content').focus();
+        nano.content.innerText = filedata.data ? filedata.data : '';
+        nano.content.focus();
 
         document.getElementById('terminal-content-user').classList.add('d-none');
         document.getElementById('terminal-input').classList.add('d-none');
 
         document.getElementById('nano').classList.remove('d-none');
         document.getElementById('nano').classList.add('d-flex');
-
-        for (let key in pressedKeys) {
-            pressedKeys[key] = false;
-        }
-
-        const nano = {
-            message: document.getElementById('nano-message')
-        }
 
         const exit = () => {
             conn.send('exit');
@@ -225,7 +226,8 @@ conn.onopen = (e) => {
             document.getElementById('terminal-input').classList.remove('d-none');
 
             document.getElementById('nano-header').innerText = "File: ";
-            document.getElementById('nano-content').innerText = '';
+            nano.content.innerText = '';
+            nano.message.childNodes.forEach(child => child.remove());
 
             selectInput();
         }
@@ -252,7 +254,7 @@ conn.onopen = (e) => {
 
                     input.addEventListener('keydown', e => {
                         if (e.key == 'Enter') {
-                            conn.send('save ' + input.value + '|' + document.getElementById('nano-content').value);
+                            conn.send('save ' + input.value + '|' + nano.content.value);
 
                             exit();
                         }
@@ -260,9 +262,9 @@ conn.onopen = (e) => {
 
                     input.focus();
                 } else if (pressedKeys['Control'] && pressedKeys['x']) {
-                    console.log(document.getElementById('nano-content').value);
+                    console.log(nano.content.value);
                     console.log(filedata.data);
-                    if (document.getElementById('nano-content').value !== filedata.data) {
+                    if (nano.content.value !== filedata.data) {
                         nano.message.innerText = 'Save modified buffer?  (Answering "No" will DISCARD changes.)';
 
                         controlled = true;
@@ -273,23 +275,23 @@ conn.onopen = (e) => {
                             pressedKeys[e.key] = true;
 
                             if (pressedKeys['y']) {
-                                conn.send('save ' + filedata.name + '|' + document.getElementById('nano-content').value);
+                                conn.send('save ' + filedata.name + '|' + nano.content.value);
 
-                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
+                                nano.content.removeEventListener('keydown', saveornot);
 
                                 exit();
                             } else if (pressedKeys['n']) {
-                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
+                                nano.content.removeEventListener('keydown', saveornot);
 
                                 exit();
                             } else if (pressedKeys['Control'] && pressedKeys['c']) {
-                                document.getElementById('nano-content').removeEventListener('keydown', saveornot);
-                                document.getElementById('nano-content').addEventListener('keydown', nano_controller);
+                                nano.content.removeEventListener('keydown', saveornot);
+                                nano.content.addEventListener('keydown', nano_controller);
                             }
                         }
 
-                        document.getElementById('nano-content').removeEventListener('keydown', nano_controller);
-                        document.getElementById('nano-content').addEventListener('keydown', saveornot);
+                        nano.content.removeEventListener('keydown', nano_controller);
+                        nano.content.addEventListener('keydown', saveornot);
                     } else {
                         exit();
                     }
@@ -297,8 +299,8 @@ conn.onopen = (e) => {
             }
         }
 
-        document.getElementById('nano-content').addEventListener('keydown', nano_controller);
-        document.getElementById('nano-content').addEventListener('keyup', e => {
+        nano.content.addEventListener('keydown', nano_controller);
+        nano.content.addEventListener('keyup', e => {
             pressedKeys[e.key] = false;
         });
     }
