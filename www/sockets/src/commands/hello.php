@@ -29,12 +29,7 @@ class hello implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        $answer=["What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","Amusant, humain","Do what you know, cause a Pirate's free","I'm not world. I'm you","Is this real life ?","Don't talk to me","jajajajajaja","Gaggagaga","rofl","Julio","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non","What's alPH Nigga ?","Yo yo yo yo","Bonjour","Oui","Non","sometimes","sisi","non",];
-        $choice = 0;
-        $count = strlen($cmd);
-        for($i = 0;$i<strlen($cmd);$i++){
-            $choice = $choice + ord($cmd[$i])%47;
-        }
-        $sender->send("message|World : ".$answer[$choice]);
+        
+        return;
     }
 }

@@ -12,11 +12,19 @@ conn.onopen = (e) => {
 
     console.log("Connection established!");
 
-    //Get the data send by the user.
-    document.getElementById('terminal-input').addEventListener('keydown', e => {
-        pressedKeys[e.key] = true;
 
-        if (e.key === "Enter") {
+
+
+
+    //Get the data send by the user.
+    document.getElementById('terminal-input').addEventListener('keydown', function (e) {
+        pressedKeys[e.key] = true;
+        console.log(e.key);
+        if (e.key === "Tab") {
+            if(e.target.innerHTML.indexOf(" ") != -1){
+                conn.send('$$autocomplete ' + e.target.innerHTML)
+            }
+        } else if (e.key === "Enter") {
             e.preventDefault();
             if (e.target.innerHTML && e.target.innerHTML.length > 0 && e.target.innerHTML.replace(/[ ]+/i, '').length > 0) {
                 e.target.innerHTML = e.target.innerHTML.replace(/^(\s+)?(.*?)(\s+)?$/, "$2");
