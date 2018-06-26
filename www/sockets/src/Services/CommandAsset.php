@@ -346,6 +346,21 @@ class CommandAsset
 
         return $chmod;
     }
+
+    /**
+     *
+     */
+    public static function removeElementFromArray(&$array, $element)
+    {
+        $newArray = [];
+        for ($i = 0; $i < count($array); $i++) {
+            if ($element != $array[$i]) {
+                $newArray[] = $array[$i];
+            }
+        }
+        $array = $newArray;
+    }
+
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -740,4 +755,88 @@ class CommandAsset
         $stmp->execute();
     }
     //CHMOD USAGE FUNCTIONS --END
+
+    //MV USAGE FUNCTIONS -- START
+    /**
+     * Treat mv element to determine Element position
+     */
+    public static function mvIsolateElement($parameters)
+    {
+        $parametersArray = [];
+
+        $pattern = "/(\"([^\"]+)\") /";
+        $fullQuotedParameters = [];
+        // Get quoted element with the pattern
+        preg_match_all($pattern, $parameters . " ", $quotedParameters);
+
+        // Use 2 position of array, to exclude " "
+        if (!empty($quotedParameters[1])) {
+            foreach ($quotedParameters[1] as $quotedParameter) {
+                // Update the whole parameters for further concatenation
+                $parameters = str_replace(" " . $quotedParameter, "", " " . $parameters);
+
+                $fullQuotedParameters[] = $quotedParameter;
+            }
+        }
+
+        // get Regular parameters into array for further concatenation
+        $regularParameters = explode(" ", $parameters);
+
+        //Update element if quoted element is in. It creates an empty entry
+        if (!empty($fullQuotedParameters)) {
+            array_shift($regularParameters);
+        }
+
+        //concatenate whole parameters
+        self::concatenateParameters($parametersArray, $regularParameters, $fullQuotedParameters);
+
+        return $parametersArray;
+    }
+
+    /**
+     * Get option from array of parameters
+     */
+    public static function mvGetOptions(array &$fullParameters)
+    {
+        $options = "";
+        $option = "";
+        $pattern = "/(-([a-zA-Z\d]+))/";
+
+        // check if every array entry is an option
+        foreach ($fullParameters as $parameter) {
+            //reset option
+            $option = "";
+            preg_match($pattern, $parameter, $option);
+            if (!empty($option)) {
+                //remove the Element from the array
+                self::removeElementFromArray($fullParameters, $parameter);
+
+                // get parameters without "-" and concatenate into option, to get a full string of options
+                $options .= $option[2];
+            }
+        }
+        return $options;
+    }
+
+    /**
+     * Return target (last element) with array and string
+     */
+    public static function getTarget($parameters, &$fullParameters)
+    {
+        $position = 0;
+        
+        $elementPosition = [];
+
+        //research Element
+        for ($i = 0; $i < count($fullParameters); $i++) {
+            $elementPosition[] = strpos($parameters, $fullParameters[$i]);
+            if ($elementPosition[$i] > $position) {
+                $target = $fullParameters[$i];
+            }
+            
+        }
+        return $target;
+    }
+
+    //MV USAGE FUNCTIONS -- END
 }

@@ -64,19 +64,6 @@ class mv implements CommandInterface
         $options = CommandAsset::getOptions($parameters);
         $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
 
-        // Change simple parameters into array for further treatement
-        $newFiles = explode(" ", $parameters);
-        if (!empty($newFiles)) {
-            $newFiles = CommandAsset::fullPathFromParameters($newFiles, $data->position);
-        }
-
-        if (!empty($options)) {
-            if (!null(\array_count_values($options["d"])) && \array_count_values($options)["d"] > 0) {
-                CommandAsset::mkdirDOption($db, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $pathParameters);
-                $newFiles = array_merge($newFiles, $quotedParameters);
-            }
-        }
-        CommandAsset::concatenateParameters($newFiles, $pathParameters, $quotedParameters);
-        return CommandAsset::stageCreateNewFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $newFiles);
+        
     }
 }
