@@ -40,15 +40,26 @@ class adduser implements CommandInterface
             $remaining = explode(' ', $parameters);
 
             if (count($remaining) === 1) {
-                $data->controller = "\\Alph\\Commands\\adduser::call";
-                $data->private_input = true;
+                $stmp = $db->prepare('SELECT 1 FROM TERMINAL_USER WHERE terminal = :terminal AND username = :username;');
 
-                $data->data->adduser = [
-                    'nickname' => $remaining[0],
-                ];
+                $stmp->bindParam(':terminal', $terminal_mac);
+                $stmp->bindParam(':username', $remaining[0]);
 
-                $sender->send('action|hide input');
-                $sender->send('message|<br><span>Enter new UNIX password: </span>');
+                $stmp->execute();
+
+                if ($stmp->rowCount() === 0) {
+                    $data->controller = "\\Alph\\Commands\\adduser::call";
+                    $data->private_input = true;
+
+                    $data->data->adduser = [
+                        'nickname' => $remaining[0],
+                    ];
+
+                    $sender->send('action|hide input');
+                    $sender->send('message|<br><span>Enter new UNIX password: </span>');
+                } else {
+                    $sender->send("message|<br><span>adduser: The user `" . $remaining[0] . "' already exists.</span>");
+                }
             } else {
                 help::call(...\func_get_args());
             }
@@ -66,28 +77,44 @@ class adduser implements CommandInterface
 
                     $sender->send('message|<br><span>Enter new UNIX password: </span>');
                 } else {
-                    $password = \password_hash($cmd, PASSWORD_BCRYPT);
-                    $stmp = $db->prepare('CALL NewUser(:terminal_mac, :nickname, :password);');
+                    $stmp = $db->prepare('SELECT 1 FROM TERMINAL_USER WHERE terminal = :terminal AND username = :username;');
 
-                    $stmp->bindParam(':terminal_mac', $terminal_mac);
-                    $stmp->bindParam(':nickname', $data->data->adduser['nickname']);
-                    $stmp->bindParam(':password', $password);
+                    $stmp->bindParam(':terminal', $terminal_mac);
+                    $stmp->bindParam(':username', $remaining[0]);
 
                     $stmp->execute();
 
-                    if ($stmp->rowCount() === 1) {
-                        $result = $stmp->fetch(\PDO::FETCH_ASSOC);
+                    if ($stmp->rowCount() === 0) {
+                        $password = \password_hash($cmd, PASSWORD_BCRYPT);
+                        $stmp = $db->prepare('CALL NewUser(:terminal_mac, :nickname, :password);');
 
-                        if (isset($result['gid']) && !empty($result['gid'])) {
-                            $sender->send('message|<br><span>Adding user `' . $data->data->adduser['nickname'] . '\' ...</span>');
-                            $sender->send('message|<br><span>Adding new group `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') ...</span>');
-                            $sender->send('message|<br><span>Adding new user `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') with group \`' . $data->data->adduser['nickname'] . '\' ...</span>');
+                        $stmp->bindParam(':terminal_mac', $terminal_mac);
+                        $stmp->bindParam(':nickname', $data->data->adduser['nickname']);
+                        $stmp->bindParam(':password', $password);
 
-                            unset($data->data->adduser);
+                        $stmp->execute();
 
-                            $data->controller = null;
-                            $data->private_input = false;
+                        if ($stmp->rowCount() === 1) {
+                            $result = $stmp->fetch(\PDO::FETCH_ASSOC);
+
+                            if (isset($result['gid']) && !empty($result['gid'])) {
+                                $sender->send('message|<br><span>Adding user `' . $data->data->adduser['nickname'] . '\' ...</span>');
+                                $sender->send('message|<br><span>Adding new group `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') ...</span>');
+                                $sender->send('message|<br><span>Adding new user `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') with group \`' . $data->data->adduser['nickname'] . '\' ...</span>');
+
+                                unset($data->data->adduser);
+
+                                $data->controller = null;
+                                $data->private_input = false;
+                            }
                         }
+                    } else {
+                        $sender->send("message|<br><span>adduser: The user `" . $data->data->adduser['nickname'] . "' already exists.</span>");
+                        
+                        unset($data->data->adduser);
+
+                        $data->controller = null;
+                        $data->private_input = false;
                     }
                 }
             }
