@@ -77,10 +77,10 @@ class adduser implements CommandInterface
 
                     $sender->send('message|<br><span>Enter new UNIX password: </span>');
                 } else {
-                    $stmp = $db->prepare('SELECT 1 FROM TERMINAL_USER WHERE terminal = :terminal AND username = :username;');
+                    $stmp = $db->prepare('SELECT 1 FROM TERMINAL_USER WHERE terminal = :terminal AND username = :username');
 
                     $stmp->bindParam(':terminal', $terminal_mac);
-                    $stmp->bindParam(':username', $remaining[0]);
+                    $stmp->bindParam(':username', $data->data->adduser['nickname']);
 
                     $stmp->execute();
 
@@ -110,7 +110,7 @@ class adduser implements CommandInterface
                         }
                     } else {
                         $sender->send("message|<br><span>adduser: The user `" . $data->data->adduser['nickname'] . "' already exists.</span>");
-                        
+
                         unset($data->data->adduser);
 
                         $data->controller = null;
