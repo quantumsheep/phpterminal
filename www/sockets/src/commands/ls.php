@@ -75,7 +75,7 @@ class ls implements CommandInterface
             }
 
             foreach ($dirs as $dir) {
-                if ($dir->name[0] !== '.') {
+                if (isset($dir->name[0]) && $dir->name[0] !== '.') {
                     $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $parentId);
                     if ($chmod == 777) {
                         $str = $str . '<span style="padding-left: 0; padding-top: 20px; padding-right:20px;"><span style="color:#343862; background-color:#449544;">' . $dir->name . ' </span></span>';

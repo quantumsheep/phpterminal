@@ -4,6 +4,7 @@ namespace Alph\Services;
 use Alph\Services\History;
 use Alph\Services\SenderData;
 use Alph\Services\Session;
+use Alph\Models\Model;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
@@ -116,6 +117,8 @@ class CommandHandler implements MessageComponentInterface
                                     "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
                                 ];
 
+                                $this->data[$sender->resourceId]->data = new Model();
+
                                 foreach ($greetings as &$greet) {
                                     $sender->send("message|<br><span>" . $greet . "</span>");
                                 }
@@ -153,8 +156,6 @@ class CommandHandler implements MessageComponentInterface
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
         unset($this->data[$conn->resourceId]);
-
-        echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)

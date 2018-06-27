@@ -1,13 +1,17 @@
 USE `alph`;
 
+SET GLOBAL log_bin_trust_function_creators = 1;
+
 DROP FUNCTION IF EXISTS `MACADDRESS`;
 DROP FUNCTION IF EXISTS `GENERATE_PRIVATE_IP`;
 DROP FUNCTION IF EXISTS `GENERATE_PUBLIC_IP`;
 DROP FUNCTION IF EXISTS `SPLIT_STR`;
 DROP FUNCTION IF EXISTS `IdDirectoryFromPath`;
+DROP FUNCTION IF EXISTS `IdFileFromPath`;
+DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
 DROP PROCEDURE IF EXISTS `NewNetwork`;
 DROP PROCEDURE IF EXISTS `NewTerminal`;
-DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
+DROP PROCEDURE IF EXISTS `NewUser`;
 
 DELIMITER $$
 
@@ -187,6 +191,32 @@ BEGIN
     RETURN null;
 END$$
 
+/** 
+ * Give reversed Full Path from ID
+ */
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_REVERSED_FULL_PATH_FROM_FILE_ID`(id INT, terminal_mac CHAR(17)) RETURNS text CHARSET utf8
+BEGIN
+	DECLARE parentId INT;
+    DECLARE fullPath TEXT;
+    DECLARE parentName VARCHAR(255);
+    
+    set parentId = (SELECT parent FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac);
+    SET fullPath = CONCAT((SELECT name FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac),'/');
+
+    
+		WHILE parentId <> (SELECT iddir FROM terminal_directory where parent is null AND terminal = terminal_mac) DO
+        
+			SET parentName = (SELECT name FROM TERMINAL_DIRECTORY WHERE iddir = parentId AND terminal = terminal_mac);
+			SET fullPath = CONCAT(fullPath, parentName, '/');
+			SET parentId = (SELECT parent FROM TERMINAL_DIRECTORY where iddir = parentId AND terminal = terminal_mac);
+            
+		END WHILE;
+
+    
+    RETURN  fullPath;
+    
+END$$
+
 /**
  * Generate a new network
  */
@@ -260,27 +290,18 @@ BEGIN
 
 	SELECT @terminal_mac;
 END$$
-DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
 
-/** 
- * Give reversed Full Path from ID
- */
-CREATE DEFINER=`root`@`localhost` FUNCTION `GET_REVERSED_FULL_PATH_FROM_FILE_ID`(id INT, terminal_mac CHAR(17)) RETURNS TEXT CHARSET utf8
+CREATE DEFINER=`root`@`localhost` PROCEDURE `NewUser`(IN terminal_mac CHAR(17), IN nickname TEXT, IN password VARCHAR(255))
 BEGIN
-	DECLARE parentId INT;
-    DECLARE fullPath TEXT;
-    DECLARE parentName VARCHAR(255);
+	SET @terminal_mac = MACADDRESS();
+    SET @gid = (SELECT GREATEST(MAX(TERMINAL_GROUP.gid), MAX(TERMINAL_USER.uid)) + 1 FROM TERMINAL_GROUP, TERMINAL_USER WHERE TERMINAL_GROUP.terminal = terminal_mac AND TERMINAL_USER.terminal = terminal_mac);
+
+	INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(terminal_mac, @gid, 1, nickname);
+    SET @terminal_group = LAST_INSERT_ID();
     
-    set parentId = (SELECT parent FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac);
-    SET fullPath = CONCAT((SELECT name FROM TERMINAL_FILE where idfile = id AND terminal = terminal_mac),'/');
+    INSERT INTO TERMINAL_USER (terminal, uid, gid, status, username, password) VALUES(terminal_mac, @gid, @terminal_group, 1, nickname, password);
     
-    WHILE parentId IS NOT null DO
-		SET parentName = (SELECT name FROM TERMINAL_DIRECTORY WHERE iddir = parentId AND terminal = terminal_mac);
-		SET fullPath = CONCAT(fullPath, parentName, '/');
-		SET parentId = (SELECT parent FROM TERMINAL_DIRECTORY where iddir = parentId AND terminal = terminal_mac);
-	END WHILE;
-    
-    RETURN  LEFT(fullPath, length(fullpath)-2);
+    SELECT @gid as gid;
 END$$
 
 DELIMITER ;

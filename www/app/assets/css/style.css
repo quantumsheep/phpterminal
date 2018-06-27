@@ -88,3 +88,12 @@ footer {
 .custom-file-control:focus, .form-control:focus {
     color: rgb(231, 231, 231);
 }
+
+a {
+    color: #fff;
+    font-weight: 600;
+}
+
+a:hover {
+    color: rgb(185, 185, 185);
+}

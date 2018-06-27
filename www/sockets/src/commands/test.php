@@ -19,6 +19,13 @@ class test implements CommandInterface
 
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        var_dump(CommandAsset::getFullPathFromIdFile( $db,'caca' , $terminal_mac));
+        $fullParameters = CommandAsset::mvIsolateElement($parameters);
+        if(count($fullParameters) < 2){
+            return $sender->send("message|<br>mv: target operand missing" . (count($fullParameters) == 1? " after " . $fullParameters[0] . ".": "."));
+        }
+
+        $options = CommandAsset::mvGetOptions($fullParameters);
+        $target = CommandAsset::getTarget($parameters, $fullParameters);
+        var_dump($target);
     }
 }

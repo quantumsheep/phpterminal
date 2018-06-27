@@ -94,10 +94,10 @@ class rm implements CommandInterface
         }
         CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
         if (empty($options)) {
-            return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files, 'file');
+            return CommandAsset::stageDeleteFiles($db, $data, $sender, $terminal_mac, $Files, 'file');
 
         } else if (\in_array("r", $options) || \in_array("R", $options) || \in_array("-recursive", $options)) {
-            return CommandAsset::stageDeleteFiles($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, $Files, 'dir');
+            return CommandAsset::stageDeleteFiles($db, $data, $sender, $terminal_mac, $Files, 'dir');
         }
     }
 }
