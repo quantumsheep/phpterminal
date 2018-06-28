@@ -117,7 +117,7 @@ class CommandAsset
     }
 
     /**
-     * get absolute path parameters and retuen it in an array
+     * get absolute path parameters and return it in an array
      */
     public static function getAbsolutePathParameters(string &$parameters)
     {
@@ -249,11 +249,12 @@ class CommandAsset
     /**
      * Check if a directory exist from its Absolute Path
      */
-    public static function checkDirectoryExistence(string $directoryName, int $parentId, \PDO $db)
+    public static function checkDirectoryExistence(string $terminal_mac, string $directoryName, int $parentId, \PDO $db)
     {
-        $stmp = $db->prepare("SELECT * FROM TERMINAL_DIRECTORY WHERE name= :name AND parent= :parent");
+        $stmp = $db->prepare("SELECT * FROM TERMINAL_DIRECTORY WHERE name= :name AND parent= :parent AND terminal= :terminal_mac");
         $stmp->bindParam(":name", $directoryName);
         $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":terminal_mac", $terminal_mac);
         $stmp->execute();
         $count = $stmp->rowCount();
         if ($count > 0) {
@@ -264,11 +265,12 @@ class CommandAsset
     /**
      * Check if a file exist from its Absolute Path
      */
-    public static function checkFileExistence(string $FileName, int $parentId, \PDO $db)
+    public static function checkFileExistence(string $terminal_mac, string $FileName, int $parentId, \PDO $db)
     {
-        $stmp = $db->prepare("SELECT * FROM TERMINAL_FILE WHERE name= :name AND parent= :parent");
+        $stmp = $db->prepare("SELECT * FROM TERMINAL_FILE WHERE name= :name AND parent= :parent AND terminal= :terminal_mac");
         $stmp->bindParam(":name", $FileName);
         $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":terminal_mac", $terminal_mac);
         $stmp->execute();
         $count = $stmp->rowCount();
         if ($count > 0) {
@@ -348,7 +350,7 @@ class CommandAsset
     }
 
     /**
-     *
+     * Remove element from array (whatever the times it appears in)
      */
     public static function removeElementFromArray(&$array, $element)
     {
@@ -361,6 +363,13 @@ class CommandAsset
         $array = $newArray;
     }
 
+    /**
+     * Clean quote from string
+     */
+    public static function cleanQuote(string &$string)
+    {
+        return str_replace('"', "", $string);
+    }
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -541,7 +550,7 @@ class CommandAsset
                 $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
 
                 // Check if directory already exists
-                if (self::checkDirectoryExistence($newDirectoryName, $parentId, $db) === false && self::checkFileExistence($newDirectoryName, $parentId, $db) === false) {
+                if (self::checkDirectoryExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false) {
                     // Create directory
                     self::createNewDirectory($db, $data, $terminal_mac, $newDirectoryName, $parentId);
                 } else {
@@ -585,7 +594,7 @@ class CommandAsset
             array_shift($directorySplited);
 
             foreach ($directorySplited as $directoryName) {
-                if (self::checkDirectoryExistence($directoryName, $parentId, $db) === false) {
+                if (self::checkDirectoryExistence($terminal_mac, $directoryName, $parentId, $db) === false) {
                     self::createNewDirectory($db, $data, $terminal_mac, $directoryName, $parentId);
                 }
                 $parentPath = $parentPath . "/" . $directoryName;
@@ -608,7 +617,7 @@ class CommandAsset
                 $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
 
                 // Check if file exists
-                if (self::checkDirectoryExistence($FileName, $parentId, $db) === false && self::checkFileExistence($FileName, $parentId, $db) === false) {
+                if (self::checkDirectoryExistence($terminal_mac, $FileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $FileName, $parentId, $db) === false) {
                     $sender->send("message|<br>" . $FileName . " : didn't exists");
                 } else {
                     if ($type == 'file') {
@@ -756,7 +765,7 @@ class CommandAsset
             $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
 
             // Check if file already exists
-            if (self::checkDirectoryExistence($newFileName, $parentId, $db) === false && self::checkFileExistence($newFileName, $parentId, $db) === false) {
+            if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
                 // Create file
                 return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
             } else {
@@ -850,7 +859,7 @@ class CommandAsset
                 $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
 
                 // Check if file exists
-                if (self::checkDirectoryExistence($FileName, $parentId, $db) === false && self::checkFileExistence($FileName, $parentId, $db) === false) {
+                if (self::checkDirectoryExistence($terminal_mac, $FileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $FileName, $parentId, $db) === false) {
                     $sender->send("message|<br>" . $FileName . " : didn't exists");
                 } else {
                     self::changeChmod($db, $data, $terminal_mac, $FileName, $askedChmod, $parentId);
@@ -889,7 +898,7 @@ class CommandAsset
     /**
      * Treat mv element to determine Element position
      */
-    public static function mvIsolateElement($parameters)
+    public static function mvIsolateElement(string $parameters)
     {
         $parametersArray = [];
 
@@ -913,7 +922,9 @@ class CommandAsset
 
         //Update element if quoted element is in. It creates an empty entry
         if (!empty($fullQuotedParameters)) {
-            array_shift($regularParameters);
+            for ($i = 0; $i < count($fullQuotedParameters); $i++) {
+                array_shift($regularParameters);
+            }
         }
 
         //concatenate whole parameters
@@ -950,10 +961,10 @@ class CommandAsset
     /**
      * Return target (last element) with array and string
      */
-    public static function getTarget($parameters, &$fullParameters)
+    public static function getTarget(string &$parameters, array &$fullParameters)
     {
         $position = 0;
-
+        $elementInArray;
         $elementPosition = [];
 
         //research Element
@@ -961,11 +972,18 @@ class CommandAsset
             $elementPosition[] = strpos($parameters, $fullParameters[$i]);
             if ($elementPosition[$i] > $position) {
                 $target = $fullParameters[$i];
+                $elementInArray = $i;
             }
 
         }
+
+        self::removeElementFromArray($fullParameters, $fullParameters[$elementInArray]);
         return $target;
     }
 
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, ConnectionInterface $sender)
+    {
+
+    }
     //MV USAGE FUNCTIONS -- END
 }
