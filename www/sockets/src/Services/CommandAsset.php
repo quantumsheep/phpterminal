@@ -179,7 +179,7 @@ class CommandAsset
         }
 
         if ($path[0][0] !== '/') {
-            throw new \Exception("The first path given to getAbsolute function must be an absolute path.");
+            throw new \Exception("The first path given to currentPathAbsolute function must be an absolute path.");
         }
 
         $i = 0;
@@ -373,6 +373,7 @@ class CommandAsset
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
+
     /**
      * Get the files in the actual directory in an array
      */
