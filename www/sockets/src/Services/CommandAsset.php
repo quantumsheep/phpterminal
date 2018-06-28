@@ -179,7 +179,7 @@ class CommandAsset
         }
 
         if ($path[0][0] !== '/') {
-            throw new \Exception("The first path given to currentPathlute function must be an absolute path.");
+            throw new \Exception("The first path given to currentPathAbsolute function must be an absolute path.");
         }
 
         $i = 0;
@@ -288,7 +288,7 @@ class CommandAsset
         if (!empty($parameters)) {
             foreach ($parameters as $parameter) {
                 if ($parameter != "") {
-                    $fullPathParameters[] = self::currentPathlute($position, $parameter);
+                    $fullPathParameters[] = self::getAbsolute($position, $parameter);
                 }
             }
             return $fullPathParameters;
