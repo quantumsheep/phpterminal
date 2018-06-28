@@ -36,16 +36,17 @@ class test implements CommandInterface
 
         $cleanedTarget = CommandAsset::cleanQuote($target);
         $absolutePathTarget = CommandAsset::getAbsolute($data->position, $cleanedTarget);
+        $targetAttribut = CommandAsset::checkBoth($terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget), $db);
 
-        // First check what will be the action depending on the target essence
+        // First check what will be the action depending on the target attribut
         var_dump(CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget));
-        var_dump(CommandAsset::checkDirectoryExistence($terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget), $db));
+        var_dump($targetAttribut);
 
         // if Target is an actual directory
-        if (CommandAsset::checkDirectoryExistence($terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget), $db)) {
-            foreach($absolutePathFullParameters as $absolutePathParameter){
-                CommandAsset::updatePosition($db, $terminal_mac, $absolutePathParameter, $sender);
-            }   
+        if ($targetAttribut == 1) {
+            foreach ($absolutePathFullParameters as $absolutePathParameter) {
+                CommandAsset::updatePosition($db, $terminal_mac, $absolutePathParameter, CommandAsset::getIdDirectory($db, $terminal_mac, $absolutePathTarget), $absolutePathTarget, $sender);
+            }
         }
 
     }

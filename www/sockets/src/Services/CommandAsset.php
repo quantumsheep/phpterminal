@@ -280,6 +280,24 @@ class CommandAsset
     }
 
     /**
+     * Check Both and return with a bool (0,1 or 2) what is the document
+     */
+    public static function checkBoth(string $terminal_mac, string $ElementName, int $parentId, \PDO $db)
+    {
+        $ElementAttribut = 0;
+        //Check if it's a directory
+        if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
+            $ElementAttribut = 1;
+
+            // otherwise check if it's a file
+        } else if (self::checkFileExistence($terminal_mac, $ElementName, $parentId, $db)) {
+            $ElementAttribut = 2;
+
+        }
+        return $ElementAttribut;
+    }
+
+    /**
      * return array of fullPath from array of parameters
      */
     public static function fullPathFromParameters(array $parameters, string $position)
@@ -852,8 +870,36 @@ class CommandAsset
         return $target;
     }
 
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, ConnectionInterface $sender)
+    /**
+     * Function update element Position after several check up
+     */
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
     {
+        // get Element Name
+        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
+
+        // Check if Element is a directory, or a file, or even exist.
+        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
+
+        // If Element is a directory
+        if($elementAttribut == 1){
+            if(self::checkSiblings($movedElementFullPath, $newParentFullPath)){
+                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
+            }
+        // If Element is a file
+        } else if ($elementAttribut == 2) {
+            return;
+        // If Element doesn't exist
+        } else{
+            return;
+        }
+    }
+
+
+    /**
+     * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
+     */
+    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath){
 
     }
     //MV USAGE FUNCTIONS -- END
