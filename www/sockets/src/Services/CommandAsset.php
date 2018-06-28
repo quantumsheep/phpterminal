@@ -900,7 +900,7 @@ class CommandAsset
      * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
      */
     public static function checkSiblings(\PDO $db, $sonPath, $daddyPath){
-
+        
     }
     //MV USAGE FUNCTIONS -- END
 }
