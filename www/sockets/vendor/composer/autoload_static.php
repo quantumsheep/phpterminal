@@ -9,16 +9,13 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         '6b06ce8ccf69c43a60a1e48495a034c9' => __DIR__ . '/..' . '/react/promise-timer/src/functions.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '3be16222a6efa6dd226a219eaaff823b' => __DIR__ . '/..' . '/ratchet/pawl/src/functions_include.php',
         '0ba80dff9b7dbd6577349a9501c76512' => __DIR__ . '/../..' . '/Parameters.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'W' => 
-        array (
-            'WebSocket\\' => 10,
-        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -35,6 +32,7 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
             'React\\Dns\\' => 10,
             'React\\Cache\\' => 12,
             'Ratchet\\RFC6455\\' => 16,
+            'Ratchet\\Client\\' => 15,
             'Ratchet\\' => 8,
         ),
         'P' => 
@@ -52,10 +50,6 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
     );
 
     public static $prefixDirsPsr4 = array (
-        'WebSocket\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/textalk/websocket/lib',
-        ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
@@ -99,6 +93,10 @@ class ComposerStaticInit82a4b1bbb39cf13b8f89718c8daa421d
         'Ratchet\\RFC6455\\' => 
         array (
             0 => __DIR__ . '/..' . '/ratchet/rfc6455/src',
+        ),
+        'Ratchet\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ratchet/pawl/src',
         ),
         'Ratchet\\' => 
         array (

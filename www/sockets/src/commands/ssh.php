@@ -1,11 +1,10 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Models\Model;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
-use Alph\Models\Model;
 use Ratchet\ConnectionInterface;
-use WebSocket\Client;
 
 class ssh implements CommandInterface
 {
@@ -27,7 +26,7 @@ class ssh implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         // if(!empty($data->data->ssh->options["host"])) {
-            
+
         // }
 
         if (empty($parameters)) {
@@ -74,20 +73,25 @@ class ssh implements CommandInterface
         }
 
         $data->controller = "\\Alph\\Commands\\ssh::call";
-        
+
         $data->data->ssh = new Model();
 
         $data->data->ssh->options = $options;
-        // $data->data["ssh"]->conn->data = new SenderData();
-    
-        $data->data->ssh->client = new Client("ws://localhost:800/", [
-            "headers" => [
-                "cookie" => 'alph_sess=' . $sess_id . '; terminal=FD-7A-FF-CE-47-AD'
-            ]
-        ]);
+
+        \Ratchet\Client\connect('ws://localhost:800', ['permessage-deflate'], [
+            "cookie" => 'alph_sess=' . $sess_id . '; terminal=FD-7A-FF-CE-47-AD',
+        ])->then(function ($conn) {
+            $conn->on('message', function ($msg) use ($conn) {
+                echo "Received: {$msg}\n";
+            });
+
+            $conn->on('close', function ($code = null, $reason = null) {
+                echo "Connection closed ({$code} - {$reason})\n";
+            });
+        }, function ($e) {
+            echo "Could not connect: {$e->getMessage()}\n";
+        });
 
         //$data->data->ssh->client->connect();
-
-        var_dump($data->data->ssh->client);
     }
 }
