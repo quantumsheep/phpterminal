@@ -389,13 +389,6 @@ class CommandAsset
         $array = $newArray;
     }
 
-    /**
-     * Clean quote from string
-     */
-    public static function cleanQuote(string &$string)
-    {
-        return str_replace('"', "", $string);
-    }
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -891,11 +884,9 @@ class CommandAsset
     /**
      * Function update element Position after several check up
      */
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
     {
-        // get Element Name
-        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
-
+        
         // Check if Element is a directory, or a file, or even exist.
         $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
         // If Element is a directory

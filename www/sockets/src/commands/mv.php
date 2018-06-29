@@ -58,6 +58,7 @@ class mv implements CommandInterface
     {
         // stock parameters for further treatment
         $registeredParameters = $parameters;
+        $cleanedParameters = [];
 
         // Treat command to get parameters
         $quotedParameters = CommandAsset::mvGetQuotedParameters($parameters, $data->position);
@@ -68,14 +69,32 @@ class mv implements CommandInterface
         CommandAsset::concatenateParameters($fullElements, $quotedParameters, $pathParameters);
 
         //Check if element provided is more than 1
-        if(count($fullElements) < 2){
+        if (count($fullElements) < 2) {
             return $sender->send("message|<br>mv: target operand missing" . (count($fullElements) == 1 ? " after " . $fullElements[0] . "." : "."));
         }
 
         //get and remove target from parameters
         $target = CommandAsset::getTarget($registeredParameters, $fullElements);
-        
 
+        //Clean parameters from "" now everything is cleared
+        $cleanedTarget = str_replace('"', "", $target);
+
+        foreach ($fullElements as $Element) {
+            $cleanedParameters = str_replace('"', "", $Element);
+        }
+
+        // Get target attributs
+        $targetFullPath = CommandAsset::getAbsolute($data->position, $target);
+        $targetType = CommandAsset::checkBoth($terminal_mac, $target, CommandAsset::getParentId($db, $terminal_mac, $targetFullPath), $db);
+
+        // Action if target is a directory
+        if ($targetType == 1) {
+            $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
+
+            foreach ($cleanedParameters as $parameter) {
+                CommandAsset::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath);
+            }
+        }
 
         /*
     if (count($fullParameters) < 2) {
