@@ -97,23 +97,24 @@ class AccountManager
         return false;
     }
 
-    public static function countAccounts(\PDO $db, string $search = null) {
+    public static function countAccounts(\PDO $db, string $search = null)
+    {
         $sql = "SELECT COUNT(idaccount) as c FROM ACCOUNT";
 
-        if($search !== null) {
+        if ($search !== null) {
             $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
         }
 
         $stmp = $db->prepare($sql);
 
-        if($search !== null) {
-            $stmp->bindParam(":search", $search);            
+        if ($search !== null) {
+            $stmp->bindParam(":search", $search);
         }
 
         $stmp->execute();
 
-        if($stmp->rowCount() > 0) {
-            if($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+        if ($stmp->rowCount() > 0) {
+            if ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                 return $row["c"];
             }
         }
@@ -124,20 +125,21 @@ class AccountManager
     /**
      * @return AccountModel[]
      */
-    public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null) {
-        $sql = "SELECT idaccount, status, hyperpower, email, username FROM ACCOUNT";
+    public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null)
+    {
+        $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
 
         $isOffset = $offset != null && $offset > 0;
         $isLimited = $limit != null;
 
-        if($search !== null) {
+        if ($search !== null) {
             $search = \str_replace('%', "\\%", $search);
             $sql .= " WHERE username LIKE CONCAT('%', :search ,'%') OR email LIKE CONCAT('%', :search ,'%')";
         }
 
-        if($isOffset && $isLimited) {
+        if ($isOffset && $isLimited) {
             $sql .= " LIMIT :offset, :limit";
-        } else if($isLimited) {
+        } else if ($isLimited) {
             $sql .= " LIMIT :limit";
         } else if ($isOffset) {
             $sql .= " OFFSET :offset";
@@ -145,15 +147,15 @@ class AccountManager
 
         $stmp = $db->prepare($sql);
 
-        if($search !== null) {
-            $stmp->bindParam(":search", $search);            
+        if ($search !== null) {
+            $stmp->bindParam(":search", $search);
         }
 
-        if($isOffset) {
+        if ($isOffset) {
             $stmp->bindParam(":offset", $offset, \PDO::PARAM_INT);
         }
 
-        if($isLimited) {
+        if ($isLimited) {
             $stmp->bindParam(":limit", $limit, \PDO::PARAM_INT);
         }
 
@@ -161,8 +163,8 @@ class AccountManager
 
         $accounts = [];
 
-        if($stmp->rowCount() > 0) {
-            while($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+        if ($stmp->rowCount() > 0) {
+            while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
                 $accounts[$row["idaccount"]] = AccountModel::map($row);
             }
 
@@ -172,10 +174,11 @@ class AccountManager
         return $accounts;
     }
 
-    public static function getAccountById(\PDO $db, int $idaccount) {
+    public static function getAccountById(\PDO $db, int $idaccount)
+    {
         $account = self::getAccountsById($db, [$idaccount]);
-        
-        if(!empty($account)) {
+
+        if (!empty($account)) {
             return reset($account);
         }
 
@@ -315,12 +318,16 @@ class AccountManager
         return false;
     }
 
-    public static function isConnected() {
-        return isset($_SESSION["account"]) && !empty($_SESSION["account"]->idaccount);
-    }
+    public static function editAccount(\PDO $db, int $idaccount, AccountModel $account)
+    {
+        $stmp = $db->prepare("UPDATE account SET username = :username, email = :email, password = :password WHERE idaccount= :idaccount;");
+        $stmp->bindParam(":username", $account->username);
+        $stmp->bindParam(":email", $account->email);
+        $stmp->bindParam(":password", $account->password);
+        $stmp->bindParam(":idaccount", $idaccount);
+        $stmp->execute();
 
-    public static function isAdmin() {
-        return isset($_SESSION["account"]) && $_SESSION["account"]->hyperpower;        
+        return true;
     }
 
     /**
