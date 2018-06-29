@@ -889,7 +889,7 @@ class CommandAsset
 
         // Check if Element is a directory, or a file, or even exist.
         $elementAttribut = self::checkBoth($terminal_mac, $movedElementName, self::getParentId($db, $terminal_mac, $movedElementName), $db);
-        var_dump($elementAttribut);
+
         // If Element is a directory
         if ($elementAttribut == 1) {
             //Get full path of moved directory
@@ -899,7 +899,6 @@ class CommandAsset
             //Check if directory can be moved (depends of the full path)
             if (self::checkSiblings($movedElementName, $newParentFullPath) == true) {
                 return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
-
             } else {
                 //change Directory position
                 if (CommandAsset::checkDirectoryExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
@@ -947,13 +946,15 @@ class CommandAsset
     /**
      * update directory parent
      */
-    public static function changeDirectoryParentId(\PDO $db, int $fileId, string $newParentId, string $terminal_mac)
+    public static function changeDirectoryParentId(\PDO $db, int $idDirectory, string $newParentId, string $terminal_mac)
     {
-        $stmp = $db->prepare("UPDATE terminal_directory SET parent= :newParent WHERE idfile= :idfile AND terminal= :terminal ;");
+        var_dump($idDirectory);
+        var_dump($newParentId);
+        $stmp = $db->prepare("UPDATE terminal_directory SET parent= :newParent WHERE iddir= :idDirectory AND terminal= :terminal ");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":newParent", $newParentId);
-        $stmp->bindParam(":idfile", $fileId);
+        $stmp->bindParam(":idDirectory", $idDirectory);
 
         $stmp->execute();
     }
@@ -961,11 +962,60 @@ class CommandAsset
     /**
      * update file parent
      */
-    public static function changeFileParentId(\PDO $db, int $parentId, string $newParentId,string $fileName, string $terminal_mac)
-    {    
+    public static function changeFileParentId(\PDO $db, int $parentId, string $newParentId, string $fileName, string $terminal_mac)
+    {
         $stmp = $db->prepare("UPDATE terminal_file SET parent= :newParent WHERE parent= :parent AND terminal= :terminal AND name = :filename");
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":newParent", $newParentId);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":filename", $fileName);
+
+        $stmp->execute();
+    }
+
+    /**
+     * Change file or directory name
+     */
+    public static function changeName(\PDO $db, string $position, string $terminal_mac, string $elementName, string $newName, ConnectionInterface $sender)
+    {
+        // Get whole Element information
+        $elementAbsolutePath = self::getAbsolute($position, $elementName);
+        $elementParentId = self::getParentId($db, $terminal_mac, $elementAbsolutePath);
+        $elementType = self::checkBoth($terminal_mac, $elementName, $elementParentId, $db);
+        //if Element doesn't exist
+        if($elementType == 0){
+            return $sender->send("message|<br>" . $elementName . " doesn't exist.");
+        //If element is a directory
+        }else if ($elementType == 1){
+            return self::changeDirectoryName($db, $terminal_mac, self::getIdDirectory($db, $terminal_mac, $elementAbsolutePath), $newName);
+        //if element is a file
+        } else if ($elementType == 2){
+            return self::changeFileName($db, $terminal_mac, $elementParentId, $newName, $elementName);
+        }
+    }
+
+    /**
+     * change File name
+     */
+    public static function changeDirectoryName(\PDO $db, string $terminal_mac, int $idDirectory, string $newName){
+        $stmp = $db->prepare("UPDATE terminal_directory SET name= :newName WHERE iddir= :iddir AND terminal= :terminal");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newName", $newName);
+        $stmp->bindParam(":iddir", $idDirectory);
+
+        $stmp->execute();
+    }
+
+
+    /**
+     * change File name
+     */
+    public static function changeFileName(\PDO $db, string $terminal_mac, int $parentId, string $newName, string $fileName){
+        $stmp = $db->prepare("UPDATE terminal_file SET name= :newName WHERE parent= :parent AND terminal= :terminal AND name = :filename");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newName", $newName);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":filename", $fileName);
 

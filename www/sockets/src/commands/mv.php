@@ -108,10 +108,12 @@ class mv implements CommandInterface
         } else if ($targetType == 0) {
             //in case the targetType is nothing, we may change directory or file provided as parameter for this name
             if (count($cleanedParameters) == 1) {
-
+                CommandAsset::changeName($db, $data->position, $terminal_mac, $cleanedParameters[0], $cleanedTarget, $sender);
             } else {
-                return $sender->send("message|<br> you can only change name of 1 Element at a time");
+                return $sender->send("message|<br> You can only change name of 1 Element at a time");
             }
+        } else if ($targetType == 2) {
+            return $sender->send("message|<br>" . $cleanedTarget . " already exists");
         }
     }
 }
