@@ -46,6 +46,10 @@ class CommandHandler implements MessageComponentInterface
         // Get cookie HTTP header
         $cookies = $sender->httpRequest->getHeader('Cookie');
 
+        if(empty($cookies)) {
+            $cookies = $sender->httpRequest->getHeader('cookie');
+        }
+
         // If there is no values in the cookie header, stop the process
         if (!empty($cookies)) {
             // Parse the cookies to obtain each cookies separately
