@@ -1,6 +1,7 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
@@ -55,15 +56,61 @@ class mv implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        // If no params
-        if (empty($parameters)) {
-            $sender->send("message|<br>Operand missing <br>please enter mv --help for more information");
-            return;
-        }
-        $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
-        $options = CommandAsset::getOptions($parameters);
-        $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
+        // stock parameters for further treatment
+        $registeredParameters = $parameters;
 
+        // Treat command to get parameters
+        $quotedParameters = CommandAsset::mvGetQuotedParameters($parameters, $data->position);
+        $options = CommandAsset::getOptions($parameters);
+        $pathParameters = CommandAsset::mvGetPathParameters($parameters, $data->position);
+
+        $fullElements = explode(" ", $parameters);
+        CommandAsset::concatenateParameters($fullElements, $quotedParameters, $pathParameters);
+
+        //Check if element provided is more than 1
+        if(count($fullElements) < 2){
+            return $sender->send("message|<br>mv: target operand missing" . (count($fullElements) == 1 ? " after " . $fullElements[0] . "." : "."));
+        }
+
+        //get and remove target from parameters
+        $target = CommandAsset::getTarget($registeredParameters, $fullElements);
         
+
+
+        /*
+    if (count($fullParameters) < 2) {
+    return $sender->send("message|<br>mv: target operand missing" . (count($fullParameters) == 1 ? " after " . $fullParameters[0] . "." : "."));
+    }
+
+    $options = CommandAsset::mvGetOptions($fullParameters);
+
+    $target = CommandAsset::getTarget($parameters, $fullParameters);
+
+    // Transform element name into full path
+    foreach ($fullParameters as $parameter) {
+    $cleanedParameter = CommandAsset::cleanQuote($parameter);
+    $absolutePathFullParameters[] = CommandAsset::getAbsolute($data->position, $cleanedParameter);
+    }
+
+    //Get Target Revelant information
+    $cleanedTarget = CommandAsset::cleanQuote($target);
+    $absolutePathTarget = CommandAsset::getAbsolute($data->position, $cleanedTarget);
+
+    if(CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget)){
+    $targetAttribut = CommandAsset::checkBoth($terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget), $db);
+    } else {
+    return;
+    }
+
+    // First check what will be the action depending on the target attribut
+
+    // if Target is a directory
+    if ($targetAttribut == 1) {
+    foreach ($absolutePathFullParameters as $absolutePathParameter) {
+    CommandAsset::updatePosition($db, $terminal_mac, $absolutePathParameter, CommandAsset::getIdDirectory($db, $terminal_mac, $absolutePathTarget), $absolutePathTarget, $sender);
+    }
+
+    }
+     */
     }
 }

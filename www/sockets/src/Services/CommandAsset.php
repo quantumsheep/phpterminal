@@ -121,7 +121,7 @@ class CommandAsset
      */
     public static function getAbsolutePathParameters(string &$parameters)
     {
-
+        $finalPathParameters = [];
         $pattern = "/ ((\/+((\"[^\"]*\")|[^\/ ]+))+)/";
 
         // Get path parameters with the pattern
@@ -130,9 +130,13 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                //remove potential empty element
+                if ($pathParameter != "") {
+                    $finalPathParameters[] = $pathParameter;
+                }
             }
-            return $pathParameters[1];
+            return $finalPathParameters;
         }
 
         return;
@@ -154,7 +158,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -284,7 +288,11 @@ class CommandAsset
      */
     public static function checkBoth(string $terminal_mac, string $ElementName, int $parentId, \PDO $db)
     {
+        //Will Trim in case Element passed is a relative of a full path
+        $ElementName = explode("/", $ElementName)[count(explode("/", $ElementName)) - 1];
+
         $ElementAttribut = 0;
+
         //Check if it's a directory
         if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 1;
@@ -784,67 +792,80 @@ class CommandAsset
     //CHMOD USAGE FUNCTIONS --END
 
     //MV USAGE FUNCTIONS -- START
-    /**
-     * Treat mv element to determine Element position
-     */
-    public static function mvIsolateElement(string $parameters)
-    {
-        $parametersArray = [];
 
-        $pattern = "/(\"([^\"]+)\") /";
-        $fullQuotedParameters = [];
+    /**
+     * custom get quoted
+     */
+    public static function mvGetQuotedParameters(string &$parameters, string $position)
+    {
+        $pattern = "/ (\"([^\"]+)\") /";
+        $fullPathQuotedParameters = [];
         // Get quoted element with the pattern
-        preg_match_all($pattern, $parameters . " ", $quotedParameters);
+        preg_match_all($pattern, " " . $parameters . " ", $quotedParameters);
 
         // Use 2 position of array, to exclude " "
         if (!empty($quotedParameters[1])) {
             foreach ($quotedParameters[1] as $quotedParameter) {
-                // Update the whole parameters for further concatenation
-                $parameters = str_replace(" " . $quotedParameter, "", " " . $parameters);
+                // Update the whole parameters for further treatments
+                $parameters = str_replace(" " . $quotedParameter, "", $parameters);
 
-                $fullQuotedParameters[] = $quotedParameter;
             }
         }
 
-        // get Regular parameters into array for further concatenation
-        $regularParameters = explode(" ", $parameters);
+        return $quotedParameters[1];
+    }
+    /**
+     * custom get Path parameters
+     */
+    public static function mvGetPathParameters(string &$parameters, string $position): array
+    {
+        $fullPathParameters = [];
 
-        //Update element if quoted element is in. It creates an empty entry
-        if (!empty($fullQuotedParameters)) {
-            for ($i = 0; $i < count($fullQuotedParameters); $i++) {
-                array_shift($regularParameters);
-            }
+        // Get absolute Path parameters
+        $absolutePathParameters = self::getAbsolutePathParameters($parameters);
+
+        // Get relative Path parameters
+        $relativePathParameters = self::mvGetRelativePathParameters($parameters, $position);
+
+        // Check empty array case
+        if (!empty($relativePathParameters) && !empty($absolutePathParameters)) {
+            $fullPathParameters = array_merge($relativePathParameters, $absolutePathParameters);
+        } else if (empty($relativePathParameters) && !empty($absolutePathParameters)) {
+            // If no relative Parameters, $fullPath = absolute path parameters
+            $fullPathParameters = $absolutePathParameters;
+        } else if (empty($absolutePathParameters) && !empty($relativePathParameters)) {
+            // If no absolute Parameters, $fullPath = relative path parameters
+            $fullPathParameters = $relativePathParameters;
         }
 
-        //concatenate whole parameters
-        self::concatenateParameters($parametersArray, $regularParameters, $fullQuotedParameters);
-
-        return $parametersArray;
+        return $fullPathParameters;
     }
 
     /**
-     * Get option from array of parameters
+     * custom relative path parameters
      */
-    public static function mvGetOptions(array &$fullParameters)
+    public static function mvGetRelativePathParameters(string &$parameters, string $position)
     {
-        $options = "";
-        $option = "";
-        $pattern = "/(-([a-zA-Z\d]+))/";
 
-        // check if every array entry is an option
-        foreach ($fullParameters as $parameter) {
-            //reset option
-            $option = "";
-            preg_match($pattern, $parameter, $option);
-            if (!empty($option)) {
-                //remove the Element from the array
-                self::removeElementFromArray($fullParameters, $parameter);
+        $finalPathParameters = [];
+        $pattern = "/ (((\"[^\"]*\")|([^\/ ]))+\/((\"[^\"]*\")|([^\/ ]+\/?))*)+/";
 
-                // get parameters without "-" and concatenate into option, to get a full string of options
-                $options .= $option[2];
+        // Get path parameters with the pattern
+        preg_match_all($pattern, " " . $parameters, $pathParameters);
+        if (!empty($pathParameters[1])) {
+            foreach ($pathParameters[1] as $pathParameter) {
+                // Update the whole parameters for further treatments
+                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+
+                //remove potential empty element
+                if ($pathParameter != "") {
+                    $finalPathParameters[] = $pathParameter;
+                }
             }
+            return $finalPathParameters;
         }
-        return $options;
+
+        return;
     }
 
     /**
@@ -852,21 +873,18 @@ class CommandAsset
      */
     public static function getTarget(string &$parameters, array &$fullParameters)
     {
-        $position = 0;
-        $elementInArray;
-        $elementPosition = [];
+        $target;
+        $lastPosition = 0;
 
-        //research Element
-        for ($i = 0; $i < count($fullParameters); $i++) {
-            $elementPosition[] = strpos($parameters, $fullParameters[$i]);
-            if ($elementPosition[$i] > $position) {
-                $target = $fullParameters[$i];
-                $elementInArray = $i;
+        foreach ($fullParameters as $parameter) {
+            $position = strrpos($parameters, $parameter);
+            if ($position > $lastPosition) {
+                $lastPosition = $position;
+                $target = $parameter;
             }
-
         }
 
-        self::removeElementFromArray($fullParameters, $fullParameters[$elementInArray]);
+        self::removeElementFromArray($fullParameters, $target);
         return $target;
     }
 
@@ -880,27 +898,30 @@ class CommandAsset
 
         // Check if Element is a directory, or a file, or even exist.
         $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
-
         // If Element is a directory
-        if($elementAttribut == 1){
-            if(self::checkSiblings($movedElementFullPath, $newParentFullPath)){
-                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
+        if ($elementAttribut == 1) {
+            if (self::checkSiblings($db, $movedElementFullPath, $newParentFullPath) == true) {
+                return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
             }
-        // If Element is a file
+            // If Element is a file
         } else if ($elementAttribut == 2) {
             return;
-        // If Element doesn't exist
-        } else{
+            // If Element doesn't exist
+        } else {
             return;
         }
     }
 
-
     /**
      * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
      */
-    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath){
-        
+    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath)
+    {
+        if (strpos($sonPath, $daddyPath) === false) {
+            return true;
+        } else {
+            return false;
+        }
     }
     //MV USAGE FUNCTIONS -- END
 }
