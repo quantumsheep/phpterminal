@@ -1,29 +1,26 @@
 <?php
 
 use React\Dns\Model\Message;
-use React\Dns\Protocol\BinaryDumper;
-use React\Dns\Protocol\Parser;
-use React\Dns\Query\Executor;
 use React\Dns\Query\Query;
+use React\Dns\Query\UdpTransportExecutor;
 use React\EventLoop\Factory;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $loop = Factory::create();
-
-$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new UdpTransportExecutor($loop);
 
 $name = isset($argv[1]) ? $argv[1] : 'www.google.com';
 
-$ipv4Query = new Query($name, Message::TYPE_A, Message::CLASS_IN, time());
-$ipv6Query = new Query($name, Message::TYPE_AAAA, Message::CLASS_IN, time());
+$ipv4Query = new Query($name, Message::TYPE_A, Message::CLASS_IN);
+$ipv6Query = new Query($name, Message::TYPE_AAAA, Message::CLASS_IN);
 
-$executor->query('8.8.8.8:53', $ipv4Query)->done(function (Message $message) {
+$executor->query('8.8.8.8:53', $ipv4Query)->then(function (Message $message) {
     foreach ($message->answers as $answer) {
         echo 'IPv4: ' . $answer->data . PHP_EOL;
     }
 }, 'printf');
-$executor->query('8.8.8.8:53', $ipv6Query)->done(function (Message $message) {
+$executor->query('8.8.8.8:53', $ipv6Query)->then(function (Message $message) {
     foreach ($message->answers as $answer) {
         echo 'IPv6: ' . $answer->data . PHP_EOL;
     }

@@ -125,7 +125,7 @@ class AccountManager
      * @return AccountModel[]
      */
     public static function getAccounts(\PDO $db, $limit = 10, $offset = 0, string $search = null) {
-        $sql = "SELECT idaccount, status, email, username FROM ACCOUNT";
+        $sql = "SELECT idaccount, status, hyperpower, email, username FROM ACCOUNT";
 
         $isOffset = $offset != null && $offset > 0;
         $isLimited = $limit != null;
@@ -313,6 +313,14 @@ class AccountManager
         }
 
         return false;
+    }
+
+    public static function isConnected() {
+        return isset($_SESSION["account"]) && !empty($_SESSION["account"]->idaccount);
+    }
+
+    public static function isAdmin() {
+        return isset($_SESSION["account"]) && $_SESSION["account"]->hyperpower;        
     }
 
     /**

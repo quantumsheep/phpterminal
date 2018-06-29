@@ -4,6 +4,7 @@ namespace Alph\Models;
 class AccountModel {
     public $idaccount;
     public $status;
+    public $hyperpower;
     public $email;
     public $username;
     public $password;
@@ -22,6 +23,7 @@ class AccountModel {
 
         $row->idaccount = $data["idaccount"] ?? null;
         $row->status = $data["status"] ?? null;
+        $row->hyperpower = $data["hyperpower"] ?? null;
         $row->email = $data["email"] ?? null;
         $row->username = $data["username"] ?? null;
         $row->password = $data["password"] ?? null;

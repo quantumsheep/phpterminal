@@ -8,6 +8,7 @@
         ]
     },
     "require": {
-        "cboden/ratchet": "^0.4.1"
+        "cboden/ratchet": "^0.4.1",
+        "ratchet/pawl": "^0.3.2"
     }
 }
