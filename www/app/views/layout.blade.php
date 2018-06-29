@@ -39,6 +39,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/terminal">Terminal</a>
                 </li>
+                @if($_SESSION["account"]->hyperpower)
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link" href="/account">Account</a>
                 </li>
