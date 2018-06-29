@@ -83,21 +83,30 @@ class rm implements CommandInterface
             return;
         }
 
+        $currentPosition = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
         $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
 
-        // Change simple parameters into array for further treatement
-        $Files = explode(" ", $parameters);
-        if (!empty($Files)) {
-            $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
-        }
-        CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
-        if (empty($options)) {
-            return CommandAsset::stageDeleteFiles($db, $data, $sender, $terminal_mac, $Files, 'file');
+        $paramArray = explode(" ", $parameters);
 
-        } else if (\in_array("r", $options) || \in_array("R", $options) || \in_array("-recursive", $options)) {
-            return CommandAsset::stageDeleteFiles($db, $data, $sender, $terminal_mac, $Files, 'dir');
+        foreach ($paramArray as $param) {
+            $type = CommandAsset::checkBoth($terminal_mac, $param, $currentPosition, $db);
+
+            if ($type == 2) {
+                $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
+                CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
+            } else if ($type == 1) {
+                $dirpath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
+                $files = CommandAsset::getFiles($db, $terminal_mac, $dirpath);
+                $dirs = CommandAsset::getDirectories($db, $terminal_mac, $dirpath);
+
+                var_dump($dirpath);
+                var_dump($files);
+                var_dump($dirs);
+            } else {
+                $sender->send('message|<br>' . $param . ' didnt exist.');
+            }
         }
     }
 }
