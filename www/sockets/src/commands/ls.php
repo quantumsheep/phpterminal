@@ -64,7 +64,9 @@ class ls implements CommandInterface
                 $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
                 $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
 
-                $sender->send("message|<br>" . $path . " :<br>");
+                if (!empty($path)) {
+                    $sender->send("message|<br>" . $path . ": <br>");
+                }
                 self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
             }
         } else {

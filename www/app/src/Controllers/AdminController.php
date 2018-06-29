@@ -14,6 +14,10 @@ class AdminController
 {
     public static function index(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -32,6 +36,10 @@ class AdminController
 
     public static function terminal(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -65,6 +73,10 @@ class AdminController
 
     public static function terminal_add(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -79,42 +91,51 @@ class AdminController
         return $view;
     }
 
-    public static function terminal_add_action(array $params) {
+    public static function terminal_add_action(array $params)
+    {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
 
         $_SESSION["errors"] = [];
-            $_SESSION["success"] = [];
+        $_SESSION["success"] = [];
 
-            if (!empty($_POST["account"]) && isset($_POST["network"])) {
+        if (!empty($_POST["account"]) && isset($_POST["network"])) {
+
+            if (empty($_POST["network"])) {
+                $_POST["network"] = NetworkManager::createNetwork($db);
 
                 if (empty($_POST["network"])) {
-                    $_POST["network"] = NetworkManager::createNetwork($db);
-
-                    if (empty($_POST["network"])) {
-                        $_SESSION["errors"][] = "An error occured while creating a new network.";
-                        return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
-                    }
-                } else if (!NetworkManager::isMAC($_POST["network"])) {
-                    $_SESSION["errors"][] = "The selected network is unvalid.";
+                    $_SESSION["errors"][] = "An error occured while creating a new network.";
                     return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
                 }
-
-                if ($terminal_mac = TerminalManager::createTerminal($db, $_POST["account"], $_POST["network"])) {
-                    $_SESSION["success"][] = "Terminal <a href=\"/admin/terminal/" . $terminal_mac . "\">" . $terminal_mac . "</a> created for account <a href=\"/admin/account/" . $_POST["account"] . "\">" . $_POST["account"] . "</a>" . " in network <a href=\"/admin/network/" . $_POST["network"] . "\">" . $_POST["network"] . "</a>";
-
-                    return header("Location: /admin/terminal/add");
-                } else {
-                    $_SESSION["errors"][] = "An error occured while creating the new terminal.";
-                    return header("Location: /admin/terminal/add?account=" . $_POST["account"] . "&network=" . $_POST["network"]);
-                }
-            } else {
-                $_SESSION["errors"][] = "Thanks to complete the form.";
-                return header("Location: /admin/terminal/add?account=" . ($_POST["account"] ?? null) . "&network=" . ($_POST["network"] ?? null));
+            } else if (!NetworkManager::isMAC($_POST["network"])) {
+                $_SESSION["errors"][] = "The selected network is unvalid.";
+                return header("Location: /admin/terminal/add?account=" . $_POST["account"]);
             }
+
+            if ($terminal_mac = TerminalManager::createTerminal($db, $_POST["account"], $_POST["network"])) {
+                $_SESSION["success"][] = "Terminal <a href=\"/admin/terminal/" . $terminal_mac . "\">" . $terminal_mac . "</a> created for account <a href=\"/admin/account/" . $_POST["account"] . "\">" . $_POST["account"] . "</a>" . " in network <a href=\"/admin/network/" . $_POST["network"] . "\">" . $_POST["network"] . "</a>";
+
+                return header("Location: /admin/terminal/add");
+            } else {
+                $_SESSION["errors"][] = "An error occured while creating the new terminal.";
+                return header("Location: /admin/terminal/add?account=" . $_POST["account"] . "&network=" . $_POST["network"]);
+            }
+        } else {
+            $_SESSION["errors"][] = "Thanks to complete the form.";
+            return header("Location: /admin/terminal/add?account=" . ($_POST["account"] ?? null) . "&network=" . ($_POST["network"] ?? null));
+        }
     }
 
     public static function network(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -133,6 +154,10 @@ class AdminController
 
     public static function account(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -169,15 +194,19 @@ class AdminController
 
     public static function referential(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
-        $model->idreferencial = !empty($params["idreferential"]) ? intval($params["idreferential"]) : NULL;
+        $model->idreferencial = !empty($params["idreferential"]) ? intval($params["idreferential"]) : null;
 
-        if(!empty($model->idreferencial)) {
+        if (!empty($model->idreferencial)) {
             $model->referential = ReferentialManager::getReferential($db, $model->idreferencial);
 
-            if(!empty($model->referential)) {
+            if (!empty($model->referential)) {
                 $model->referentialParentName = ReferentialManager::getReferentialCategoryCode($db, $model->referential->category);
             }
         }
@@ -189,6 +218,10 @@ class AdminController
 
     public static function referential_add(array $params)
     {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
         $model = new Model();
 
@@ -197,7 +230,12 @@ class AdminController
         return (new View("admin/referential/referential_add", $model))->render();
     }
 
-    public static function referential_add_action(array $params) {
+    public static function referential_add_action(array $params)
+    {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
 
         $_SESSION["errors"] = [];
@@ -205,14 +243,14 @@ class AdminController
         if (isset($_POST["type"]) && isset($_POST["code"])) {
             // Redefining category
 
-            if(!empty($_POST["category"]) && ($_POST["type"] === "0" || $_POST["type"] === "1")) {
+            if (!empty($_POST["category"]) && ($_POST["type"] === "0" || $_POST["type"] === "1")) {
                 $_POST["category"] = intval($_POST["category"]);
             } else {
                 $_POST["category"] = null;
             }
 
-            // Checking value's value           
-            if(empty($_POST["value"]) || $_POST["type"] === "0") {
+            // Checking value's value
+            if (empty($_POST["value"]) || $_POST["type"] === "0") {
                 $_POST["value"] = null;
             }
 
@@ -222,15 +260,20 @@ class AdminController
         header("Location: ");
     }
 
-    public static function referential_edit(array $params) {
+    public static function referential_edit(array $params)
+    {
+        if (!AccountManager::isConnected() || !AccountManager::isAdmin()) {
+            return header('Location: /');
+        }
+
         $db = Database::connect();
 
-        if(!empty($params["idreferential"])) {
-            if(isset($_POST["value"])) {
+        if (!empty($params["idreferential"])) {
+            if (isset($_POST["value"])) {
                 ReferentialManager::updateValue($db, intval($params["idreferential"]), $_POST["value"]);
             }
         }
 
-        header("Location: ");        
+        header("Location: ");
     }
 }

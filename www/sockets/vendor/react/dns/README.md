@@ -14,6 +14,7 @@ easily be used to create a DNS server.
 * [Caching](#caching)
   * [Custom cache adapter](#custom-cache-adapter)
 * [Advanced usage](#advanced-usage)
+  * [UdpTransportExecutor](#udptransportexecutor)
   * [HostsFileExecutor](#hostsfileexecutor)
 * [Install](#install)
 * [Tests](#tests)
@@ -28,8 +29,12 @@ names, baby!
 
 ```php
 $loop = React\EventLoop\Factory::create();
+
+$config = React\Dns\Config\Config::loadSystemConfigBlocking();
+$server = $config->nameservers ? reset($config->nameservers) : '8.8.8.8';
+
 $factory = new React\Dns\Resolver\Factory();
-$dns = $factory->create('8.8.8.8', $loop);
+$dns = $factory->create($server, $loop);
 
 $dns->resolve('igor.io')->then(function ($ip) {
     echo "Host: $ip\n";
@@ -39,6 +44,14 @@ $loop->run();
 ```
 
 See also the [first example](examples).
+
+The `Config` class can be used to load the system default config. This is an
+operation that may access the filesystem and block. Ideally, this method should
+thus be executed only once before the loop starts and not repeatedly while it is
+running.
+Note that this class may return an *empty* configuration if the system config
+can not be loaded. As such, you'll likely want to apply a default nameserver
+as above if none can be found.
 
 > Note that the factory loads the hosts file from the filesystem once when
   creating the resolver instance.
@@ -61,8 +74,12 @@ You can cache results by configuring the resolver to use a `CachedExecutor`:
 
 ```php
 $loop = React\EventLoop\Factory::create();
+
+$config = React\Dns\Config\Config::loadSystemConfigBlocking();
+$server = $config->nameservers ? reset($config->nameservers) : '8.8.8.8';
+
 $factory = new React\Dns\Resolver\Factory();
-$dns = $factory->createCached('8.8.8.8', $loop);
+$dns = $factory->createCached($server, $loop);
 
 $dns->resolve('igor.io')->then(function ($ip) {
     echo "Host: $ip\n";
@@ -101,44 +118,81 @@ See also the wiki for possible [cache implementations](https://github.com/reactp
 
 ## Advanced Usage
 
-For more advanced usages one can utilize the `React\Dns\Query\Executor` directly.
+### UdpTransportExecutor
+
+The `UdpTransportExecutor` can be used to
+send DNS queries over a UDP transport.
+
+This is the main class that sends a DNS query to your DNS server and is used
+internally by the `Resolver` for the actual message transport.
+
+For more advanced usages one can utilize this class directly.
 The following example looks up the `IPv6` address for `igor.io`.
 
 ```php
 $loop = Factory::create();
-
-$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new UdpTransportExecutor($loop);
 
 $executor->query(
     '8.8.8.8:53', 
-    new Query($name, Message::TYPE_AAAA, Message::CLASS_IN, time())
-)->done(function (Message $message) {
+    new Query($name, Message::TYPE_AAAA, Message::CLASS_IN)
+)->then(function (Message $message) {
     foreach ($message->answers as $answer) {
         echo 'IPv6: ' . $answer->data . PHP_EOL;
     }
 }, 'printf');
 
 $loop->run();
-
 ```
 
 See also the [fourth example](examples).
 
+Note that this executor does not implement a timeout, so you will very likely
+want to use this in combination with a `TimeoutExecutor` like this:
+
+```php
+$executor = new TimeoutExecutor(
+    new UdpTransportExecutor($loop),
+    3.0,
+    $loop
+);
+```
+
+Also note that this executor uses an unreliable UDP transport and that it
+does not implement any retry logic, so you will likely want to use this in
+combination with a `RetryExecutor` like this:
+
+```php
+$executor = new RetryExecutor(
+    new TimeoutExecutor(
+        new UdpTransportExecutor($loop),
+        3.0,
+        $loop
+    )
+);
+```
+
+> Internally, this class uses PHP's UDP sockets and does not take advantage
+  of [react/datagram](https://github.com/reactphp/datagram) purely for
+  organizational reasons to avoid a cyclic dependency between the two
+  packages. Higher-level components should take advantage of the Datagram
+  component instead of reimplementing this socket logic from scratch.
+
 ### HostsFileExecutor
 
-Note that the above `Executor` class always performs an actual DNS query.
+Note that the above `UdpTransportExecutor` class always performs an actual DNS query.
 If you also want to take entries from your hosts file into account, you may
 use this code:
 
 ```php
 $hosts = \React\Dns\Config\HostsFile::loadFromPathBlocking();
 
-$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new UdpTransportExecutor($loop);
 $executor = new HostsFileExecutor($hosts, $executor);
 
 $executor->query(
     '8.8.8.8:53', 
-    new Query('localhost', Message::TYPE_A, Message::CLASS_IN, time())
+    new Query('localhost', Message::TYPE_A, Message::CLASS_IN)
 );
 ```
 
@@ -150,7 +204,7 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require react/dns:^0.4.12
+$ composer require react/dns:^0.4.14
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
@@ -163,12 +217,10 @@ It's *highly recommended to use PHP 7+* for this project.
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](https://getcomposer.org).
-Because the test suite contains some circular dependencies, you may have to
-manually specify the root package version like this:
+dependencies [through Composer](https://getcomposer.org):
 
 ```bash
-$ COMPOSER_ROOT_VERSION=`git describe --abbrev=0` composer install
+$ composer install
 ```
 
 To run the test suite, go to the project root and run:

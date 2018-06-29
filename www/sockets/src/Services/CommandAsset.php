@@ -288,11 +288,9 @@ class CommandAsset
         //Check if it's a directory
         if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 1;
-
             // otherwise check if it's a file
         } else if (self::checkFileExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 2;
-
         }
         return $ElementAttribut;
     }
@@ -495,94 +493,40 @@ class CommandAsset
     //MKDIR USAGES FUNCTIONS -- END
 
     //RM USAGES FUNCTIONS -- START
-    public static function stageDeleteFiles(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, array $fullPathFiles, string $type)
+    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
     {
-        foreach ($fullPathFiles as $fullPathFile) {
-            // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $terminal_mac, $fullPathFile);
+        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
 
-            if ($parentId != null) {
-                // Get name from created file
-                $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $filename);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-                // Check if file exists
-                if (self::checkDirectoryExistence($terminal_mac, $FileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $FileName, $parentId, $db) === false) {
-                    $sender->send("message|<br>" . $FileName . " : didn't exists");
-                } else {
-                    if ($type == 'file') {
-                        // Delete file
-                        self::deleteFile($db, $data, $sender, $terminal_mac, $FileName, $parentId);
-                    } else if ($type == 'dir') {
-                        // Delete file
-                        self::deleteDir($db, $data, $sender, $terminal_mac, $FileName, $parentId);
-                    } else {
-                        self::deleteFile($db, $data, $sender, $terminal_mac, $FileName, $parentId);
-                        self::deleteDir($db, $data, $sender, $terminal_mac, $FileName, $parentId);
-                    }
-                }
-            } else {
-                $sender->send("message|<br> Path not found");
-            }
-        }
+        return $stmp->execute();
     }
 
-    /**
-     * delete a File
-     */
-    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $name, int $parentId)
+    public static function getAllFilesAndDirs(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId)
     {
-        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
 
-        //If the file or the dir exist, delete the file
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":name", $filename);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        $stmp->execute();
-        if ($stmp->fetch()['name']) {
-            $sender->send("message|<br>rm: cannot remove '" . $name . "': Is a directory");
-        } else {
-
-            $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
-
-            //If the file or the dir exist, delete the file
-            $stmp->bindParam(":terminal", $terminal_mac);
-            $stmp->bindParam(":parent", $parentId);
-            $stmp->bindParam(":name", $name);
-            $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-            $stmp->execute();
-        };
+        return $stmp->execute();
     }
 
-    /**
-     * delete a Directory
-     */
-    public static function deleteDir(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId)
+    public static function deleteDir(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId)
     {
-        $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+        $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
 
-        //If the file or the dir exist, delete the file
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":name", $dirname);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        $stmp->execute();
-
-        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
-
-        //If the file or the dir exist, delete the file
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        $stmp->execute();
-        if ($stmp->fetch()['name']) {
-            $sender->send("message|<br> Directory not empty.");
-        };
+        return $stmp->execute();
     }
     //RM USAGES FUNCTIONS -- END
 
@@ -600,14 +544,15 @@ class CommandAsset
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId): bool
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
     {
         $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, `data`, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :content, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":content", $content);
         $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
@@ -651,7 +596,8 @@ class CommandAsset
 
         if ($parentId != null) {
             // Get name from created file
-            $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
+            $splitedPath = explode("/", $fullPathNewFile);
+            $newFileName = $splitedPath[count($splitedPath) - 1];
 
             // Check if file already exists
             if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
@@ -882,6 +828,31 @@ class CommandAsset
         $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
 
         // If Element is a directory
+        if ($elementAttribut == 1) {
+            if (self::checkSiblings($movedElementFullPath, $newParentFullPath)) {
+                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
+            }
+            // If Element is a file
+        } else if ($elementAttribut == 2) {
+            return;
+            // If Element doesn't exist
+        } else {
+            return;
+        }
+    }
+
+    /**
+     * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
+     */
+    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath)
+    {
+        // get Element Name
+        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
+
+        // Check if Element is a directory, or a file, or even exist.
+        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
+
+        // If Element is a directory
         if($elementAttribut == 1){
             if(self::checkSiblings($movedElementFullPath, $newParentFullPath)){
                 return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
@@ -899,7 +870,7 @@ class CommandAsset
     /**
      * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
      */
-    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath){
+    public static function checkaSiblings(\PDO $db, $sonPath, $daddyPath){
         
     }
     //MV USAGE FUNCTIONS -- END

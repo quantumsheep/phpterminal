@@ -19,9 +19,9 @@ conn.onopen = (e) => {
     //Get the data send by the user.
     document.getElementById('terminal-input').addEventListener('keydown', function (e) {
         pressedKeys[e.key] = true;
-        console.log(e.key);
+
         if (e.key === "Tab") {
-            if(e.target.innerHTML.indexOf(" ") != -1){
+            if (e.target.innerHTML.indexOf(" ") != -1) {
                 conn.send('$$autocomplete ' + e.target.innerHTML)
             }
         } else if (e.key === "Enter") {
@@ -166,6 +166,7 @@ conn.onopen = (e) => {
         } else if (action == 'show input') {
             document.getElementById('terminal-input').style.visibility = "";
         } else if (parameters[0] == 'nano') {
+            console.log(parameters);
             nanoMode(JSON.parse(parameters[1]));
         }
     }
@@ -208,6 +209,7 @@ conn.onopen = (e) => {
 
         document.getElementById('nano-header').innerText = 'File: ' + filedata.name;
         nano.content.innerText = filedata.data ? filedata.data : '';
+        nano.content.value = filedata.data ? filedata.data : '';
         nano.content.focus();
 
         document.getElementById('terminal-content-user').classList.add('d-none');
@@ -226,8 +228,11 @@ conn.onopen = (e) => {
             document.getElementById('terminal-input').classList.remove('d-none');
 
             document.getElementById('nano-header').innerText = "File: ";
+
             nano.content.innerText = '';
-            nano.message.childNodes.forEach(child => child.remove());
+            nano.content.value = '';
+
+            nano.message.innerText = '';
 
             selectInput();
         }
@@ -249,6 +254,8 @@ conn.onopen = (e) => {
                     const div = document.createElement('div');
                     div.innerText = "File Name to Write: ";
 
+                    nano.message.innerText = '';
+
                     nano.message.appendChild(div);
                     nano.message.appendChild(input);
 
@@ -262,8 +269,6 @@ conn.onopen = (e) => {
 
                     input.focus();
                 } else if (pressedKeys['Control'] && pressedKeys['x']) {
-                    console.log(nano.content.value);
-                    console.log(filedata.data);
                     if (nano.content.value !== filedata.data) {
                         nano.message.innerText = 'Save modified buffer?  (Answering "No" will DISCARD changes.)';
 
