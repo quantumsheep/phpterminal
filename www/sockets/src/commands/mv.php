@@ -59,13 +59,23 @@ class mv implements CommandInterface
         // stock parameters for further treatment
         $registeredParameters = $parameters;
         $cleanedParameters = [];
+        $fullElements = [];
 
         // Treat command to get parameters
         $quotedParameters = CommandAsset::mvGetQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
         $pathParameters = CommandAsset::mvGetPathParameters($parameters, $data->position);
 
-        $fullElements = explode(" ", $parameters);
+        // Fix several bug in the array, due to precedent manipulation
+        if ($parameters !== "") {
+            $fullElements = explode(" ", $parameters);
+            if (!empty($pathParameters)) {
+                for ($i = 0; $i < count($pathParameters); $i++) {
+                    array_shift($fullElements);
+                }
+            }
+        }
+
         CommandAsset::concatenateParameters($fullElements, $quotedParameters, $pathParameters);
 
         //Check if element provided is more than 1
@@ -80,11 +90,11 @@ class mv implements CommandInterface
         $cleanedTarget = str_replace('"', "", $target);
 
         foreach ($fullElements as $Element) {
-            $cleanedParameters = str_replace('"', "", $Element);
+            $cleanedParameters[] = str_replace('"', "", $Element);
         }
 
         // Get target attributs
-        $targetFullPath = CommandAsset::getAbsolute($data->position, $target);
+        $targetFullPath = CommandAsset::getAbsolute($data->position, $cleanedTarget);
         $targetType = CommandAsset::checkBoth($terminal_mac, $target, CommandAsset::getParentId($db, $terminal_mac, $targetFullPath), $db);
 
         // Action if target is a directory
@@ -92,7 +102,15 @@ class mv implements CommandInterface
             $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
 
             foreach ($cleanedParameters as $parameter) {
-                CommandAsset::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath);
+                CommandAsset::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath, $sender, $data->position);
+            }
+
+        } else if ($targetType == 0) {
+            //in case the targetType is nothing, we may change directory or file provided as parameter for this name
+            if (count($cleanedParameters) == 1) {
+
+            } else {
+                return $sender->send("message|<br> you can only change name of 1 Element at a time");
             }
         }
 

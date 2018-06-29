@@ -130,7 +130,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
                 //remove potential empty element
                 if ($pathParameter != "") {
                     $finalPathParameters[] = $pathParameter;
@@ -848,7 +848,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
 
                 //remove potential empty element
                 if ($pathParameter != "") {
@@ -884,14 +884,21 @@ class CommandAsset
     /**
      * Function update element Position after several check up
      */
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender, string $position)
     {
-        
+
         // Check if Element is a directory, or a file, or even exist.
-        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
+        $elementAttribut = self::checkBoth($terminal_mac, $movedElementName, self::getParentId($db, $terminal_mac, $movedElementName), $db);
+
         // If Element is a directory
         if ($elementAttribut == 1) {
-            if (self::checkSiblings($db, $movedElementFullPath, $newParentFullPath) == true) {
+            //Get full path of moved directory
+            $directoryFullPath = CommandAsset::getAbsolute($position, $movedElementName);
+            var_dump($directoryFullPath);
+            var_dump($newParentFullPath);
+            var_dump(self::checkSiblings($db, $directoryFullPath, $newParentFullPath));
+            //Check if directory can be moved (depends of the full path)
+            if (self::checkSiblings($db, $movedElementName, $newParentFullPath) == true) {
                 return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
             }
             // If Element is a file
@@ -899,19 +906,19 @@ class CommandAsset
             return;
             // If Element doesn't exist
         } else {
-            return;
+            return $sender->send("message|<br>" . $movedElementName . " doesn't exist.");
         }
     }
 
     /**
      * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
      */
-    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath)
+    public static function checkSiblings(\PDO $db, string $sonPath, string $daddyPath)
     {
-        if (strpos($sonPath, $daddyPath) === false) {
-            return true;
-        } else {
+        if (strpos($daddyPath, $sonPath) === false) {
             return false;
+        } else {
+            return true;
         }
     }
     //MV USAGE FUNCTIONS -- END
