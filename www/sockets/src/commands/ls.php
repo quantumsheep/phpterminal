@@ -56,7 +56,7 @@ class ls implements CommandInterface
         if (!empty($parameters)) {
             $options = CommandAsset::getOptions($parameters);
             $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
-
+            
             $paramArray = explode(" ", $parameters);
 
             foreach ($paramArray as $path) {

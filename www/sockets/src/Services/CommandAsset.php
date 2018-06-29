@@ -121,7 +121,7 @@ class CommandAsset
      */
     public static function getAbsolutePathParameters(string &$parameters)
     {
-
+        $finalPathParameters = [];
         $pattern = "/ ((\/+((\"[^\"]*\")|[^\/ ]+))+)/";
 
         // Get path parameters with the pattern
@@ -130,9 +130,13 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
+                //remove potential empty element
+                if ($pathParameter != "") {
+                    $finalPathParameters[] = $pathParameter;
+                }
             }
-            return $pathParameters[1];
+            return $finalPathParameters;
         }
 
         return;
@@ -154,7 +158,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -247,7 +251,7 @@ class CommandAsset
     }
 
     /**
-     * Check if a directory exist from its Absolute Path
+     * Check if a directory exist from its name
      */
     public static function checkDirectoryExistence(string $terminal_mac, string $directoryName, int $parentId, \PDO $db)
     {
@@ -284,13 +288,19 @@ class CommandAsset
      */
     public static function checkBoth(string $terminal_mac, string $ElementName, int $parentId, \PDO $db)
     {
+        //Will Trim in case Element passed is a relative of a full path
+        $ElementName = explode("/", $ElementName)[count(explode("/", $ElementName)) - 1];
+
         $ElementAttribut = 0;
+
         //Check if it's a directory
         if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 1;
+
             // otherwise check if it's a file
         } else if (self::checkFileExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 2;
+
         }
         return $ElementAttribut;
     }
@@ -379,13 +389,6 @@ class CommandAsset
         $array = $newArray;
     }
 
-    /**
-     * Clean quote from string
-     */
-    public static function cleanQuote(string &$string)
-    {
-        return str_replace('"', "", $string);
-    }
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -730,67 +733,80 @@ class CommandAsset
     //CHMOD USAGE FUNCTIONS --END
 
     //MV USAGE FUNCTIONS -- START
-    /**
-     * Treat mv element to determine Element position
-     */
-    public static function mvIsolateElement(string $parameters)
-    {
-        $parametersArray = [];
 
-        $pattern = "/(\"([^\"]+)\") /";
-        $fullQuotedParameters = [];
+    /**
+     * custom get quoted
+     */
+    public static function mvGetQuotedParameters(string &$parameters, string $position)
+    {
+        $pattern = "/ (\"([^\"]+)\") /";
+        $fullPathQuotedParameters = [];
         // Get quoted element with the pattern
-        preg_match_all($pattern, $parameters . " ", $quotedParameters);
+        preg_match_all($pattern, " " . $parameters . " ", $quotedParameters);
 
         // Use 2 position of array, to exclude " "
         if (!empty($quotedParameters[1])) {
             foreach ($quotedParameters[1] as $quotedParameter) {
-                // Update the whole parameters for further concatenation
-                $parameters = str_replace(" " . $quotedParameter, "", " " . $parameters);
+                // Update the whole parameters for further treatments
+                $parameters = str_replace(" " . $quotedParameter, "", $parameters);
 
-                $fullQuotedParameters[] = $quotedParameter;
             }
         }
 
-        // get Regular parameters into array for further concatenation
-        $regularParameters = explode(" ", $parameters);
+        return $quotedParameters[1];
+    }
+    /**
+     * custom get Path parameters
+     */
+    public static function mvGetPathParameters(string &$parameters, string $position): array
+    {
+        $fullPathParameters = [];
 
-        //Update element if quoted element is in. It creates an empty entry
-        if (!empty($fullQuotedParameters)) {
-            for ($i = 0; $i < count($fullQuotedParameters); $i++) {
-                array_shift($regularParameters);
-            }
+        // Get absolute Path parameters
+        $absolutePathParameters = self::getAbsolutePathParameters($parameters);
+
+        // Get relative Path parameters
+        $relativePathParameters = self::mvGetRelativePathParameters($parameters, $position);
+
+        // Check empty array case
+        if (!empty($relativePathParameters) && !empty($absolutePathParameters)) {
+            $fullPathParameters = array_merge($relativePathParameters, $absolutePathParameters);
+        } else if (empty($relativePathParameters) && !empty($absolutePathParameters)) {
+            // If no relative Parameters, $fullPath = absolute path parameters
+            $fullPathParameters = $absolutePathParameters;
+        } else if (empty($absolutePathParameters) && !empty($relativePathParameters)) {
+            // If no absolute Parameters, $fullPath = relative path parameters
+            $fullPathParameters = $relativePathParameters;
         }
 
-        //concatenate whole parameters
-        self::concatenateParameters($parametersArray, $regularParameters, $fullQuotedParameters);
-
-        return $parametersArray;
+        return $fullPathParameters;
     }
 
     /**
-     * Get option from array of parameters
+     * custom relative path parameters
      */
-    public static function mvGetOptions(array &$fullParameters)
+    public static function mvGetRelativePathParameters(string &$parameters, string $position)
     {
-        $options = "";
-        $option = "";
-        $pattern = "/(-([a-zA-Z\d]+))/";
 
-        // check if every array entry is an option
-        foreach ($fullParameters as $parameter) {
-            //reset option
-            $option = "";
-            preg_match($pattern, $parameter, $option);
-            if (!empty($option)) {
-                //remove the Element from the array
-                self::removeElementFromArray($fullParameters, $parameter);
+        $finalPathParameters = [];
+        $pattern = "/ (((\"[^\"]*\")|([^\/ ]))+\/((\"[^\"]*\")|([^\/ ]+\/?))*)+/";
 
-                // get parameters without "-" and concatenate into option, to get a full string of options
-                $options .= $option[2];
+        // Get path parameters with the pattern
+        preg_match_all($pattern, " " . $parameters, $pathParameters);
+        if (!empty($pathParameters[1])) {
+            foreach ($pathParameters[1] as $pathParameter) {
+                // Update the whole parameters for further treatments
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
+
+                //remove potential empty element
+                if ($pathParameter != "") {
+                    $finalPathParameters[] = $pathParameter;
+                }
             }
+            return $finalPathParameters;
         }
-        return $options;
+
+        return;
     }
 
     /**
@@ -798,80 +814,161 @@ class CommandAsset
      */
     public static function getTarget(string &$parameters, array &$fullParameters)
     {
-        $position = 0;
-        $elementInArray;
-        $elementPosition = [];
+        $target;
+        $lastPosition = 0;
 
-        //research Element
-        for ($i = 0; $i < count($fullParameters); $i++) {
-            $elementPosition[] = strpos($parameters, $fullParameters[$i]);
-            if ($elementPosition[$i] > $position) {
-                $target = $fullParameters[$i];
-                $elementInArray = $i;
+        foreach ($fullParameters as $parameter) {
+            $position = strpos($parameters, $parameter);
+            if ($position > $lastPosition) {
+                $lastPosition = $position;
+                $target = $parameter;
             }
-
         }
 
-        self::removeElementFromArray($fullParameters, $fullParameters[$elementInArray]);
+        self::removeElementFromArray($fullParameters, $target);
         return $target;
     }
 
     /**
      * Function update element Position after several check up
      */
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newParentId, string $newParentFullPath, ConnectionInterface $sender, string $position)
     {
-        // get Element Name
-        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
 
         // Check if Element is a directory, or a file, or even exist.
-        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
+        $elementAttribut = self::checkBoth($terminal_mac, $movedElementName, self::getParentId($db, $terminal_mac, $movedElementName), $db);
 
         // If Element is a directory
         if ($elementAttribut == 1) {
-            if (self::checkSiblings($movedElementFullPath, $newParentFullPath)) {
-                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
+            //Get full path of moved directory
+            $directoryFullPath = CommandAsset::getAbsolute($position, $movedElementName);
+            $directoryId = CommandAsset::getIdDirectory($db, $terminal_mac, $directoryFullPath);
+
+            //Check if directory can be moved (depends of the full path)
+            if (self::checkSiblings($movedElementName, $newParentFullPath) == true) {
+                return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
+            } else {
+                //change Directory position
+                if (CommandAsset::checkDirectoryExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
+                    // check if directory doesn't already exist in target directory
+                    return self::changeDirectoryParentId($db, $directoryId, $newParentId, $terminal_mac);
+                } else {
+                    return $sender->send("message|<br>" . $movedElementName . " directory already exist in " . $newParentFullPath . ".");
+                }
+
             }
             // If Element is a file
         } else if ($elementAttribut == 2) {
-            return;
+
+            //Get full path of moved file
+            $fileFullPath = CommandAsset::getAbsolute($position, $movedElementName);
+            $fileParentId = CommandAsset::getParentId($db, $terminal_mac, $fileFullPath);
+            var_dump($fileParentId);
+
+            //check if file does exist
+            if (CommandAsset::checkFileExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
+                // check if file doesn't already exist in target directory
+                return self::changeFileParentId($db, $fileParentId, $newParentId, $movedElementName, $terminal_mac);
+            } else {
+                return $sender->send("message|<br>" . $movedElementName . " file already exist in " . $newParentFullPath . ".");
+            }
+
             // If Element doesn't exist
         } else {
-            return;
+            return $sender->send("message|<br>" . $movedElementName . " doesn't exist and cannot be moved.");
         }
     }
 
     /**
      * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
      */
-    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath)
+    public static function checkSiblings(string $sonPath, string $daddyPath)
     {
-        // get Element Name
-        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
-
-        // Check if Element is a directory, or a file, or even exist.
-        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
-
-        // If Element is a directory
-        if($elementAttribut == 1){
-            if(self::checkSiblings($movedElementFullPath, $newParentFullPath)){
-                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
-            }
-        // If Element is a file
-        } else if ($elementAttribut == 2) {
-            return;
-        // If Element doesn't exist
-        } else{
-            return;
+        if (strpos($daddyPath, $sonPath) === false) {
+            return false;
+        } else {
+            return true;
         }
     }
 
+    /**
+     * update directory parent
+     */
+    public static function changeDirectoryParentId(\PDO $db, int $idDirectory, string $newParentId, string $terminal_mac)
+    {
+        var_dump($idDirectory);
+        var_dump($newParentId);
+        $stmp = $db->prepare("UPDATE terminal_directory SET parent= :newParent WHERE iddir= :idDirectory AND terminal= :terminal ");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newParent", $newParentId);
+        $stmp->bindParam(":idDirectory", $idDirectory);
+
+        $stmp->execute();
+    }
 
     /**
-     * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
+     * update file parent
      */
-    public static function checkaSiblings(\PDO $db, $sonPath, $daddyPath){
-        
+    public static function changeFileParentId(\PDO $db, int $parentId, string $newParentId, string $fileName, string $terminal_mac)
+    {
+        $stmp = $db->prepare("UPDATE terminal_file SET parent= :newParent WHERE parent= :parent AND terminal= :terminal AND name = :filename");
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newParent", $newParentId);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":filename", $fileName);
+
+        $stmp->execute();
+    }
+
+    /**
+     * Change file or directory name
+     */
+    public static function changeName(\PDO $db, string $position, string $terminal_mac, string $elementName, string $newName, ConnectionInterface $sender)
+    {
+        // Get whole Element information
+        $elementAbsolutePath = self::getAbsolute($position, $elementName);
+        $elementParentId = self::getParentId($db, $terminal_mac, $elementAbsolutePath);
+        $elementType = self::checkBoth($terminal_mac, $elementName, $elementParentId, $db);
+        //if Element doesn't exist
+        if ($elementType == 0) {
+            return $sender->send("message|<br>" . $elementName . " doesn't exist.");
+            //If element is a directory
+        } else if ($elementType == 1) {
+            return self::changeDirectoryName($db, $terminal_mac, self::getIdDirectory($db, $terminal_mac, $elementAbsolutePath), $newName);
+            //if element is a file
+        } else if ($elementType == 2) {
+            return self::changeFileName($db, $terminal_mac, $elementParentId, $newName, $elementName);
+        }
+    }
+
+    /**
+     * change File name
+     */
+    public static function changeDirectoryName(\PDO $db, string $terminal_mac, int $idDirectory, string $newName)
+    {
+        $stmp = $db->prepare("UPDATE terminal_directory SET name= :newName WHERE iddir= :iddir AND terminal= :terminal");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newName", $newName);
+        $stmp->bindParam(":iddir", $idDirectory);
+
+        $stmp->execute();
+    }
+
+    /**
+     * change File name
+     */
+    public static function changeFileName(\PDO $db, string $terminal_mac, int $parentId, string $newName, string $fileName)
+    {
+        $stmp = $db->prepare("UPDATE terminal_file SET name= :newName WHERE parent= :parent AND terminal= :terminal AND name = :filename");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":newName", $newName);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":filename", $fileName);
+
+        $stmp->execute();
     }
     //MV USAGE FUNCTIONS -- END
 }

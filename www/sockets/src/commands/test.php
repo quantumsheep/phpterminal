@@ -19,35 +19,6 @@ class test implements CommandInterface
 
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        $absolutePathFullParameters = [];
-
-        $fullParameters = CommandAsset::mvIsolateElement($parameters);
-        if (count($fullParameters) < 2) {
-            return $sender->send("message|<br>mv: target operand missing" . (count($fullParameters) == 1 ? " after " . $fullParameters[0] . "." : "."));
-        }
-        $options = CommandAsset::mvGetOptions($fullParameters);
-
-        $target = CommandAsset::getTarget($parameters, $fullParameters);
-
-        foreach ($fullParameters as $parameter) {
-            $cleanedparameter = CommandAsset::cleanQuote($parameter);
-            $absolutePathFullParameters[] = CommandAsset::getAbsolute($data->position, $cleanedparameter);
-        }
-
-        $cleanedTarget = CommandAsset::cleanQuote($target);
-        $absolutePathTarget = CommandAsset::getAbsolute($data->position, $cleanedTarget);
-        $targetAttribut = CommandAsset::checkBoth($terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget), $db);
-
-        // First check what will be the action depending on the target attribut
-        var_dump(CommandAsset::getParentId($db, $terminal_mac, $absolutePathTarget));
-        var_dump($targetAttribut);
-
-        // if Target is an actual directory
-        if ($targetAttribut == 1) {
-            foreach ($absolutePathFullParameters as $absolutePathParameter) {
-                CommandAsset::updatePosition($db, $terminal_mac, $absolutePathParameter, CommandAsset::getIdDirectory($db, $terminal_mac, $absolutePathTarget), $absolutePathTarget, $sender);
-            }
-        }
-
+        var_dump(CommandAsset::getAbsolute($data->position, "chien/cheval"));
     }
 }
