@@ -5,6 +5,7 @@ use Alph\Controllers\View;
 use Alph\Managers\AccountManager;
 use Alph\Managers\NetworkManager;
 use Alph\Managers\TerminalManager;
+use Alph\Models\AccountModel;
 use Alph\Services\Database;
 use Alph\Services\Mail;
 
@@ -43,6 +44,37 @@ class AccountController
         return $view;
     }
 
+    public static function accountOption_modify(array $params)
+    {
+        $db = Database::connect();
+
+        if (empty(AccountManager::checkAccountLogin($_SESSION["account"]->email, $_POST["oldPassword"]))) {
+            $account = new AccountModel();
+
+            if ($_POST["email"] != null) {
+                $account->email = $_POST["email"];
+            } else {
+                $account->email = $_SESSION["account"]->email;
+            }
+            if ($_POST["username"] != null) {
+                $account->username = $_POST["username"];
+            } else {
+                $account->username = $_SESSION["account"]->username;
+            }
+            if ($_POST["password"] != null || $_POST["newPasswordVerif"] != null || $_POST["password"] != $_POST["newPasswordVerif"]) {
+                $account->password = $_POST["password"];
+            } else {
+                $account->password = $_SESSION["account"]->email;
+            }
+
+            $res = AccountManager::editAccount($db, $_SESSION["account"]->idaccount, $account);
+
+            if (!$res) {
+                header("Location: /");
+            }
+        }
+    }
+
     public static function logout(array $params)
     {
         AccountManager::logout();
@@ -72,14 +104,14 @@ class AccountController
                         AccountManager::removeValidationCode($db, $params["code"]);
 
                         $_SESSION["success"] = [
-                            "You have successfully validate your account !"
+                            "You have successfully validate your account !",
                         ];
                     }
                 }
             }
-        }else{
+        } else {
             $_SESSION["errors"] = [
-                "Your validation code was not correct."
+                "Your validation code was not correct.",
             ];
         }
 
@@ -107,7 +139,7 @@ class AccountController
             $mail->send();
 
             $_SESSION["success"] = [
-                "You will receipt a validation email soon, please confirm it!"
+                "You will receipt a validation email soon, please confirm it!",
             ];
         }
 
@@ -130,7 +162,7 @@ class AccountController
         if (!AccountManager::identificateAccount($db, $_POST["email"], $_POST["password"])) {
             $_SESSION["data"]["email"] = $_POST["email"];
             $_SESSION["errors"] = [
-                "You have entered an invalid email or password."
+                "You have entered an invalid email or password.",
             ];
 
             return header("Location: /signin");

@@ -97,9 +97,13 @@ class rm implements CommandInterface
                 $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
                 CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
             } else if ($type == 1) {
-                // $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
-                // $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
-                // $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+                $dirpath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
+                $files = CommandAsset::getFiles($db, $terminal_mac, $dirpath);
+                $dirs = CommandAsset::getDirectories($db, $terminal_mac, $dirpath);
+
+                var_dump($dirpath);
+                var_dump($files);
+                var_dump($dirs);
             } else {
                 $sender->send('message|<br>' . $param . ' didnt exist.');
             }
