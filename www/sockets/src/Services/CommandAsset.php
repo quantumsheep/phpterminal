@@ -600,14 +600,15 @@ class CommandAsset
     /**
      * generate a new File
      */
-    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId): bool
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
     {
         $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, `data`, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :content, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":content", $content);
         $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
@@ -651,7 +652,8 @@ class CommandAsset
 
         if ($parentId != null) {
             // Get name from created file
-            $newFileName = explode("/", $fullPathNewFile)[count(explode("/", $fullPathNewFile)) - 1];
+            $splitedPath = explode("/", $fullPathNewFile);
+            $newFileName = $splitedPath[count($splitedPath) - 1];
 
             // Check if file already exists
             if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
