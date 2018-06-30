@@ -2,7 +2,9 @@
 namespace Alph\Commands;
 
 use Alph\Models\Model;
+use Alph\Services\CommandHandler;
 use Alph\Services\CommandInterface;
+use Alph\Services\History;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
 
@@ -25,9 +27,26 @@ class ssh implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        // if(!empty($data->data->ssh->options["host"])) {
+        if ($data->controller == "\\Alph\\Commands\\ssh::call") {
+            if ($data->data->ssh->data->connected) {
+                if ($data->data->ssh->data->controller != null || in_array($cmd, \Alph\Services\DefinedCommands::get())) {
+                    CommandHandler::callCommand($db, $clients, $data->data->ssh->data, $sender, $sender_session, $sess_id, $data->data->ssh->terminal_mac, $cmd, $parameters, $data->data->ssh->lineReturn);
+                } else {
+                    $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
+                }
 
-        // }
+                if (!$data->data->ssh->data->private_input) {
+                    $sender->send("message|" . ($data->data->ssh->lineReturn ? "<br>" : "") . "<span>" . $data->data->ssh->data->user->username . "@54.37.69.220:" . $data->data->ssh->data->position . "# </span>");
+                }
+
+                // Push the command into the history
+                History::push($db, $data->data->ssh->data->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
+            } else {
+                CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $cmd, $data->data->ssh->terminal_mac);
+            }
+
+            return;
+        }
 
         if (empty($parameters)) {
             return help::call(...\func_get_args());
@@ -72,26 +91,32 @@ class ssh implements CommandInterface
             return help::call(...\func_get_args());
         }
 
+        $stmp = $db->prepare("SELECT terminal FROM PRIVATEIP, (SELECT mac FROM NETWORK WHERE ipv4 = :ipv4) as net WHERE ip = (SELECT ip FROM PORT WHERE network = net.mac AND port = :port AND ipport = 22) AND PRIVATEIP.network = net.mac");
+
+        $stmp->bindParam(':ipv4', $options["host"]);
+        $stmp->bindParam(':port', $options["port"]);
+
+        $stmp->execute();
+
+        if ($stmp->rowCount() === 0) {
+            return $sender->send('message|<span>ssh: connect to host ' . $options["host"] . ' port ' . $options["port"] . ': Connection timed out</span><br>');
+        }
+
         $data->controller = "\\Alph\\Commands\\ssh::call";
 
         $data->data->ssh = new Model();
 
         $data->data->ssh->options = $options;
 
-        \Ratchet\Client\connect('ws://localhost:800', ['permessage-deflate'], [
-            "cookie" => 'alph_sess=' . $sess_id . '; terminal=FD-7A-FF-CE-47-AD',
-        ])->then(function ($conn) {
-            $conn->on('message', function ($msg) use ($conn) {
-                echo "Received: {$msg}\n";
-            });
+        $data->data->ssh->terminal_mac = $stmp->fetch()["terminal"];
 
-            $conn->on('close', function ($code = null, $reason = null) {
-                echo "Connection closed ({$code} - {$reason})\n";
-            });
-        }, function ($e) {
-            echo "Could not connect: {$e->getMessage()}\n";
-        });
+        $data->data->ssh->data = new SenderData();
 
-        //$data->data->ssh->client->connect();
+        $data->data->ssh->data->private_input = false;
+        $data->data->ssh->lineReturn = true;
+
+        $data->private_input = true;
+
+        CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $data->data->ssh->options["user"], $data->data->ssh->terminal_mac);
     }
 }
