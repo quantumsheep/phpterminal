@@ -71,7 +71,7 @@ class CommandHandler implements MessageComponentInterface
 
                         // Check if the command exists
                         if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
-                            $this->callCommand($this->db, $this->clients, $this->data[$sender->resourceId], $sender, $sender_session, $parsed_cookies, $cmd, $parameters, $lineReturn);
+                            $this->callCommand($this->db, $this->clients, $this->data[$sender->resourceId], $sender, $sender_session, $parsed_cookies[0]["alph_sess"], $parsed_cookies[0]["terminal"], $cmd, $parameters, $lineReturn);
                         } else {
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
@@ -95,7 +95,7 @@ class CommandHandler implements MessageComponentInterface
         }
     }
 
-    public static function callCommand(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface &$sender, $sender_session, array $parsed_cookies, string $cmd, $parameters, bool &$lineReturn)
+    public static function callCommand(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface &$sender, $sender_session, string $sess_id, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         $controller = $data->controller != null ? $data->controller : '\\Alph\\Commands\\' . $cmd . '::call';
 
@@ -105,9 +105,9 @@ class CommandHandler implements MessageComponentInterface
             $clients,
             &$data,
             $sender,
-            $parsed_cookies[0]["alph_sess"],
+            $sess_id,
             $sender_session,
-            $parsed_cookies[0]["terminal"],
+            $terminal_mac,
             $cmd,
             $parameters,
             &$lineReturn,
