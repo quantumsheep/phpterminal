@@ -14,7 +14,7 @@ class AccountManager
         $errors = [];
 
         // Check if the form is completed
-        if (empty($username) || empty($email) || empty($password) || empty($password)) {
+        if (empty($username) || empty($email) || empty($password) || empty($password2)) {
             $errors[] = "Please complete the form.";
             return $errors;
         }
@@ -61,6 +61,34 @@ class AccountManager
                     } else if ($row["username"] == $username) {
                         $errors[] = "This username is already used.";
                     }
+                }
+            }
+        }
+
+        // Return the errors
+        return $errors;
+    }
+
+    /**
+     * Check if a username already exist.
+     */
+    public static function usernameExist(\PDO $db, string $username)
+    {
+        $stmp = $db->prepare("SELECT username FROM ACCOUNT WHERE username = :username");
+
+        // Bind the query parameters
+        $stmp->bindParam(':username', $username);
+
+        // Execute the SQL command
+        $stmp->execute();
+
+        // Check if there's a select row
+        if ($stmp->rowCount() > 0) {
+            // Loop over all the rows
+            while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+                // If there's already an email or an username matching the user input, declare an error
+                if ($row["username"] == $username) {
+                    $errors[] = "This username is already used.";
                 }
             }
         }
@@ -320,14 +348,20 @@ class AccountManager
 
     public static function editAccount(\PDO $db, int $idaccount, AccountModel $account)
     {
-        $stmp = $db->prepare("UPDATE account SET username = :username, email = :email, password = :password WHERE idaccount= :idaccount;");
-        $stmp->bindParam(":username", $account->username);
-        $stmp->bindParam(":email", $account->email);
-        $stmp->bindParam(":password", $account->password);
-        $stmp->bindParam(":idaccount", $idaccount);
+        if ($account->email != null || !empty($account->email)) {
+            $stmp = $db->prepare("UPDATE account SET email = :email WHERE idaccount= :idaccount;");
+            $stmp->bindParam(":idaccount", $idaccount);
+            $stmp->bindParam(":email", $account->email);
+        } else if ($account->username != null || !empty($account->username)) {
+            $stmp = $db->prepare("UPDATE account SET username = :username WHERE idaccount= :idaccount;");
+            $stmp->bindParam(":idaccount", $idaccount);
+            $stmp->bindParam(":username", $account->username);
+        } else if ($account->password != null || !empty($account->password)) {
+            $stmp = $db->prepare("UPDATE account SET password = :password WHERE idaccount= :idaccount;");
+            $stmp->bindParam(":idaccount", $idaccount);
+            $stmp->bindParam(":password", $account->password);
+        }
         $stmp->execute();
-
-        return true;
     }
 
     /**

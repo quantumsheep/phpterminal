@@ -33,9 +33,9 @@ class AccountController
         return $view;
     }
 
-    public static function accountOption(array $params)
+    public static function account(array $params)
     {
-        $view = (new View("account/accountOption"))->render();
+        $view = (new View("account/account"))->render();
 
         unset($_SESSION["errors"]);
         unset($_SESSION["data"]);
@@ -44,35 +44,50 @@ class AccountController
         return $view;
     }
 
-    public static function accountOption_modify(array $params)
+    public static function account_modify(array $params)
     {
         $db = Database::connect();
+        $account = new AccountModel();
 
-        if (empty(AccountManager::checkAccountLogin($_SESSION["account"]->email, $_POST["oldPassword"]))) {
-            $account = new AccountModel();
+        if (!empty($_POST["email"] || $_POST["email"] != null)) {
 
-            if ($_POST["email"] != null) {
-                $account->email = $_POST["email"];
-            } else {
-                $account->email = $_SESSION["account"]->email;
+            $account->email = $_POST["email"];
+            $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_SESSION["account"]->username . 2, $account->email, $_POST["oldPassword2"], $_POST["oldPassword2"]);
+
+            if (empty($_SESSION["errors"])) {
+                $res = AccountManager::editAccount($db, $_SESSION["account"]->idaccount, $account);
+                $_SESSION["success"] = ["You have successfuly changed your mail."];
             }
-            if ($_POST["username"] != null) {
+
+        } else if (!empty($_POST["username"] || $_POST["username"] != null)) {
+
+            if (strlen($_POST["username"]) < 3) {
+                $_SESSION["errors"] = ["The username must contains 3 characters minimum."];
+            } else if (!empty(AccountManager::usernameExist($db, $_POST["username"]))) {
+                $_SESSION["errors"] = ["This username is already used."];
+            } else {
                 $account->username = $_POST["username"];
-            } else {
-                $account->username = $_SESSION["account"]->username;
-            }
-            if ($_POST["password"] != null || $_POST["newPasswordVerif"] != null || $_POST["password"] != $_POST["newPasswordVerif"]) {
-                $account->password = $_POST["password"];
-            } else {
-                $account->password = $_SESSION["account"]->email;
+                $res = AccountManager::editAccount($db, $_SESSION["account"]->idaccount, $account);
+
+                $_SESSION["success"] = ["You have successfuly changed your username."];
             }
 
-            $res = AccountManager::editAccount($db, $_SESSION["account"]->idaccount, $account);
+        } else if ($_POST["password"] != null || $_POST["newPasswordVerif"] != null || $_POST["password"] == $_POST["newPasswordVerif"] || !empty($_POST["password"]) || !empty($_POST["newPasswordVerif"])) {
 
-            if (!$res) {
-                header("Location: /");
+            if (empty(AccountManager::checkAccountLogin($_SESSION["account"]->email, $_POST["oldPassword"]))) {
+
+                $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_SESSION["account"]->username . 2, $_SESSION["account"]->email .'r', $_POST["password"], $_POST["newPasswordVerif"]);
+
+                if (empty($_SESSION["errors"])) {
+                    $account->password = \password_hash($_POST["password"], PASSWORD_BCRYPT);
+                    $res = AccountManager::editAccount($db, $_SESSION["account"]->idaccount, $account);
+
+                    $_SESSION["success"] = ["You have successfuly changed your password."];
+                }
             }
         }
+        
+        header("Location: /account");
     }
 
     public static function logout(array $params)

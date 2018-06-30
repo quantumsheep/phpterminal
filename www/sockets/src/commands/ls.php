@@ -56,18 +56,34 @@ class ls implements CommandInterface
         if (!empty($parameters)) {
             $options = CommandAsset::getOptions($parameters);
             $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
-            
-            $paramArray = explode(" ", $parameters);
 
-            foreach ($paramArray as $path) {
-                $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
-                $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
-                $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+            if ($parameters != "") {
+                $paramArray = explode(" ", $parameters);
+            }
 
-                if (!empty($path)) {
-                    $sender->send("message|<br>" . $path . ": <br>");
+            if (!empty($paramArray)) {
+                foreach ($paramArray as $path) {
+                    $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . $path), $db);
+
+                    if ($fileType == 1) {
+                        $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
+                        $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
+                        $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+
+                        if (!empty($path) && count($paramArray) > 1) {
+                            $sender->send("message|<br>" . $path . ": <br>");
+                        }
+                        self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
+                    } else if ($fileType == 2) {
+                        $sender->send("message|<br>" . $path . "<br>");
+                    } else if($path == ""){
+
+                    }else {
+                        $sender->send("message|<br>ls: cannot access '" . $path . "': No such file or directory<br>");
+                    }
                 }
-                self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
+            } else {
+                return self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
             }
         } else {
             $options = [];
