@@ -517,6 +517,8 @@ class CommandAsset
     }
     //LS USAGES FUNCTIONS -- END
 
+    
+
     //RM USAGES FUNCTIONS -- START
     public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
     {
