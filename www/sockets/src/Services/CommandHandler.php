@@ -117,7 +117,7 @@ class CommandHandler implements MessageComponentInterface
     public static function askForCredentials(\PDO $db, SenderData &$data, ConnectionInterface &$sender, string $cmd, string $terminal)
     {
         if (!empty($data->user->username) && !isset($data->user->password)) {
-            $stmp = $db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
+            $stmp = $db->prepare("SELECT idterminal_user, password, gid FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
             $stmp->bindParam(":username", $data->user->username);
             $stmp->bindParam(":terminal", $terminal);
@@ -153,6 +153,7 @@ class CommandHandler implements MessageComponentInterface
 
                 $data->connected = true;
                 $data->user->idterminal_user = $row["idterminal_user"];
+                $data->user->gid = $row["gid"];
             } else {
                 $sender->send("message|<br><span>Access denied.</span>");
                 $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220's password: <span>");

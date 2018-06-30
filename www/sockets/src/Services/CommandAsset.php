@@ -390,17 +390,32 @@ class CommandAsset
     }
 
     /**
-     *
+     * Check if user can make functionality
      */
-    public static function checkRightsTo(\PDO $db, string $terminal_mac, string $owner, string $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
+    public static function checkRightsTo(\PDO $db, string $terminal_mac, int $owner, int $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
     {
         $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
+
+        if($userType == 1){
+            $rightsTo = $elementChmod / 100;
+
+        } else if ($userType == 2){
+            $rightsTo = ($elementChmod / 10) % 10;
+
+        } else if($userType == 3){
+            $rightsTo = $elementChmod % 10;
+        } else {
+            return;
+        }
+
+        return $chmodNeeded <= $rightsTo;
+
 
     }
     /**
      * return User type (1,2,3) for owner, group or others
      */
-    public static function getUserType(\PDO $db, string $terminal_mac, string $group, string $owner, string $elementFullPath)
+    public static function getUserType(\PDO $db, string $terminal_mac, int $group, int $owner, string $elementFullPath)
     {
         $elementName = explode("/", $elementFullPath)[count(explode("/", $elementFullPath)) - 1];
 
