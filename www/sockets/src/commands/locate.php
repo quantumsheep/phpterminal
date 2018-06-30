@@ -28,6 +28,7 @@ class locate implements CommandInterface
      * @param string $sess_id
      * @param string $cmd
      */
+
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         $path = [];
@@ -44,7 +45,7 @@ class locate implements CommandInterface
             return $sender->send("message|<br> multiple argument entered. Locate only support one argument");
         }
       
-        $localisations = CommandAsset::locateFile($db, $fullNames, $terminal_mac);
+        $localisations = self::locateFile($db, $fullNames, $terminal_mac);
         
         if(!empty($localisations)){
             foreach($localisations as $localisation){
@@ -54,5 +55,74 @@ class locate implements CommandInterface
         } else {
             return $sender->send("message|<br>Can't locate file passed.");
         }
+    }
+
+
+
+    /**
+     * return array full of paths leading to file
+     */
+
+    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
+    {
+
+        $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
+
+        return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
+    }
+
+
+    /**
+     * return IDs from $name
+     */
+    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac)
+    {
+        $fileIds = [];
+
+        $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
+        $stmp->bindParam(":file_name", $fileName);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->execute();
+        $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
+
+        // remove multiple size array, for easier further treatment
+        foreach ($fileIdsArray as $fileIdArray) {
+            $fileIds[] = $fileIdArray[0];
+        }
+
+        return $fileIds;
+    }
+
+    /**
+     * From an array of id file, return an array of full path
+     */
+    public static function getFullPathFromIdFile(\PDO $db, array $fileIds, string $terminal_mac)
+    {
+        $reversedPaths = [];
+        $realFullPaths = [];
+
+        // Get reversed full Path as an intermediary stage
+        foreach ($fileIds as $fileId) {
+            $stmp = $db->prepare("SELECT GET_REVERSED_FULL_PATH_FROM_FILE_ID(:id, :terminal_mac);");
+            $stmp->bindParam(":id", $fileId);
+            $stmp->bindParam(":terminal_mac", $terminal_mac);
+            $stmp->execute();
+            $reversedPaths[] = $stmp->fetch(\PDO::FETCH_ASSOC)["GET_REVERSED_FULL_PATH_FROM_FILE_ID('" . $fileId . "', '" . $terminal_mac . "')"];
+        }
+
+        // Reverse Paths to have true Full paths
+        foreach ($reversedPaths as $reversedPath) {
+
+            $realFullPath = "";
+            $interArray = explode("/", $reversedPath);
+            array_pop($interArray);
+
+            // Concatenate and reverse array into strings
+            for ($i = count($interArray) - 1; $i >= 0; $i--) {
+                $realFullPath = $realFullPath . "/" . $interArray[$i];
+            }
+            $realFullPaths[] = $realFullPath;
+        }
+        return $realFullPaths;
     }
 }
