@@ -296,9 +296,11 @@ class CommandAsset
         //Check if it's a directory
         if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 1;
+
             // otherwise check if it's a file
         } else if (self::checkFileExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 2;
+
         }
         return $ElementAttribut;
     }
