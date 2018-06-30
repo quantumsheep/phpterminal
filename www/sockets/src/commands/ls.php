@@ -57,17 +57,27 @@ class ls implements CommandInterface
             $options = CommandAsset::getOptions($parameters);
             $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
 
-            $paramArray = explode(" ", $parameters);
+            if ($parameters != "") {
+                $paramArray = explode(" ", $parameters);
+            }
 
-            foreach ($paramArray as $path) {
-                $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
-                $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
-                $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+            if (!empty($paramArray)) {
+                foreach ($paramArray as $path) {
+                    if (CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . $path), $db) == 1) {
+                        $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
+                        $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
+                        $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
 
-                if (!empty($path)) {
-                    $sender->send("message|<br>" . $path . ": <br>");
+                        if (!empty($path) && count($paramArray) > 1) {
+                            $sender->send("message|<br>" . $path . ": <br>");
+                        }
+                        self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
+                    } else {
+                        $sender->send("message|<br>" . $path . "<br>");
+                    }
                 }
-                self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
+            } else {
+                return self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
             }
         } else {
             $options = [];
