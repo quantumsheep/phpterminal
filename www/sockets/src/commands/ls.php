@@ -63,7 +63,9 @@ class ls implements CommandInterface
 
             if (!empty($paramArray)) {
                 foreach ($paramArray as $path) {
-                    if (CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . $path), $db) == 1) {
+                    $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . $path), $db);
+
+                    if ($fileType == 1) {
                         $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
                         $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
                         $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
@@ -72,8 +74,12 @@ class ls implements CommandInterface
                             $sender->send("message|<br>" . $path . ": <br>");
                         }
                         self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
-                    } else {
+                    } else if ($fileType == 2) {
                         $sender->send("message|<br>" . $path . "<br>");
+                    } else if($path == ""){
+
+                    }else {
+                        $sender->send("message|<br>ls: cannot access '" . $path . "': No such file or directory<br>");
                     }
                 }
             } else {
