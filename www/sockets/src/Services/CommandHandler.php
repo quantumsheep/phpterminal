@@ -1,10 +1,10 @@
 <?php
 namespace Alph\Services;
 
+use Alph\Models\Model;
 use Alph\Services\History;
 use Alph\Services\SenderData;
 use Alph\Services\Session;
-use Alph\Models\Model;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
@@ -46,7 +46,7 @@ class CommandHandler implements MessageComponentInterface
         // Get cookie HTTP header
         $cookies = $sender->httpRequest->getHeader('Cookie');
 
-        if(empty($cookies)) {
+        if (empty($cookies)) {
             $cookies = $sender->httpRequest->getHeader('cookie');
         }
 
@@ -71,20 +71,7 @@ class CommandHandler implements MessageComponentInterface
 
                         // Check if the command exists
                         if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
-                            $controller = $this->data[$sender->resourceId]->controller != null ? $this->data[$sender->resourceId]->controller : '\\Alph\\Commands\\' . $cmd . '::call';
-                            // Call the command with arguments
-                            \call_user_func_array($controller, [
-                                $this->db,
-                                $this->clients,
-                                &$this->data[$sender->resourceId],
-                                $sender,
-                                $parsed_cookies[0]["alph_sess"],
-                                $sender_session,
-                                $parsed_cookies[0]["terminal"],
-                                $cmd,
-                                $parameters,
-                                &$lineReturn,
-                            ]);
+                            $this->callCommand($this->db, $this->clients, $this->data[$sender->resourceId], $sender, $sender_session, $parsed_cookies, $cmd, $parameters, $lineReturn);
                         } else {
                             $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                         }
@@ -96,55 +83,8 @@ class CommandHandler implements MessageComponentInterface
                         // Push the command into the history
                         History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
                     } else {
-                        if (!empty($this->data[$sender->resourceId]->user->username) && !isset($this->data[$sender->resourceId]->user->password)) {
-                            $stmp = $this->db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
-
-                            $terminal_mac = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
-
-                            $stmp->bindParam(":username", $this->data[$sender->resourceId]->user->username);
-                            $stmp->bindParam(":terminal", $terminal_mac);
-
-                            $stmp->execute();
-
-                            $row = $stmp->fetch(\PDO::FETCH_ASSOC);
-
-                            if (\password_verify($cmd, $row["password"])) {
-                                $greetings = [
-                                    "Alph 1.0.6-7 (2018-29-03)",
-                                    "",
-                                    "The programs included with a simulated Debian GNU/Linux system;",
-                                    "the exact distribution terms for each program are described in the",
-                                    "individual files in /usr/share/doc/*/copyright.",
-                                    "",
-                                    "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
-                                    "permitted by applicable law.",
-                                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
-                                ];
-
-                                $this->data[$sender->resourceId]->data = new Model();
-
-                                foreach ($greetings as &$greet) {
-                                    $sender->send("message|<br><span>" . $greet . "</span>");
-                                }
-
-                                $this->data[$sender->resourceId]->position = "/";
-
-                                $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
-
-                                $sender->send("action|show input");
-
-                                $this->data[$sender->resourceId]->connected = true;
-                                $this->data[$sender->resourceId]->user->idterminal_user = $row["idterminal_user"];
-                            } else {
-                                $sender->send("message|<br><span>Access denied.</span>");
-                                $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
-                            }
-                        } else {
-                            $this->data[$sender->resourceId]->user->username = $cmd;
-
-                            $sender->send("action|hide input");
-                            $sender->send("message|<br><span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220's password: <span>");
-                        }
+                        $terminal = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
+                        $this->askForCredentials($this->db, $this->data[$sender->resourceId], $sender, $cmd, $terminal);
                     }
                 } else {
                     $sender->send("message|<br><span>alph: account connection error</span>");
@@ -152,6 +92,76 @@ class CommandHandler implements MessageComponentInterface
             } else {
                 $sender->send("message|<br><span>alph: terminal connection error</span>");
             }
+        }
+    }
+
+    public static function callCommand(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface &$sender, $sender_session, array $parsed_cookies, string $cmd, $parameters, bool &$lineReturn)
+    {
+        $controller = $data->controller != null ? $data->controller : '\\Alph\\Commands\\' . $cmd . '::call';
+
+        // Call the command with arguments
+        \call_user_func_array($controller, [
+            $db,
+            $clients,
+            &$data,
+            $sender,
+            $parsed_cookies[0]["alph_sess"],
+            $sender_session,
+            $parsed_cookies[0]["terminal"],
+            $cmd,
+            $parameters,
+            &$lineReturn,
+        ]);
+    }
+
+    public static function askForCredentials(\PDO $db, SenderData &$data, ConnectionInterface &$sender, string $cmd, string $terminal)
+    {
+        if (!empty($data->user->username) && !isset($data->user->password)) {
+            $stmp = $db->prepare("SELECT idterminal_user, password FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
+
+            $stmp->bindParam(":username", $data->user->username);
+            $stmp->bindParam(":terminal", $terminal);
+
+            $stmp->execute();
+
+            $row = $stmp->fetch(\PDO::FETCH_ASSOC);
+
+            if (\password_verify($cmd, $row["password"])) {
+                $greetings = [
+                    "Alph 1.0.6-7 (2018-29-03)",
+                    "",
+                    "The programs included with a simulated Debian GNU/Linux system;",
+                    "the exact distribution terms for each program are described in the",
+                    "individual files in /usr/share/doc/*/copyright.",
+                    "",
+                    "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
+                    "permitted by applicable law.",
+                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
+                ];
+
+                $data->data = new Model();
+
+                foreach ($greetings as &$greet) {
+                    $sender->send("message|<br><span>" . $greet . "</span>");
+                }
+
+                $data->position = "/";
+
+                $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220:" . $data->position . "# </span>");
+
+                $sender->send("action|show input");
+
+                $data->connected = true;
+                $data->user->idterminal_user = $row["idterminal_user"];
+            } else {
+                $sender->send("message|<br><span>Access denied.</span>");
+                $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220's password: <span>");
+            }
+        } else {
+            $data->user->username = $cmd;
+
+            $sender->send("action|hide input");
+            $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220's password: <span>");
         }
     }
 
