@@ -121,7 +121,7 @@ class CommandAsset
      */
     public static function getAbsolutePathParameters(string &$parameters)
     {
-
+        $finalPathParameters = [];
         $pattern = "/ ((\/+((\"[^\"]*\")|[^\/ ]+))+)/";
 
         // Get path parameters with the pattern
@@ -130,9 +130,13 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
+                //remove potential empty element
+                if ($pathParameter != "") {
+                    $finalPathParameters[] = $pathParameter;
+                }
             }
-            return $pathParameters[1];
+            return $finalPathParameters;
         }
 
         return;
@@ -154,7 +158,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace($pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -247,7 +251,7 @@ class CommandAsset
     }
 
     /**
-     * Check if a directory exist from its Absolute Path
+     * Check if a directory exist from its name
      */
     public static function checkDirectoryExistence(string $terminal_mac, string $directoryName, int $parentId, \PDO $db)
     {
@@ -280,11 +284,15 @@ class CommandAsset
     }
 
     /**
-     * Check Both and return with a bool (0,1 or 2) what is the document
+     * Check Both and return with a bin (0,1 or 2) what is the document
      */
     public static function checkBoth(string $terminal_mac, string $ElementName, int $parentId, \PDO $db)
     {
+        //Will Trim in case Element passed is a relative of a full path
+        $ElementName = explode("/", $ElementName)[count(explode("/", $ElementName)) - 1];
+
         $ElementAttribut = 0;
+
         //Check if it's a directory
         if (self::checkDirectoryExistence($terminal_mac, $ElementName, $parentId, $db)) {
             $ElementAttribut = 1;
@@ -379,13 +387,6 @@ class CommandAsset
         $array = $newArray;
     }
 
-    /**
-     * Clean quote from string
-     */
-    public static function cleanQuote(string &$string)
-    {
-        return str_replace('"', "", $string);
-    }
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -421,76 +422,7 @@ class CommandAsset
     }
     //LS USAGES FUNCTIONS -- END
 
-    //MKDIR USAGES FUNCTIONS -- START
-
-    /**
-     * Generate new directories from array of Full Paths
-     */
-    public static function stageCreateNewDirectories(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathNewDirectories)
-    {
-        foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
-            // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $terminal_mac, $fullPathNewDirectory);
-
-            if ($parentId != null) {
-                // Get name from created directory
-                $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
-
-                // Check if directory already exists
-                if (self::checkDirectoryExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false) {
-                    // Create directory
-                    self::createNewDirectory($db, $data, $terminal_mac, $newDirectoryName, $parentId);
-                } else {
-
-                    $sender->send("message|<br>" . $newDirectoryName . " : already exists");
-                }
-            } else {
-                $sender->send("message|<br> Path not found");
-            }
-        }
-    }
-
-    /**
-     * generate a new directory
-     */
-    public static function createNewDirectory(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId)
-    {
-        $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_DIRECTORY(terminal, parent, name, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        $stmp->execute();
-    }
-
-    /**
-     * Automatically generate directory if it doesn't exist
-     * -d's mkdir option
-     */
-    public static function mkdirDOption(\PDO $db, SenderData &$data, string $terminal_mac, $fullPathParameters)
-    {
-        foreach ($fullPathParameters as $fullPathParameter) {
-            $parentId = 1;
-            $parentPath = "";
-            // Get whole directory name
-            $directorySplited = explode("/", $fullPathParameter);
-            array_shift($directorySplited);
-
-            foreach ($directorySplited as $directoryName) {
-                if (self::checkDirectoryExistence($terminal_mac, $directoryName, $parentId, $db) === false) {
-                    self::createNewDirectory($db, $data, $terminal_mac, $directoryName, $parentId);
-                }
-                $parentPath = $parentPath . "/" . $directoryName;
-                $parentId = self::getIdDirectory($db, $terminal_mac, $parentPath);
-            }
-        }
-
-    }
-    //MKDIR USAGES FUNCTIONS -- END
+    
 
     //RM USAGES FUNCTIONS -- START
     public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
@@ -614,239 +546,5 @@ class CommandAsset
     }
     //TOUCH USAGES FUNCTIONS -- END
 
-    //LOCATE USAGE FUNCTIONS -- START
-    /**
-     * return array full of paths leading to file
-     */
 
-    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
-    {
-
-        $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
-
-        return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
-    }
-    /**
-     * return IDs from $name
-     */
-    public static function getIdFromName(\PDO $db, string $fileName, string $terminal_mac)
-    {
-        $fileIds = [];
-
-        $stmp = $db->prepare("SELECT idfile FROM terminal_file where name=:file_name and terminal=:terminal");
-        $stmp->bindParam(":file_name", $fileName);
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->execute();
-        $fileIdsArray = $stmp->fetchAll(\PDO::FETCH_NUM);
-
-        // remove multiple size array, for easier further treatment
-        foreach ($fileIdsArray as $fileIdArray) {
-            $fileIds[] = $fileIdArray[0];
-        }
-
-        return $fileIds;
-    }
-
-    /**
-     * From an array of id file, return an array of full path
-     */
-    public static function getFullPathFromIdFile(\PDO $db, array $fileIds, string $terminal_mac)
-    {
-        $reversedPaths = [];
-        $realFullPaths = [];
-
-        // Get reversed full Path as an intermediary stage
-        foreach ($fileIds as $fileId) {
-            $stmp = $db->prepare("SELECT GET_REVERSED_FULL_PATH_FROM_FILE_ID(:id, :terminal_mac);");
-            $stmp->bindParam(":id", $fileId);
-            $stmp->bindParam(":terminal_mac", $terminal_mac);
-            $stmp->execute();
-            $reversedPaths[] = $stmp->fetch(\PDO::FETCH_ASSOC)["GET_REVERSED_FULL_PATH_FROM_FILE_ID('" . $fileId . "', '" . $terminal_mac . "')"];
-        }
-
-        // Reverse Paths to have true Full paths
-        foreach ($reversedPaths as $reversedPath) {
-
-            $realFullPath = "";
-            $interArray = explode("/", $reversedPath);
-            array_pop($interArray);
-
-            // Concatenate and reverse array into strings
-            for ($i = count($interArray) - 1; $i >= 0; $i--) {
-                $realFullPath = $realFullPath . "/" . $interArray[$i];
-            }
-            $realFullPaths[] = $realFullPath;
-        }
-        return $realFullPaths;
-    }
-    //LOCATE USAGE FUNCTIONS --END
-
-    //CHMOD USAGE FUNCTIONS --END
-
-    public static function stageChangeChmod(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathFiles, int $askedChmod)
-    {
-        foreach ($fullPathFiles as $fullPathFile) {
-            // get Full Path of Parent directory
-            $parentId = self::getParentId($db, $sender, $terminal_mac, $fullPathFile);
-
-            if ($parentId != null) {
-                // Get name from created file
-                $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
-
-                // Check if file exists
-                if (self::checkDirectoryExistence($terminal_mac, $FileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $FileName, $parentId, $db) === false) {
-                    $sender->send("message|<br>" . $FileName . " : didn't exists");
-                } else {
-                    self::changeChmod($db, $data, $terminal_mac, $FileName, $askedChmod, $parentId);
-                }
-            } else {
-                $sender->send("message|<br> Path not found");
-            }
-        }
-    }
-
-    public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
-    {
-        $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
-
-        $stmp->bindParam(":chmod", $askedChmod);
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $FileName);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        $stmp->execute();
-
-        $stmp = $db->prepare("UPDATE terminal_directory SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
-
-        $stmp->bindParam(":chmod", $askedChmod);
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $FileName);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        $stmp->execute();
-    }
-    //CHMOD USAGE FUNCTIONS --END
-
-    //MV USAGE FUNCTIONS -- START
-    /**
-     * Treat mv element to determine Element position
-     */
-    public static function mvIsolateElement(string $parameters)
-    {
-        $parametersArray = [];
-
-        $pattern = "/(\"([^\"]+)\") /";
-        $fullQuotedParameters = [];
-        // Get quoted element with the pattern
-        preg_match_all($pattern, $parameters . " ", $quotedParameters);
-
-        // Use 2 position of array, to exclude " "
-        if (!empty($quotedParameters[1])) {
-            foreach ($quotedParameters[1] as $quotedParameter) {
-                // Update the whole parameters for further concatenation
-                $parameters = str_replace(" " . $quotedParameter, "", " " . $parameters);
-
-                $fullQuotedParameters[] = $quotedParameter;
-            }
-        }
-
-        // get Regular parameters into array for further concatenation
-        $regularParameters = explode(" ", $parameters);
-
-        //Update element if quoted element is in. It creates an empty entry
-        if (!empty($fullQuotedParameters)) {
-            for ($i = 0; $i < count($fullQuotedParameters); $i++) {
-                array_shift($regularParameters);
-            }
-        }
-
-        //concatenate whole parameters
-        self::concatenateParameters($parametersArray, $regularParameters, $fullQuotedParameters);
-
-        return $parametersArray;
-    }
-
-    /**
-     * Get option from array of parameters
-     */
-    public static function mvGetOptions(array &$fullParameters)
-    {
-        $options = "";
-        $option = "";
-        $pattern = "/(-([a-zA-Z\d]+))/";
-
-        // check if every array entry is an option
-        foreach ($fullParameters as $parameter) {
-            //reset option
-            $option = "";
-            preg_match($pattern, $parameter, $option);
-            if (!empty($option)) {
-                //remove the Element from the array
-                self::removeElementFromArray($fullParameters, $parameter);
-
-                // get parameters without "-" and concatenate into option, to get a full string of options
-                $options .= $option[2];
-            }
-        }
-        return $options;
-    }
-
-    /**
-     * Return target (last element) with array and string
-     */
-    public static function getTarget(string &$parameters, array &$fullParameters)
-    {
-        $position = 0;
-        $elementInArray;
-        $elementPosition = [];
-
-        //research Element
-        for ($i = 0; $i < count($fullParameters); $i++) {
-            $elementPosition[] = strpos($parameters, $fullParameters[$i]);
-            if ($elementPosition[$i] > $position) {
-                $target = $fullParameters[$i];
-                $elementInArray = $i;
-            }
-
-        }
-
-        self::removeElementFromArray($fullParameters, $fullParameters[$elementInArray]);
-        return $target;
-    }
-
-    /**
-     * Function update element Position after several check up
-     */
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementFullPath, int $newPositionId, string $newParentFullPath, ConnectionInterface $sender)
-    {
-        // get Element Name
-        $ElementName = explode("/", $movedElementFullPath)[count(explode("/", $movedElementFullPath)) - 1];
-
-        // Check if Element is a directory, or a file, or even exist.
-        $elementAttribut = self::checkBoth($terminal_mac, $ElementName, self::getParentId($db, $terminal_mac, $movedElementFullPath), $db);
-
-        // If Element is a directory
-        if ($elementAttribut == 1) {
-            if (self::checkSiblings($movedElementFullPath, $newParentFullPath)) {
-                return $sender->send("message|Cannot move parent into child's Path. Children shouldn't live that way.");
-            }
-            // If Element is a file
-        } else if ($elementAttribut == 2) {
-            return;
-            // If Element doesn't exist
-        } else {
-            return;
-        }
-    }
-
-    /**
-     * check if 2 directories are parents from their full Path. Parent shouldn't walk in their children's Path
-     */
-    public static function checkSiblings(\PDO $db, $sonPath, $daddyPath)
-    {
-
-    }
-    //MV USAGE FUNCTIONS -- END
 }
