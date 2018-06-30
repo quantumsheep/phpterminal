@@ -117,14 +117,6 @@ class mv implements CommandInterface
         }
     }
 
-
-
-
-
-
-
-
-
     /**
      * custom get quoted
      */
@@ -146,6 +138,7 @@ class mv implements CommandInterface
 
         return $quotedParameters[1];
     }
+    
     /**
      * custom get Path parameters
      */

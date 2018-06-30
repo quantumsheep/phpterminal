@@ -1,10 +1,10 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
 use Ratchet\ConnectionInterface;
-use Alph\Services\CommandAsset;
 
 /**
  * chmod
@@ -69,24 +69,74 @@ class chmod implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $Files = explode(" ", $parameters);
+        
 
-        for($i=0;$i<count($options);$i++){
+        for ($i = 0; $i < count($options); $i++) {
             unset($Files[$i]);
         }
 
         $askedChmod = $Files[count($options)];
         unset($Files[count($options)]);
-        
+
         if (is_numeric($askedChmod)) {
             if (!empty($Files)) {
                 $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
             }
             CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
             if (empty($options)) {
-                return CommandAsset::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
+                return self::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
             }
         } else {
-            $sender->send("message|<br>chmod: missing operand after ‘".$askedChmod."’<br>Try 'chmod --help' for more information.");
+            $sender->send("message|<br>chmod: missing operand after ‘" . $askedChmod . "’<br>Try 'chmod --help' for more information.");
         }
+    }
+
+    public static function stageChangeChmod(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathFiles, int $askedChmod)
+    {
+        foreach ($fullPathFiles as $fullPathFile) {
+            // get Full Path of Parent directory
+            $parentId = CommandAsset::getParentId($db, $terminal_mac, $fullPathFile);
+
+            if ($parentId != null) {
+                // Get name from created file
+                $FileName = explode("/", $fullPathFile)[count(explode("/", $fullPathFile)) - 1];
+
+                // Check if file exists
+                if (CommandAsset::checkDirectoryExistence($terminal_mac, $FileName, $parentId, $db) === false && CommandAsset::checkFileExistence($terminal_mac, $FileName, $parentId, $db) === false) {
+                    $sender->send("message|<br>" . $FileName . " : didn't exists");
+                } else {
+                    self::changeChmod($db, $data, $terminal_mac, $FileName, $askedChmod, $parentId);
+                }
+            } else {
+                $sender->send("message|<br> Path not found");
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
+    {
+        
+        $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+
+        $stmp = $db->prepare("UPDATE terminal_directory SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        $stmp->bindParam(":chmod", $askedChmod);
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $FileName);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
     }
 }
