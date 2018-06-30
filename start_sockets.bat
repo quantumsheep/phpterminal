@@ -1,2 +1,2 @@
 @echo off
-cd www/sockets && start_sockets.bat && pause
+cd www/sockets && start_sockets.bat & pause
