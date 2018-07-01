@@ -83,29 +83,51 @@ class rm implements CommandInterface
             return;
         }
 
-        $currentPosition = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
-        $pathParameters = CommandAsset::GetPathParameters($parameters, $data->position);
-
         $paramArray = explode(" ", $parameters);
 
+        foreach ($quotedParameters as $quoted) {
+            if ($quoted != "" || !empty($quoted)) {
+                $type = CommandAsset::checkBoth($terminal_mac, $quoted, CommandAsset::getIdDirectory($db, $terminal_mac, $data->position), $db);
+
+                if ($type == 2) {
+                    $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($quoted));
+                    if (strpos($quoted, '/') !== false) {
+                        $quoted = explode("/", $quoted);
+
+                        $quoted = end($quoted);
+                    }
+
+                    var_dump($parentId);
+                    var_dump($quoted);
+                    CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $quoted, $parentId);
+                } else if ($type == 1) {
+                    $sender->send('message|<br>' . $quoted . ' is a directory, please use rmdir.');
+                } else {
+                    $sender->send('message|<br>' . $quoted . ' didnt exist.');
+                }
+            }
+        }
+
         foreach ($paramArray as $param) {
-            $type = CommandAsset::checkBoth($terminal_mac, $param, $currentPosition, $db);
-
-            if ($type == 2) {
+            if ($param != "" || !empty($param)) {
                 $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
-                CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
-            } else if ($type == 1) {
-                $dirpath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
-                $files = CommandAsset::getFiles($db, $terminal_mac, $dirpath);
-                $dirs = CommandAsset::getDirectories($db, $terminal_mac, $dirpath);
+                $type = CommandAsset::checkBoth($terminal_mac, $param, $parentId, $db);
 
-                var_dump($dirpath);
-                var_dump($files);
-                var_dump($dirs);
-            } else {
-                $sender->send('message|<br>' . $param . ' didnt exist.');
+                if (strpos($param, '/') !== false) {
+                    $param = explode("/", $param);
+
+                    $param = end($param);
+                }
+
+                if ($type == 2) {
+                    CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
+                } else if ($type == 1) {
+                    $sender->send('message|<br>' . $param . ' is a directory, please use rmdir.');
+                } else {
+                    $sender->send('message|<br>' . $param . ' didnt exist.');
+                }
             }
         }
     }
