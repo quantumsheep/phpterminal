@@ -12,6 +12,7 @@ DROP FUNCTION IF EXISTS `GET_REVERSED_FULL_PATH_FROM_FILE_ID`;
 DROP PROCEDURE IF EXISTS `NewNetwork`;
 DROP PROCEDURE IF EXISTS `NewTerminal`;
 DROP PROCEDURE IF EXISTS `NewUser`;
+DROP VIEW IF EXISTS `TERMINAL_INFO`;
 
 DELIMITER $$
 
@@ -308,3 +309,25 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `TERMINAL_INFO` AS
+    SELECT 
+        `terminal`.`mac` AS `terminalmac`,
+        `network`.`mac` AS `networkmac`,
+        `privateip`.`ip` AS `privateipv4`,
+        `network`.`ipv4` AS `publicipv4`,
+        `port`.`port` AS `sshport`
+    FROM
+        (((`terminal`
+        JOIN `privateip`)
+        JOIN `network`)
+        JOIN `port`)
+    WHERE
+        ((`privateip`.`terminal` = `terminal`.`mac`)
+            AND (`network`.`mac` = `terminal`.`localnetwork`)
+            AND (`port`.`ip` = `privateip`.`ip`)
+            AND (`port`.`ipport` = 22));

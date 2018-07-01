@@ -158,7 +158,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -224,16 +224,26 @@ class CommandAsset
         return '/' . join('/', $absolute_parts);
     }
 
+    /***
+     * Get Parent Path
+     */
+    public static function getParentPath(string $absolutePath)
+    {
+
+        $directorySplited = explode("/", $absolutePath);
+        array_pop($directorySplited);
+        array_shift($directorySplited);
+        $parentPath = "/" . implode("/", $directorySplited);
+        return $parentPath;
+    }
+
     /**
      * return ID of parent from the absolute path given, directory or file as last element
      */
     public static function getParentId(\PDO $db, string $terminal_mac, string $absolutePath)
     {
         // Treat fullPath of created directory to get parent Directory
-        $directorySplited = explode("/", $absolutePath);
-        array_pop($directorySplited);
-        array_shift($directorySplited);
-        $parentPath = "/" . implode("/", $directorySplited);
+        $parentPath = self::getParentPath($absolutePath);
         return self::getIdDirectory($db, $terminal_mac, $parentPath);
     }
 
@@ -390,17 +400,60 @@ class CommandAsset
     }
 
     /**
-     *
+     * Check if user can make functionality
      */
-    public static function checkRightsTo(\PDO $db, string $terminal_mac, string $owner, string $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
+    public static function checkRightsTo(\PDO $db, string $terminal_mac, int $owner, int $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
     {
+        //if user is Root, nothing can stop HIM
+        if (self::isRoot($db, $terminal_mac, $owner)) {
+            return true;
+        }
+
         $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
+
+        if ($userType == 1) {
+            $rightsTo = floor($elementChmod / 100);
+
+        } else if ($userType == 2) {
+            $rightsTo = floor(($elementChmod / 10) % 10);
+
+        } else if ($userType == 3) {
+            $rightsTo = floor($elementChmod % 10);
+        } else {
+            return;
+        }
+        var_dump($elementChmod);
+        var_dump($rightsTo);
+
+        if ($chmodNeeded == 1) {
+            return $rightsTo % 2 == 1;
+
+        } else if ($chmodNeeded == 2) {
+            return ($rightsTo == 2 || $rightsTo == 3 || $rightsTo == 6 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 3) {
+            return ($rightsTo == 3 || $rightsTo == 5 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 4) {
+            return ($rightsTo * 2) <= 8;
+
+        } else if ($chmodNeeded == 5) {
+            return ($rightsTo == 5 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 6) {
+            return ($rightsTo == 6 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 7) {
+            return ($rightsTo == 7);
+        }
+
+        return true;
 
     }
     /**
      * return User type (1,2,3) for owner, group or others
      */
-    public static function getUserType(\PDO $db, string $terminal_mac, string $group, string $owner, string $elementFullPath)
+    public static function getUserType(\PDO $db, string $terminal_mac, int $group, int $owner, string $elementFullPath)
     {
         $elementName = explode("/", $elementFullPath)[count(explode("/", $elementFullPath)) - 1];
 
@@ -482,34 +535,28 @@ class CommandAsset
             return false;
         }
     }
-    //GLOBAL USAGES FUNCTIONS -- END
 
-    public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
+    /**    
+    * Check if a user is Root
+    */
+    public static function isRoot(\PDO $db, string $terminal_mac, int $owner)
     {
-        // get Full Path of Parent directory
-        $parentId = self::getParentId($db, $terminal_mac, $fullPathNewFile);
+        $stmp = $db->prepare("SELECT username FROM terminal_user WHERE idterminal_user=:owner AND terminal=:terminal");
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":owner", $owner);
 
-        if ($parentId != null) {
-            // Get name from created file
-            $splitedPath = explode("/", $fullPathNewFile);
-            $newFileName = $splitedPath[count($splitedPath) - 1];
+        $stmp->execute();
+        $username = $stmp->fetch(\PDO::FETCH_COLUMN);
 
-            // Check if file already exists
-            if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
-                // Create file
-                return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
-            } else if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
-                $sender->send("message|<br>" . $newFileName . " : already exists");
-                return false;
-            } else {
-                return false;
-            }
-        } else {
-            $sender->send("message|<br> Path not found");
-            return false;
+        if ($username == "root") {
+            return true;
         }
-    }
 
+        return false;
+    }
+    //GLOBAL USAGES FUNCTIONS -- END
+    
+    //TOUCH USAGES FUNCTIONS -- START
     /**
      * Create or update files
      */
@@ -538,4 +585,32 @@ class CommandAsset
 
         return $stmp->execute();
     }
+
+    public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
+    {
+        // get Full Path of Parent directory
+        $parentId = self::getParentId($db, $terminal_mac, $fullPathNewFile);
+
+        if ($parentId != null) {
+            // Get name from created file
+            $splitedPath = explode("/", $fullPathNewFile);
+            $newFileName = $splitedPath[count($splitedPath) - 1];
+
+            // Check if file already exists
+            if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
+                // Create file
+                return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
+            } else if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
+                $sender->send("message|<br>" . $newFileName . " : already exists");
+                return false;
+            } else {
+                return false;
+            }
+        } else {
+            $sender->send("message|<br> Path not found");
+            return false;
+        }
+    }
+    //TOUCH USAGES FUNCTIONS -- END
+
 }
