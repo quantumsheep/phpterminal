@@ -2,6 +2,7 @@
 namespace Alph\Commands;
 
 use Alph\Models\Model;
+use Alph\Models\ViewTerminal_InfoModel;
 use Alph\Services\CommandHandler;
 use Alph\Services\CommandInterface;
 use Alph\Services\History;
@@ -38,7 +39,7 @@ class ssh implements CommandInterface
                 }
 
                 if ($data->data->ssh->data->controller != null || in_array($cmd, \Alph\Services\DefinedCommands::get())) {
-                    CommandHandler::callCommand($db, $clients, $data->data->ssh->data, $sender, $sender_session, $sess_id, $data->data->ssh->terminal_mac, $cmd, $parameters, $data->data->ssh->lineReturn);
+                    CommandHandler::callCommand($db, $clients, $data->data->ssh->data, $sender, $sender_session, $sess_id, $cmd, $parameters, $data->data->ssh->lineReturn);
                 } else {
                     $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
                 }
@@ -50,7 +51,7 @@ class ssh implements CommandInterface
                 // Push the command into the history
                 History::push($db, $data->data->ssh->data->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
             } else {
-                CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $cmd, $data->data->ssh->terminal_mac);
+                CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $cmd);
             }
 
             return;
@@ -99,7 +100,7 @@ class ssh implements CommandInterface
             return help::call(...\func_get_args());
         }
 
-        $stmp = $db->prepare("SELECT terminal FROM PRIVATEIP, (SELECT mac FROM NETWORK WHERE ipv4 = :ipv4) as net WHERE ip = (SELECT ip FROM PORT WHERE network = net.mac AND port = :port AND ipport = 22) AND PRIVATEIP.network = net.mac");
+        $stmp = $db->prepare("SELECT terminalmac, networkmac, privateipv4, publicipv4, sshport FROM TERMINAL_INFO WHERE terminalmac = (SELECT terminal FROM PRIVATEIP, (SELECT mac FROM NETWORK WHERE ipv4 = :ipv4) as net WHERE ip = (SELECT ip FROM PORT WHERE network = net.mac AND port = :port AND ipport = 22) AND PRIVATEIP.network = net.mac)");
 
         $stmp->bindParam(':ipv4', $options["host"]);
         $stmp->bindParam(':port', $options["port"]);
@@ -116,15 +117,14 @@ class ssh implements CommandInterface
 
         $data->data->ssh->options = $options;
 
-        $data->data->ssh->terminal_mac = $stmp->fetch()["terminal"];
-
         $data->data->ssh->data = new SenderData();
+        $data->data->ssh->data->terminal = ViewTerminal_InfoModel::map($stmp->fetch());
 
         $data->data->ssh->data->private_input = false;
         $data->data->ssh->lineReturn = true;
 
         $data->private_input = true;
 
-        CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $data->data->ssh->options["user"], $data->data->ssh->terminal_mac);
+        CommandHandler::askForCredentials($db, $data->data->ssh->data, $sender, $data->data->ssh->options["user"], $data->data->ssh->data->terminal->terminalmac);
     }
 }
