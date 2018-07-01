@@ -150,7 +150,7 @@ class AccountController
         $account_code = AccountManager::createAccount($db, $_POST["username"], $_POST["email"], $_POST["password"]);
 
         if ($account_code !== false) {
-            $mail = new Mail($db, "Account validation", "Please validate your email at this link: <a href=\"" . SITE_PROTOCOL . SITE_ADRESS . "/validate/" . $account_code . "\">Click here</a>.", [$_POST["email"]]);
+            $mail = new Mail($db, "alPH - Account validation", "Please validate your email at this link: <a href=\"" . SITE_PROTOCOL . SITE_ADRESS . "/validate/" . $account_code . "\">Click here</a>.", [$_POST["email"]]);
             $mail->send();
 
             $_SESSION["success"] = [

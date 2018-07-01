@@ -15,20 +15,20 @@
             <div class="nano-controls mt-2">
                 <div id="nano-message" class="nano-message d-flex"></div>
                 <div class="d-flex flex-wrap">
-                    <div class="col-sm-2"><span class="nano-badge">^G</span> Get help</div>
+                    <!-- <div class="col-sm-2"><span class="nano-badge">^G</span> Get help</div> -->
                     <div class="col-sm-2"><span class="nano-badge">^O</span> Write Out</div>
-                    <div class="col-sm-2"><span class="nano-badge">^W</span> Where Is</div>
+                    <!-- <div class="col-sm-2"><span class="nano-badge">^W</span> Where Is</div>
                     <div class="col-sm-2"><span class="nano-badge">^K</span> Cut Text</div>
                     <div class="col-sm-2"><span class="nano-badge">^J</span> Justify</div>
                     <div class="col-sm-2"><span class="nano-badge">^C</span> Cur Pos</div>
-                    <div class="col-sm-2"><span class="nano-badge">^Y</span> Prev Page</div>
+                    <div class="col-sm-2"><span class="nano-badge">^Y</span> Prev Page</div> -->
                     <div class="col-sm-2"><span class="nano-badge">^X</span> Exit</div>
-                    <div class="col-sm-2"><span class="nano-badge">^R</span> Read File</div>
+                    <!-- <div class="col-sm-2"><span class="nano-badge">^R</span> Read File</div>
                     <div class="col-sm-2"><span class="nano-badge">^\</span> Replace</div>
                     <div class="col-sm-2"><span class="nano-badge">^U</span> Uncut Text</div>
                     <div class="col-sm-2"><span class="nano-badge">^T</span> To Spell</div>
                     <div class="col-sm-2"><span class="nano-badge">^_</span> Go To Line</div>
-                    <div class="col-sm-2"><span class="nano-badge">^V</span> Next Page</div>
+                    <div class="col-sm-2"><span class="nano-badge">^V</span> Next Page</div> -->
                 </div>
             </div>
         </div>

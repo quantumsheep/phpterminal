@@ -57,10 +57,14 @@ class chmod implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
+        $allowedFiles = [];
         // If no params
         if (empty($parameters)) {
             $sender->send("message|<br>Operand missing <br>please enter chmod --help for more information");
             return;
+        }
+        if (!CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user || CommandAsset::getElementOwner())) {
+
         }
 
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
@@ -69,7 +73,6 @@ class chmod implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $Files = explode(" ", $parameters);
-        
 
         for ($i = 0; $i < count($options); $i++) {
             unset($Files[$i]);
@@ -84,7 +87,18 @@ class chmod implements CommandInterface
             }
             CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
             if (empty($options)) {
-                return self::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
+                foreach ($Files as $file) {
+
+                    if (CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user) || CommandAsset::getElementOwner($db, $terminal_mac, $file, explode("/", $file)[count(explode("/", $file)) - 1]) == $data->user->idterminal_user) {
+                        $allowedFiles[] = $file;
+
+                    } else {
+                        $sender->send("message|<br>You can't change rights on a directory or a file you don't possess.");
+                    }
+                }
+                if(!empty($allowedFiles)){
+                    return self::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
+                }
             }
         } else {
             $sender->send("message|<br>chmod: missing operand after ‘" . $askedChmod . "’<br>Try 'chmod --help' for more information.");
@@ -114,11 +128,11 @@ class chmod implements CommandInterface
     }
 
     /**
-     * 
+     *
      */
     public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
     {
-        
+
         $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
         $stmp->bindParam(":chmod", $askedChmod);
