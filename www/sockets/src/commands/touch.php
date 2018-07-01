@@ -60,6 +60,61 @@ class touch implements CommandInterface
             $newFiles = CommandAsset::fullPathFromParameters($newFiles, $data->position);
         }
 
-        return CommandAsset::stageCreateNewFiles($db, $data, $sender, $terminal_mac, $newFiles);
+        return self::stageCreateNewFiles($db, $data, $sender, $terminal_mac, $newFiles);
+    }
+
+    public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
+    {
+        // get Full Path of Parent directory
+        $parentId = self::getParentId($db, $terminal_mac, $fullPathNewFile);
+
+        if ($parentId != null) {
+            // Get name from created file
+            $splitedPath = explode("/", $fullPathNewFile);
+            $newFileName = $splitedPath[count($splitedPath) - 1];
+
+            // Check if file already exists
+            if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
+                // Create file
+                return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
+            } else if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
+                $sender->send("message|<br>" . $newFileName . " : already exists");
+                return false;
+            } else {
+                return false;
+            }
+        } else {
+            $sender->send("message|<br> Path not found");
+            return false;
+        }
+    }
+
+    /**
+     * Full stage of creating new files
+     */
+    public static function stageCreateNewFiles(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, array $fullPathNewFiles)
+    {
+        foreach ($fullPathNewFiles as $fullPathNewFile) {
+            self::stageCreateNewFile($db, $data, $sender, $terminal_mac, $fullPathNewFile);
+        }
+    }
+
+    /**
+     * generate a new File
+     */
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    {
+        $basicmod = 777;
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, `data`, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :content, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":content", $content);
+        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        return
+        $stmp->execute();
     }
 }

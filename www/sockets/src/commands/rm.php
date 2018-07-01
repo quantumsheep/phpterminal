@@ -99,9 +99,7 @@ class rm implements CommandInterface
                         $quoted = end($quoted);
                     }
 
-                    var_dump($parentId);
-                    var_dump($quoted);
-                    CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $quoted, $parentId);
+                    self::deleteFile($db, $data, $sender, $terminal_mac, $quoted, $parentId);
                 } else if ($type == 1) {
                     $sender->send('message|<br>' . $quoted . ' is a directory, please use rmdir.');
                 } else {
@@ -122,7 +120,7 @@ class rm implements CommandInterface
                 }
 
                 if ($type == 2) {
-                    CommandAsset::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
+                    self::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
                 } else if ($type == 1) {
                     $sender->send('message|<br>' . $param . ' is a directory, please use rmdir.');
                 } else {
@@ -130,5 +128,17 @@ class rm implements CommandInterface
                 }
             }
         }
+    }
+
+    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
+    {
+        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $filename);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        return $stmp->execute();
     }
 }
