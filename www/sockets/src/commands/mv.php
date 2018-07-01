@@ -99,18 +99,26 @@ class mv implements CommandInterface
 
         // Action if target is a directory
         if ($targetType == 1) {
-            $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
+            if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $targetFullPath, CommandAsset::getChmod($db, $terminal_mac, $cleanedTarget, CommandAsset::getParentId($db, $terminal_mac, $targetFullPath)), 2)) {
+                $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
 
-            foreach ($cleanedParameters as $parameter) {
-                var_dump($targetFullPath);
-                var_dump($parameter);
-                self::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath, $sender, $data->position);
+                foreach ($cleanedParameters as $parameter) {
+                    var_dump($targetFullPath);
+                    var_dump($parameter);
+                    if ($targetId != null) {
+                        self::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath, $sender, $data);
+                    } else {
+                        return $sender->send("message|An Error occured. You can't access this element.");
+                    }
+                }
+            } else {
+                return $sender->send("message|<br>You don't have rights to write in the directory : " . $cleanedTarget . ".");
             }
 
         } else if ($targetType == 0) {
             //in case the targetType is nothing, we may change directory or file provided as parameter for this name
             if (count($cleanedParameters) == 1) {
-                self::changeName($db, $data->position, $terminal_mac, $cleanedParameters[0], $cleanedTarget, $sender);
+                self::changeName($db, $terminal_mac, $cleanedParameters[0], $cleanedTarget, $sender, $data);
             } else {
                 return $sender->send("message|<br> You can only change name of 1 Element at a time");
             }
@@ -141,7 +149,7 @@ class mv implements CommandInterface
 
         return $quotedParameters[1];
     }
-    
+
     /**
      * custom get Path parameters
      */
@@ -219,49 +227,52 @@ class mv implements CommandInterface
     /**
      * Function update element Position after several check up
      */
-    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newParentId, string $newParentFullPath, ConnectionInterface $sender, string $position)
+    public static function updatePosition(\PDO $db, string $terminal_mac, string $movedElementName, int $newParentId, string $newParentFullPath, ConnectionInterface $sender, SenderData &$data)
     {
 
         // Check if Element is a directory, or a file, or even exist.
-        $elementAbsolutePath = CommandAsset::getAbsolute($position, $movedElementName);
+        $elementAbsolutePath = CommandAsset::getAbsolute($data->position, $movedElementName);
         $elementAttribut = CommandAsset::checkBoth($terminal_mac, $movedElementName, CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath), $db);
-        var_dump($elementAttribut);
 
-        // If Element is a directory
-        if ($elementAttribut == 1) {
-            //Get full path of moved directory
-            $directoryId = CommandAsset::getIdDirectory($db, $terminal_mac, $elementAbsolutePath);
+        if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $elementAbsolutePath, CommandAsset::getChmod($db, $terminal_mac, $movedElementName, CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath)), 2)) {
+            // If Element is a directory
+            if ($elementAttribut == 1) {
+                //Get full path of moved directory
+                $directoryId = CommandAsset::getIdDirectory($db, $terminal_mac, $elementAbsolutePath);
 
-            //Check if directory can be moved (depends of the full path)
-            if (self::checkSiblings($movedElementName, $newParentFullPath) == true) {
-                return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
-            } else {
-                //change Directory position
-                if (CommandAsset::checkDirectoryExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
-                    // check if directory doesn't already exist in target directory
-                    return self::changeDirectoryParentId($db, $directoryId, $newParentId, $terminal_mac);
+                //Check if directory can be moved (depends of the full path)
+                if (self::checkSiblings($movedElementName, $newParentFullPath) == true) {
+                    return $sender->send("message|<br>Cannot move parent into child's Path. Children shouldn't live that way.");
                 } else {
-                    return $sender->send("message|<br>" . $movedElementName . " directory already exist in " . $newParentFullPath . ".");
+                    //change Directory position
+                    if (CommandAsset::checkDirectoryExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
+                        // check if directory doesn't already exist in target directory
+                        return self::changeDirectoryParentId($db, $directoryId, $newParentId, $terminal_mac);
+                    } else {
+                        return $sender->send("message|<br>" . $movedElementName . " directory already exist in " . $newParentFullPath . ".");
+                    }
+
+                }
+                // If Element is a file
+            } else if ($elementAttribut == 2) {
+
+                //Get full path of moved file
+                $fileParentId = CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath);
+
+                //check if file does exist
+                if (CommandAsset::checkFileExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
+                    // check if file doesn't already exist in target directory
+                    return self::changeFileParentId($db, $fileParentId, $newParentId, $movedElementName, $terminal_mac);
+                } else {
+                    return $sender->send("message|<br>" . $movedElementName . " file already exist in " . $newParentFullPath . ".");
                 }
 
-            }
-            // If Element is a file
-        } else if ($elementAttribut == 2) {
-
-            //Get full path of moved file
-            $fileParentId = CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath);
-
-            //check if file does exist
-            if (CommandAsset::checkFileExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
-                // check if file doesn't already exist in target directory
-                return self::changeFileParentId($db, $fileParentId, $newParentId, $movedElementName, $terminal_mac);
+                // If Element doesn't exist
             } else {
-                return $sender->send("message|<br>" . $movedElementName . " file already exist in " . $newParentFullPath . ".");
+                return $sender->send("message|<br>" . $movedElementName . " doesn't exist and cannot be moved.");
             }
-
-            // If Element doesn't exist
         } else {
-            return $sender->send("message|<br>" . $movedElementName . " doesn't exist and cannot be moved.");
+            return $sender->send("message|<br> You're not allowed to displace " . $movedElementName . " as you can't write it");
         }
     }
 
@@ -310,22 +321,28 @@ class mv implements CommandInterface
     /**
      * Change file or directory name
      */
-    public static function changeName(\PDO $db, string $position, string $terminal_mac, string $elementName, string $newName, ConnectionInterface $sender)
+    public static function changeName(\PDO $db, string $terminal_mac, string $elementName, string $newName, ConnectionInterface $sender, SenderData &$data)
     {
         // Get whole Element information
-        $elementAbsolutePath = CommandAsset::getAbsolute($position, $elementName);
+        $elementAbsolutePath = CommandAsset::getAbsolute($data->position, $elementName);
         $elementParentId = CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath);
         $elementType = CommandAsset::checkBoth($terminal_mac, $elementName, $elementParentId, $db);
-        //if Element doesn't exist
-        if ($elementType == 0) {
-            return $sender->send("message|<br>" . $elementName . " doesn't exist.");
-            //If element is a directory
-        } else if ($elementType == 1) {
-            return self::changeDirectoryName($db, $terminal_mac, CommandAsset::getIdDirectory($db, $terminal_mac, $elementAbsolutePath), $newName);
-            //if element is a file
-        } else if ($elementType == 2) {
-            return self::changeFileName($db, $terminal_mac, $elementParentId, $newName, $elementName);
+
+        if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $elementAbsolutePath, CommandAsset::getChmod($db, $terminal_mac, $elementAbsolutePath, CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath)), 2)) {
+            //if Element doesn't exist
+            if ($elementType == 0) {
+                return $sender->send("message|<br>" . $elementName . " doesn't exist.");
+                //If element is a directory
+            } else if ($elementType == 1) {
+                return self::changeDirectoryName($db, $terminal_mac, CommandAsset::getIdDirectory($db, $terminal_mac, $elementAbsolutePath), $newName);
+                //if element is a file
+            } else if ($elementType == 2) {
+                return self::changeFileName($db, $terminal_mac, $elementParentId, $newName, $elementName);
+            }
+        } else {
+            return $sender->send("message|<br>You can't rename a file or a directory you can't write.");
         }
+
     }
 
     /**

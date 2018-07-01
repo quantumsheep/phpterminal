@@ -73,6 +73,7 @@ class mkdir implements CommandInterface
             $parentId = CommandAsset::getParentId($db, $terminal_mac, $fullPathNewDirectory);
             $parentPath = CommandAsset::getParentPath($fullPathNewDirectory);
             $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
+            
             //Check if user can write in directory to create a new directory
             if(CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user,$data->user->gid, $parentPath,CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)),2)){
                 if ($parentId != null) {
