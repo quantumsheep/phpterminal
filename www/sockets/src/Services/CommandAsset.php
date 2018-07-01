@@ -490,7 +490,7 @@ class CommandAsset
      */
     public static function getFiles(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name, chmod, editeddate, length(data), username FROM terminal_file,terminal_user WHERE terminal_file.terminal=:mac AND parent=:parent AND idterminal_user = owner");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, length(data), username, parent, idfile FROM terminal_file,terminal_user WHERE terminal_file.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
@@ -504,7 +504,7 @@ class CommandAsset
 
     public static function getDirectories(\PDO $db, string $terminal_mac, $currentPath)
     {
-        $stmp = $db->prepare("SELECT name, chmod, editeddate, username FROM terminal_directory,terminal_user WHERE terminal_directory.terminal=:mac AND parent=:parent AND idterminal_user = owner");
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, username, parent, iddir FROM terminal_directory,terminal_user WHERE terminal_directory.terminal=:mac AND parent=:parent AND idterminal_user = owner");
         $stmp->bindParam(":mac", $terminal_mac);
         $stmp->bindParam(":parent", $currentPath);
         $stmp->execute();
@@ -517,22 +517,8 @@ class CommandAsset
     }
     //LS USAGES FUNCTIONS -- END
 
-    
-
     //RM USAGES FUNCTIONS -- START
     public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
-    {
-        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
-
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $filename);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        return $stmp->execute();
-    }
-
-    public static function getAllFilesAndDirs(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId)
     {
         $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
 
@@ -553,7 +539,20 @@ class CommandAsset
         $stmp->bindParam(":name", $dirname);
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
-        return $stmp->execute();
+        $stmp->execute();
+
+        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        //If the file or the dir exist, delete the file
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $dirname);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+        if ($stmp->fetch()['name']) {
+            $sender->send("message|<br> Directory not empty.");
+        };
     }
     //RM USAGES FUNCTIONS -- END
 
@@ -630,8 +629,10 @@ class CommandAsset
             if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
                 // Create file
                 return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
-            } else {
+            } else if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
                 $sender->send("message|<br>" . $newFileName . " : already exists");
+                return false;
+            } else {
                 return false;
             }
         } else {
