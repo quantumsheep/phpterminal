@@ -273,7 +273,10 @@ BEGIN
     
 	INSERT INTO TERMINAL (mac, account, localnetwork) VALUES(@terminal_mac, idaccount, network_mac);
     
-    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, GENERATE_PRIVATE_IP(@terminal_mac, network_mac)) ON DUPLICATE KEY UPDATE network=network;
+    SET @private_ip = GENERATE_PRIVATE_IP(@terminal_mac, network_mac);
+    
+    INSERT INTO PRIVATEIP (network, terminal, ip) VALUES (network_mac, @terminal_mac, @private_ip) ON DUPLICATE KEY UPDATE network=network;
+    INSERT INTO PORT (network, `port`, `status`, ip, ipport) VALUES (network_mac, (FLOOR(2000 + RAND() * 1000)), 1, @private_ip, 22);
     
     INSERT INTO TERMINAL_GROUP (terminal, gid, status, groupname) VALUES(@terminal_mac, 0, 1, 'root');
     SET @terminal_group = LAST_INSERT_ID();

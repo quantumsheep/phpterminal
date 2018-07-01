@@ -389,6 +389,99 @@ class CommandAsset
         $array = $newArray;
     }
 
+    /**
+     *
+     */
+    public static function checkRightsTo(\PDO $db, string $terminal_mac, string $owner, string $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
+    {
+        $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
+
+    }
+    /**
+     * return User type (1,2,3) for owner, group or others
+     */
+    public static function getUserType(\PDO $db, string $terminal_mac, string $group, string $owner, string $elementFullPath)
+    {
+        $elementName = explode("/", $elementFullPath)[count(explode("/", $elementFullPath)) - 1];
+
+        if ($owner == self::getElementOwner($db, $terminal_mac, $elementFullPath, $elementName)) {
+            return 1;
+        } else if ($group == self::getElementGroup($db, $terminal_mac, $elementFullPath, $elementName)) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+    /**
+     * Return Element owner from its fullPath and its name
+     */
+    public static function getElementOwner(\PDO $db, string $terminal_mac, string $elementFullPath, string $elementName)
+    {
+        $parentId = self::getParentId($db, $terminal_mac, $elementFullPath);
+        $elementType = self::checkBoth($terminal_mac, $elementName, $parentId, $db);
+
+        if ($elementType == 1) {
+            $stmp = $db->prepare("SELECT owner FROM terminal_directory WHERE name=:name AND terminal=:terminal AND parent=:parentId");
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":name", $elementName);
+            $stmp->bindParam(":parentId", $parentId);
+
+            $stmp->execute();
+            $owner = $stmp->fetch(\PDO::FETCH_COLUMN);
+
+            return $owner;
+
+        } else if ($elementType == 2) {
+
+            $stmp = $db->prepare("SELECT owner FROM terminal_file WHERE name=:name AND terminal=:terminal AND parent=:parentId");
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":name", $elementName);
+            $stmp->bindParam(":parentId", $parentId);
+
+            $stmp->execute();
+            $owner = $stmp->fetch(\PDO::FETCH_COLUMN);
+
+            return $owner;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Return Element group from its fullPath and its name
+     */
+    public static function getElementGroup(\PDO $db, string $terminal_mac, string $elementFullPath, string $elementName)
+    {
+        $parentId = self::getParentId($db, $terminal_mac, $elementFullPath);
+        $elementType = self::checkBoth($terminal_mac, $elementName, $parentId, $db);
+
+        if ($elementType == 1) {
+            $stmp = $db->prepare("SELECT group FROM terminal_directory WHERE name=:name AND terminal=:terminal AND parent=:parentId");
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":name", $elementName);
+            $stmp->bindParam(":parentId", $parentId);
+
+            $stmp->execute();
+            $group = $stmp->fetch(\PDO::FETCH_COLUMN);
+
+            return $group;
+
+        } else if ($elementType == 2) {
+
+            $stmp = $db->prepare("SELECT group FROM terminal_file WHERE name=:name AND terminal=:terminal AND parent=:parentId");
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":name", $elementName);
+            $stmp->bindParam(":parentId", $parentId);
+
+            $stmp->execute();
+            $group = $stmp->fetch(\PDO::FETCH_COLUMN);
+
+            return $group;
+        } else {
+            return false;
+        }
+    }
     //GLOBAL USAGES FUNCTIONS -- END
 
     //LS USAGES FUNCTIONS -- START
@@ -547,6 +640,5 @@ class CommandAsset
         }
     }
     //TOUCH USAGES FUNCTIONS -- END
-
 
 }

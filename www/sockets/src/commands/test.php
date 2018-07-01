@@ -19,6 +19,6 @@ class test implements CommandInterface
 
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-        var_dump(CommandAsset::getAbsolute($data->position, "chien/cheval"));
+        var_dump(CommandAsset::getUserType($db, $terminal_mac, $data->user->idterminal_user, $parameters));
     }
 }
