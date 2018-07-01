@@ -1,6 +1,7 @@
 <?php
 namespace Alph\Commands;
 
+use Alph\Models\Terminal_FileModel;
 use Alph\Services\CommandAsset;
 use Alph\Services\CommandInterface;
 use Alph\Services\SenderData;
@@ -50,8 +51,8 @@ class ls implements CommandInterface
         $lineReturn = false;
 
         $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, $data->position);
-        $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
-        $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+        $files = self::getFiles($db, $terminal_mac, $currentPath);
+        $dirs = self::getDirectories($db, $terminal_mac, $currentPath);
 
         if (!empty($parameters)) {
             $options = CommandAsset::getOptions($parameters);
@@ -67,8 +68,8 @@ class ls implements CommandInterface
 
                     if ($fileType == 1) {
                         $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
-                        $files = CommandAsset::getFiles($db, $terminal_mac, $currentPath);
-                        $dirs = CommandAsset::getDirectories($db, $terminal_mac, $currentPath);
+                        $files = self::getFiles($db, $terminal_mac, $currentPath);
+                        $dirs = self::getDirectories($db, $terminal_mac, $currentPath);
 
                         if (!empty($path) && count($paramArray) > 1) {
                             $sender->send("message|<br>" . $path . ": <br>");
@@ -76,9 +77,9 @@ class ls implements CommandInterface
                         self::ls($db, $terminal_mac, $sender, $files, $dirs, $currentPath, $options);
                     } else if ($fileType == 2) {
                         $sender->send("message|<br>" . $path . "<br>");
-                    } else if($path == ""){
+                    } else if ($path == "") {
 
-                    }else {
+                    } else {
                         $sender->send("message|<br>ls: cannot access '" . $path . "': No such file or directory<br>");
                     }
                 }
@@ -214,5 +215,33 @@ class ls implements CommandInterface
             }
             $sender->send("message|" . $str);
         }
+    }
+
+    public static function getFiles(\PDO $db, string $terminal_mac, $currentPath)
+    {
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, length(data), username, parent, idfile FROM terminal_file,terminal_user WHERE terminal_file.terminal=:mac AND parent=:parent AND idterminal_user = owner");
+        $stmp->bindParam(":mac", $terminal_mac);
+        $stmp->bindParam(":parent", $currentPath);
+        $stmp->execute();
+        $files = [];
+
+        while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+            $files[] = Terminal_FileModel::map($row);
+        }
+        return $files;
+    }
+
+    public static function getDirectories(\PDO $db, string $terminal_mac, $currentPath)
+    {
+        $stmp = $db->prepare("SELECT name, chmod, editeddate, username, parent, iddir FROM terminal_directory,terminal_user WHERE terminal_directory.terminal=:mac AND parent=:parent AND idterminal_user = owner");
+        $stmp->bindParam(":mac", $terminal_mac);
+        $stmp->bindParam(":parent", $currentPath);
+        $stmp->execute();
+        $dirs = [];
+
+        while ($row = $stmp->fetch(\PDO::FETCH_ASSOC)) {
+            $dirs[] = Terminal_FileModel::map($row);
+        }
+        return $dirs;
     }
 }
