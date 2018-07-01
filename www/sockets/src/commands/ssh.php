@@ -29,6 +29,14 @@ class ssh implements CommandInterface
     {
         if ($data->controller == "\\Alph\\Commands\\ssh::call") {
             if ($data->data->ssh->data->connected) {
+                if ($cmd == 'exit') {
+                    $data->controller = null;
+                    $data->private_input = false;
+                    unset($data->data->ssh);
+
+                    return;
+                }
+
                 if ($data->data->ssh->data->controller != null || in_array($cmd, \Alph\Services\DefinedCommands::get())) {
                     CommandHandler::callCommand($db, $clients, $data->data->ssh->data, $sender, $sender_session, $sess_id, $data->data->ssh->terminal_mac, $cmd, $parameters, $data->data->ssh->lineReturn);
                 } else {
