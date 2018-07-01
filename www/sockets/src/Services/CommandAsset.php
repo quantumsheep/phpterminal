@@ -396,20 +396,19 @@ class CommandAsset
     {
         $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
 
-        if($userType == 1){
+        if ($userType == 1) {
             $rightsTo = $elementChmod / 100;
 
-        } else if ($userType == 2){
+        } else if ($userType == 2) {
             $rightsTo = ($elementChmod / 10) % 10;
 
-        } else if($userType == 3){
+        } else if ($userType == 3) {
             $rightsTo = $elementChmod % 10;
         } else {
             return;
         }
 
         return $chmodNeeded <= $rightsTo;
-
 
     }
     /**
@@ -531,8 +530,6 @@ class CommandAsset
         return $dirs;
     }
     //LS USAGES FUNCTIONS -- END
-
-    
 
     //RM USAGES FUNCTIONS -- START
     public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
