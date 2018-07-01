@@ -65,7 +65,7 @@ class rmdir implements CommandInterface
 
                     var_dump($parentId);
                     var_dump($quoted);
-                    CommandAsset::deleteDir($db, $data, $sender, $terminal_mac, $quoted, $parentId);
+                    self::deleteDir($db, $data, $sender, $terminal_mac, $quoted, $parentId);
                 } else if ($type == 2) {
                     $sender->send('message|<br>' . $quoted . ' is a file, please use rmdir.');
                 } else {
@@ -86,7 +86,7 @@ class rmdir implements CommandInterface
                 }
 
                 if ($type == 1) {
-                    CommandAsset::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
+                    self::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
                 } else if ($type == 2) {
                     $sender->send('message|<br>' . $param . ' is a file, please use rmdir.');
                 } else {
@@ -94,5 +94,30 @@ class rmdir implements CommandInterface
                 }
             }
         }
+    }
+
+    public static function deleteDir(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId)
+    {
+        $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $dirname);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+
+        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
+
+        //If the file or the dir exist, delete the file
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $dirname);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        $stmp->execute();
+        if ($stmp->fetch()['name']) {
+            $sender->send("message|<br> Directory not empty.");
+        };
     }
 }
