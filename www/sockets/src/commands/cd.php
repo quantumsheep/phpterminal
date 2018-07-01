@@ -51,7 +51,7 @@ class cd implements CommandInterface
 
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
 
-        if(!empty($parameters)){
+        if (!empty($parameters)) {
             $path = explode(' ', $parameters);
         }
 
@@ -73,16 +73,29 @@ class cd implements CommandInterface
             return $data->position = "/";
         }
 
-        // Get absolut Path
+        // Get multiple elements for parameters treatment
         $absolutePath = CommandAsset::getAbsolute($data->position, $path[0]);
+        $DirName = explode("/", $absolutePath)[count(explode("/", $absolutePath)) - 1];
+        $ParentId = CommandAsset::getParentId($db, $terminal_mac, $absolutePath);
 
-        $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
-        $stmp->execute([$absolutePath, $terminal_mac]);
-        if ($stmp->rowCount() === 1) {
-            $row = $stmp->fetch(\PDO::FETCH_ASSOC);
-            if ($row["idDirectory"] !== null) {
-                return $data->position = $absolutePath;
+        //check if directory exist
+        if ($ParentId != null) {
+            //check if directory is accessible
+            if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $absolutePath, CommandAsset::getChmod($db, $terminal_mac, $DirName, $ParentId), 1)) {
+                //check if 
+                $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
+                $stmp->execute([$absolutePath, $terminal_mac]);
+                if ($stmp->rowCount() === 1) {
+                    $row = $stmp->fetch(\PDO::FETCH_ASSOC);
+                    if ($row["idDirectory"] !== null) {
+                        return $data->position = $absolutePath;
+                    }
+                }
+            } else {
+
+                return $sender->send("message|<br> You don't have rights to access this directory");
             }
+
         }
 
         $sender->send("message|<br>Error : " . $path[0] . " directory doesn't exists");
