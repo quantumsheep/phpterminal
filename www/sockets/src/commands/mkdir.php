@@ -58,6 +58,7 @@ class mkdir implements CommandInterface
         }
 
         CommandAsset::concatenateParameters($newDirectories, $pathParameters, $quotedParameters);
+        var_dump($newDirectories);
         return self::stageCreateNewDirectories($db, $data, $sender, $terminal_mac, $newDirectories);
     }
 
@@ -73,7 +74,7 @@ class mkdir implements CommandInterface
             $parentPath = CommandAsset::getParentPath($fullPathNewDirectory);
             $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
             //Check if user can write in directory to create a new directory
-            if(CommandAsset::checkRightsTo()){
+            if(CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user,$data->user->gid, $parentPath,CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)),2)){
                 if ($parentId != null) {
                     // Get name from created directory
                     $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
