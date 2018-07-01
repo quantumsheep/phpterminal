@@ -91,7 +91,7 @@ class CommandHandler implements MessageComponentInterface
         // Check if the sender is actually connected to an account
         if ($this->data[$sender->resourceId]->connected) {
             // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
-            @list($cmd, $parameters) = explode(' ', $cmd, 2);
+            @list($cmd, $parameters) = explode(' ', trim($cmd), 2);
 
             $lineReturn = true;
 
