@@ -82,7 +82,7 @@ class cd implements CommandInterface
         if ($ParentId != null) {
             //check if directory is accessible
             if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $absolutePath, CommandAsset::getChmod($db, $terminal_mac, $DirName, $ParentId), 1)) {
-                //check if 
+                
                 $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
                 $stmp->execute([$absolutePath, $terminal_mac]);
                 if ($stmp->rowCount() === 1) {
