@@ -55,10 +55,11 @@ class touch implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $newFiles = explode(" ", $parameters);
+
         if (!empty($newFiles)) {
             $newFiles = CommandAsset::fullPathFromParameters($newFiles, $data->position);
         }
-        CommandAsset::concatenateParameters($newFiles, $pathParameters, $quotedParameters);
+
         return CommandAsset::stageCreateNewFiles($db, $data, $sender, $terminal_mac, $newFiles);
     }
 }
