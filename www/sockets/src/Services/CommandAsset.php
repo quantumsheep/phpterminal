@@ -484,6 +484,32 @@ class CommandAsset
     }
     //GLOBAL USAGES FUNCTIONS -- END
 
+    public static function stageCreateNewFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $fullPathNewFile, string $content = ""): bool
+    {
+        // get Full Path of Parent directory
+        $parentId = self::getParentId($db, $terminal_mac, $fullPathNewFile);
+
+        if ($parentId != null) {
+            // Get name from created file
+            $splitedPath = explode("/", $fullPathNewFile);
+            $newFileName = $splitedPath[count($splitedPath) - 1];
+
+            // Check if file already exists
+            if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
+                // Create file
+                return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
+            } else if (self::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || self::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
+                $sender->send("message|<br>" . $newFileName . " : already exists");
+                return false;
+            } else {
+                return false;
+            }
+        } else {
+            $sender->send("message|<br> Path not found");
+            return false;
+        }
+    }
+
     /**
      * Create or update files
      */
