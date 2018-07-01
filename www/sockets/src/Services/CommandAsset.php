@@ -158,7 +158,7 @@ class CommandAsset
         if (!empty($pathParameters[1])) {
             foreach ($pathParameters[1] as $pathParameter) {
                 // Update the whole parameters for further treatments
-                $parameters = str_replace(" " . $pathParameter, "", $parameters);
+                $parameters = str_replace(" " . $pathParameter, "", " " . $parameters);
 
                 $FinalPathParameters[] = self::getAbsolute($position, $pathParameter);
 
@@ -404,6 +404,11 @@ class CommandAsset
      */
     public static function checkRightsTo(\PDO $db, string $terminal_mac, int $owner, int $group, string $elementFullPath, int $elementChmod, int $chmodNeeded)
     {
+        //if user is Root, nothing can stop HIM
+        if (self::isRoot($db, $terminal_mac, $owner)) {
+            return true;
+        }
+
         $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
 
         if ($userType == 1) {
@@ -427,23 +432,22 @@ class CommandAsset
             return ($rightsTo == 2 || $rightsTo == 3 || $rightsTo == 6 || $rightsTo == 7);
 
         } else if ($chmodNeeded == 3) {
-            return ($rightsTo == 3 ||$rightsTo == 5 ||$rightsTo == 7);
+            return ($rightsTo == 3 || $rightsTo == 5 || $rightsTo == 7);
 
         } else if ($chmodNeeded == 4) {
             return ($rightsTo * 2) <= 8;
 
-        } else if ($chmodNeeded == 5){
-            return ($rightsTo == 5 ||$rightsTo == 7);
+        } else if ($chmodNeeded == 5) {
+            return ($rightsTo == 5 || $rightsTo == 7);
 
-        } else if ($chmodNeeded == 6){
-            return($rightsTo == 6 || $rightsTo == 7);
+        } else if ($chmodNeeded == 6) {
+            return ($rightsTo == 6 || $rightsTo == 7);
 
-        } else if ($chmodNeeded == 7){
-            return($rightsTo == 7);
+        } else if ($chmodNeeded == 7) {
+            return ($rightsTo == 7);
         }
 
         return true;
-
 
     }
     /**
@@ -530,6 +534,25 @@ class CommandAsset
         } else {
             return false;
         }
+    }
+
+    /**    
+    * Check if a user is Root
+    */
+    public static function isRoot(\PDO $db, string $terminal_mac, int $owner)
+    {
+        $stmp = $db->prepare("SELECT username FROM terminal_user WHERE idterminal_user=:owner AND terminal=:terminal");
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":owner", $owner);
+
+        $stmp->execute();
+        $username = $stmp->fetch(\PDO::FETCH_COLUMN);
+
+        if ($username == "root") {
+            return true;
+        }
+
+        return false;
     }
     //GLOBAL USAGES FUNCTIONS -- END
 

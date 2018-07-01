@@ -78,6 +78,7 @@ class mv implements CommandInterface
 
         CommandAsset::concatenateParameters($fullElements, $quotedParameters, $pathParameters);
 
+        var_dump($fullElements);
         //Check if element provided is more than 1
         if (count($fullElements) < 2) {
             return $sender->send("message|<br>mv: target operand missing" . (count($fullElements) == 1 ? " after " . $fullElements[0] . "." : "."));
@@ -92,7 +93,6 @@ class mv implements CommandInterface
         foreach ($fullElements as $Element) {
             $cleanedParameters[] = str_replace('"', "", $Element);
         }
-
         // Get target attributs
         $targetFullPath = CommandAsset::getAbsolute($data->position, $cleanedTarget);
         $targetType = CommandAsset::checkBoth($terminal_mac, $target, CommandAsset::getParentId($db, $terminal_mac, $targetFullPath), $db);
@@ -102,6 +102,8 @@ class mv implements CommandInterface
             $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
 
             foreach ($cleanedParameters as $parameter) {
+                var_dump($targetFullPath);
+                var_dump($parameter);
                 self::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath, $sender, $data->position);
             }
 
@@ -112,6 +114,7 @@ class mv implements CommandInterface
             } else {
                 return $sender->send("message|<br> You can only change name of 1 Element at a time");
             }
+
         } else if ($targetType == 2) {
             return $sender->send("message|<br>" . $cleanedTarget . " already exists");
         }
@@ -220,13 +223,14 @@ class mv implements CommandInterface
     {
 
         // Check if Element is a directory, or a file, or even exist.
-        $elementAttribut = CommandAsset::checkBoth($terminal_mac, $movedElementName, CommandAsset::getParentId($db, $terminal_mac, $movedElementName), $db);
+        $elementAbsolutePath = CommandAsset::getAbsolute($position, $movedElementName);
+        $elementAttribut = CommandAsset::checkBoth($terminal_mac, $movedElementName, CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath), $db);
+        var_dump($elementAttribut);
 
         // If Element is a directory
         if ($elementAttribut == 1) {
             //Get full path of moved directory
-            $directoryFullPath = CommandAsset::getAbsolute($position, $movedElementName);
-            $directoryId = CommandAsset::getIdDirectory($db, $terminal_mac, $directoryFullPath);
+            $directoryId = CommandAsset::getIdDirectory($db, $terminal_mac, $elementAbsolutePath);
 
             //Check if directory can be moved (depends of the full path)
             if (self::checkSiblings($movedElementName, $newParentFullPath) == true) {
@@ -245,9 +249,7 @@ class mv implements CommandInterface
         } else if ($elementAttribut == 2) {
 
             //Get full path of moved file
-            $fileFullPath = CommandAsset::getAbsolute($position, $movedElementName);
-            $fileParentId = CommandAsset::getParentId($db, $terminal_mac, $fileFullPath);
-            var_dump($fileParentId);
+            $fileParentId = CommandAsset::getParentId($db, $terminal_mac, $elementAbsolutePath);
 
             //check if file does exist
             if (CommandAsset::checkFileExistence($terminal_mac, $movedElementName, $newParentId, $db) == false) {
