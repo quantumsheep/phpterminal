@@ -224,16 +224,26 @@ class CommandAsset
         return '/' . join('/', $absolute_parts);
     }
 
+    /***
+     * Get Parent Path
+     */
+    public static function getParentPath(string $absolutePath)
+    {
+
+        $directorySplited = explode("/", $absolutePath);
+        array_pop($directorySplited);
+        array_shift($directorySplited);
+        $parentPath = "/" . implode("/", $directorySplited);
+        return $parentPath;
+    }
+
     /**
      * return ID of parent from the absolute path given, directory or file as last element
      */
     public static function getParentId(\PDO $db, string $terminal_mac, string $absolutePath)
     {
         // Treat fullPath of created directory to get parent Directory
-        $directorySplited = explode("/", $absolutePath);
-        array_pop($directorySplited);
-        array_shift($directorySplited);
-        $parentPath = "/" . implode("/", $directorySplited);
+        $parentPath = self::getParentPath($absolutePath);
         return self::getIdDirectory($db, $terminal_mac, $parentPath);
     }
 
@@ -397,18 +407,43 @@ class CommandAsset
         $userType = self::getUserType($db, $terminal_mac, $group, $owner, $elementFullPath);
 
         if ($userType == 1) {
-            $rightsTo = $elementChmod / 100;
+            $rightsTo = floor($elementChmod / 100);
 
         } else if ($userType == 2) {
-            $rightsTo = ($elementChmod / 10) % 10;
+            $rightsTo = floor(($elementChmod / 10) % 10);
 
         } else if ($userType == 3) {
-            $rightsTo = $elementChmod % 10;
+            $rightsTo = floor($elementChmod % 10);
         } else {
             return;
         }
+        var_dump($elementChmod);
+        var_dump($rightsTo);
 
-        return $chmodNeeded <= $rightsTo;
+        if ($chmodNeeded == 1) {
+            return $rightsTo % 2 == 1;
+
+        } else if ($chmodNeeded == 2) {
+            return ($rightsTo == 2 || $rightsTo == 3 || $rightsTo == 6 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 3) {
+            return ($rightsTo == 3 ||$rightsTo == 5 ||$rightsTo == 7);
+
+        } else if ($chmodNeeded == 4) {
+            return ($rightsTo * 2) <= 8;
+
+        } else if ($chmodNeeded == 5){
+            return ($rightsTo == 5 ||$rightsTo == 7);
+
+        } else if ($chmodNeeded == 6){
+            return($rightsTo == 6 || $rightsTo == 7);
+
+        } else if ($chmodNeeded == 7){
+            return($rightsTo == 7);
+        }
+
+        return true;
+
 
     }
     /**
