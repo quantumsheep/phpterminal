@@ -62,6 +62,10 @@ class chmod implements CommandInterface
             $sender->send("message|<br>Operand missing <br>please enter chmod --help for more information");
             return;
         }
+        if(!CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user || CommandAsset::getElementOwner())){
+
+        }
+
 
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
@@ -81,9 +85,13 @@ class chmod implements CommandInterface
         if (is_numeric($askedChmod)) {
             if (!empty($Files)) {
                 $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
+                var_dump($files);
             }
             CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
             if (empty($options)) {
+                if(!CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user || !CommandAsset::getElementOwner($db, $terminal_mac,))){
+
+                }
                 return self::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
             }
         } else {
