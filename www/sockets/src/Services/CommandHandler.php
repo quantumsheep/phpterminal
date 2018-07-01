@@ -2,6 +2,7 @@
 namespace Alph\Services;
 
 use Alph\Models\Model;
+use Alph\Models\ViewTerminal_InfoModel;
 use Alph\Services\History;
 use Alph\Services\SenderData;
 use Alph\Services\Session;
@@ -38,16 +39,11 @@ class CommandHandler implements MessageComponentInterface
 
         $this->data[$conn->resourceId] = new SenderData;
 
-        $conn->send("message|login as: ");
-    }
-
-    public function onMessage(ConnectionInterface $sender, $cmd)
-    {
         // Get cookie HTTP header
-        $cookies = $sender->httpRequest->getHeader('Cookie');
+        $cookies = $conn->httpRequest->getHeader('Cookie');
 
         if (empty($cookies)) {
-            $cookies = $sender->httpRequest->getHeader('cookie');
+            $cookies = $conn->httpRequest->getHeader('cookie');
         }
 
         // If there is no values in the cookie header, stop the process
@@ -58,44 +54,66 @@ class CommandHandler implements MessageComponentInterface
             // Check if alph_sess is defined in the sender's cookies
             if (isset($parsed_cookies[0]["alph_sess"]) && isset($parsed_cookies[0]["terminal"])) {
                 // Read the sender's session data
-                $sender_session = Session::read($parsed_cookies[0]["alph_sess"]);
+                $this->data[$conn->resourceId]->session = Session::read($parsed_cookies[0]["alph_sess"]);
 
                 // Check if the idaccount is present in the sender's session
-                if (!empty($sender_session["account"])) {
-                    // Check if the sender is actually connected to an account
-                    if ($this->data[$sender->resourceId]->connected) {
-                        // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
-                        @list($cmd, $parameters) = explode(' ', $cmd, 2);
+                if (!empty($this->data[$conn->resourceId]->session["account"])) {
+                    $stmp = $this->db->prepare("SELECT terminalmac, networkmac, privateipv4, publicipv4, sshport FROM TERMINAL_INFO WHERE terminalmac = :terminal_mac");
+                    
+                    $terminal = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
+                    $stmp->bindParam(':terminal_mac', $terminal);
 
-                        $lineReturn = true;
+                    $stmp->execute();
 
-                        // Check if the command exists
-                        if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
-                            $this->callCommand($this->db, $this->clients, $this->data[$sender->resourceId], $sender, $sender_session, $parsed_cookies[0]["alph_sess"], $parsed_cookies[0]["terminal"], $cmd, $parameters, $lineReturn);
-                        } else {
-                            $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
-                        }
+                    if ($stmp->rowCount() > 0) {
+                        $this->data[$conn->resourceId]->sess_id = $parsed_cookies[0]["alph_sess"];
+                        $this->data[$conn->resourceId]->terminal = ViewTerminal_InfoModel::map($stmp->fetch());
 
-                        if (!$this->data[$sender->resourceId]->private_input) {
-                            $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@54.37.69.220:" . $this->data[$sender->resourceId]->position . "# </span>");
-                        }
-
-                        // Push the command into the history
-                        History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $sender_session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
+                        $conn->send("message|login as: ");
                     } else {
-                        $terminal = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
-                        $this->askForCredentials($this->db, $this->data[$sender->resourceId], $sender, $cmd, $terminal);
+                        $conn->send("message|<br><span>alph: this terminal doesn't exists</span>");
+                        $conn->close();
                     }
                 } else {
-                    $sender->send("message|<br><span>alph: account connection error</span>");
+                    $conn->send("message|<br><span>alph: account connection error</span>");
+                    $conn->close();
+
                 }
             } else {
-                $sender->send("message|<br><span>alph: terminal connection error</span>");
+                $conn->send("message|<br><span>alph: terminal connection error</span>");
+                $conn->close();
             }
         }
     }
 
-    public static function callCommand(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface &$sender, $sender_session, string $sess_id, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
+    public function onMessage(ConnectionInterface $sender, $cmd)
+    {
+        // Check if the sender is actually connected to an account
+        if ($this->data[$sender->resourceId]->connected) {
+            // Parse the command in 2 parts: the command and the parameters, the '@' remove the error if parameters index is null
+            @list($cmd, $parameters) = explode(' ', $cmd, 2);
+
+            $lineReturn = true;
+
+            // Check if the command exists
+            if ($this->data[$sender->resourceId]->controller != null || in_array($cmd, $this->commands)) {
+                $this->callCommand($this->db, $this->clients, $this->data[$sender->resourceId], $sender, $this->data[$sender->resourceId]->session, $this->data[$sender->resourceId]->sess_id, $cmd, $parameters, $lineReturn);
+            } else {
+                $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
+            }
+
+            if (!$this->data[$sender->resourceId]->private_input) {
+                $sender->send("message|" . ($lineReturn ? "<br>" : "") . "<span>" . $this->data[$sender->resourceId]->user->username . "@" . $this->data[$sender->resourceId]->terminal->privateipv4 . ":" . $this->data[$sender->resourceId]->position . "# </span>");
+            }
+
+            // Push the command into the history
+            History::push($this->db, $this->data[$sender->resourceId]->user->idterminal_user, $this->data[$sender->resourceId]->session["account"]->idaccount, $cmd . (!empty($parameters) ? ' ' . $parameters : ''));
+        } else {
+            $this->askForCredentials($this->db, $this->data[$sender->resourceId], $sender, $cmd);
+        }
+    }
+
+    public static function callCommand(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface &$sender, $sender_session, string $sess_id, string $cmd, $parameters, bool &$lineReturn)
     {
         $controller = $data->controller != null ? $data->controller : '\\Alph\\Commands\\' . $cmd . '::call';
 
@@ -107,20 +125,20 @@ class CommandHandler implements MessageComponentInterface
             $sender,
             $sess_id,
             $sender_session,
-            $terminal_mac,
+            $data->terminal->terminalmac,
             $cmd,
             $parameters,
             &$lineReturn,
         ]);
     }
 
-    public static function askForCredentials(\PDO $db, SenderData &$data, ConnectionInterface &$sender, string $cmd, string $terminal)
+    public static function askForCredentials(\PDO $db, SenderData &$data, ConnectionInterface &$sender, string $cmd)
     {
         if (!empty($data->user->username) && !isset($data->user->password)) {
             $stmp = $db->prepare("SELECT idterminal_user, password, gid FROM TERMINAL_USER WHERE username = :username AND terminal = :terminal;");
 
             $stmp->bindParam(":username", $data->user->username);
-            $stmp->bindParam(":terminal", $terminal);
+            $stmp->bindParam(":terminal", $data->terminal->terminalmac);
 
             $stmp->execute();
 
@@ -136,7 +154,6 @@ class CommandHandler implements MessageComponentInterface
                     "",
                     "Simulated Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent",
                     "permitted by applicable law.",
-                    "Last login: Mon Mar 28 01:54:13 2018 from 54.37.69.220",
                 ];
 
                 $data->data = new Model();
@@ -147,7 +164,7 @@ class CommandHandler implements MessageComponentInterface
 
                 $data->position = "/";
 
-                $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220:" . $data->position . "# </span>");
+                $sender->send("message|<br><span>" . $data->user->username . "@" . $data->terminal->privateipv4 . ":" . $data->position . "# </span>");
 
                 $sender->send("action|show input");
 
@@ -156,13 +173,13 @@ class CommandHandler implements MessageComponentInterface
                 $data->user->gid = $row["gid"];
             } else {
                 $sender->send("message|<br><span>Access denied.</span>");
-                $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220's password: <span>");
+                $sender->send("message|<br><span>" . $data->user->username . "@" . $data->terminal->privateipv4 . "'s password: <span>");
             }
         } else {
             $data->user->username = $cmd;
 
             $sender->send("action|hide input");
-            $sender->send("message|<br><span>" . $data->user->username . "@54.37.69.220's password: <span>");
+            $sender->send("message|<br><span>" . $data->user->username . "@" . $data->terminal->privateipv4 . "'s password: <span>");
         }
     }
 

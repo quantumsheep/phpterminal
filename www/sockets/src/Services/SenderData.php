@@ -2,12 +2,28 @@
 namespace Alph\Services;
 
 use Alph\Models\Terminal_UserModel;
+use Alph\Models\TerminalModel;
 
 class SenderData {
     /**
      * @var Terminal_UserModel
      */
     public $user;
+
+    /**
+     * @var TerminalModel
+     */
+    public $terminal;
+
+    /**
+     * @var array
+     */
+    public $session = [];
+
+    /**
+     * @var string
+     */
+    public $sess_id;
 
     /**
      * @var bool
