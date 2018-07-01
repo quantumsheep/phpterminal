@@ -84,13 +84,14 @@ class chmod implements CommandInterface
         if (is_numeric($askedChmod)) {
             if (!empty($Files)) {
                 $Files = CommandAsset::fullPathFromParameters($Files, $data->position);
-                var_dump($Files);
             }
             CommandAsset::concatenateParameters($Files, $pathParameters, $quotedParameters);
             if (empty($options)) {
                 foreach ($Files as $file) {
+
                     if (CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user) || CommandAsset::getElementOwner($db, $terminal_mac, $file, explode("/", $file)[count(explode("/", $file)) - 1]) == $data->user->idterminal_user) {
                         $allowedFiles[] = $file;
+
                     } else {
                         $sender->send("message|<br>You can't change rights on a directory or a file you don't possess.");
                     }
