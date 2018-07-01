@@ -30,7 +30,6 @@ class mkdir implements CommandInterface
      */
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
-
         $basicmod = 777;
 
         // If no params
@@ -44,11 +43,11 @@ class mkdir implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $newDirectories = explode(" ", $parameters);
-        
-        if(!empty($newDirectories)){
+
+        if (!empty($newDirectories)) {
             $newDirectories = CommandAsset::fullPathFromParameters($newDirectories, $data->position);
         }
-        
+
         if (!empty($options)) {
             if (\in_array("p", $options)) {
                 self::mkdirDOption($db, $data, $terminal_mac, $pathParameters);
@@ -67,25 +66,34 @@ class mkdir implements CommandInterface
      */
     public static function stageCreateNewDirectories(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathNewDirectories)
     {
+
         foreach ($fullPathNewDirectories as $fullPathNewDirectory) {
             // get Full Path of Parent directory
             $parentId = CommandAsset::getParentId($db, $terminal_mac, $fullPathNewDirectory);
-
-            if ($parentId != null) {
-                // Get name from created directory
-                $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
-
-                // Check if directory already exists
-                if (CommandAsset::checkDirectoryExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false && CommandAsset::checkFileExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false) {
-                    // Create directory
-                    self::createNewDirectory($db, $data, $terminal_mac, $newDirectoryName, $parentId);
+            $parentPath = CommandAsset::getParentPath($fullPathNewDirectory);
+            $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
+            //Check if user can write in directory to create a new directory
+            if(CommandAsset::checkRightsTo()){
+                if ($parentId != null) {
+                    // Get name from created directory
+                    $newDirectoryName = explode("/", $fullPathNewDirectory)[count(explode("/", $fullPathNewDirectory)) - 1];
+    
+                    // Check if directory already exists
+                    if (CommandAsset::checkDirectoryExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false && CommandAsset::checkFileExistence($terminal_mac, $newDirectoryName, $parentId, $db) === false) {
+                        // Create directory
+                        self::createNewDirectory($db, $data, $terminal_mac, $newDirectoryName, $parentId);
+                    } else {
+    
+                        $sender->send("message|<br>" . $newDirectoryName . " : already exists");
+                    }
                 } else {
-
-                    $sender->send("message|<br>" . $newDirectoryName . " : already exists");
+                    $sender->send("message|<br> Path not found");
                 }
             } else {
-                $sender->send("message|<br> Path not found");
+                $sender->send("message|<br>You can't create a file or a directory in a directory you can't write on");
             }
+
+            
         }
     }
 
