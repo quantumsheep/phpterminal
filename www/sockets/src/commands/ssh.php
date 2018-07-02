@@ -56,7 +56,7 @@ class ssh implements CommandInterface
                 }
 
                 if (!$data->data->ssh->data->private_input) {
-                    $sender->send("message|" . ($data->data->ssh->lineReturn ? "<br>" : "") . "<span>" . $data->data->ssh->data->user->username . "@" . $data->data->ssh->data->terminal->publicipv4 . ":" . $data->data->ssh->data->position . "# </span>");
+                    $sender->send("message|<br><span>" . $data->data->ssh->data->user->username . "@" . $data->data->ssh->data->terminal->publicipv4 . ":" . $data->data->ssh->data->position . "# </span>");
                 }
 
                 // Push the command into the history
