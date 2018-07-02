@@ -89,6 +89,8 @@ class adduser implements CommandInterface
                                 $result = $stmp->fetch(\PDO::FETCH_ASSOC);
 
                                 if (isset($result['gid']) && !empty($result['gid'])) {
+                                    $sender->send('action|show input');
+                                    
                                     $sender->send('message|<br><span>Adding user `' . $data->data->adduser['nickname'] . '\' ...</span>');
                                     $sender->send('message|<br><span>Adding new group `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') ...</span>');
                                     $sender->send('message|<br><span>Adding new user `' . $data->data->adduser['nickname'] . '\' (' . $result['gid'] . ') with group \`' . $data->data->adduser['nickname'] . '\' ...</span>');
