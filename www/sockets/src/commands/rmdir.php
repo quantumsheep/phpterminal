@@ -67,7 +67,7 @@ class rmdir implements CommandInterface
                     var_dump($quoted);
                     self::deleteDir($db, $data, $sender, $terminal_mac, $quoted, $parentId);
                 } else if ($type == 2) {
-                    $sender->send('message|<br>' . $quoted . ' is a file, please use rmdir.');
+                    $sender->send('message|<br>' . $quoted . ' is a file, please use rm.');
                 } else {
                     $sender->send('message|<br>' . $quoted . ' didnt exist.');
                 }
@@ -82,26 +82,23 @@ class rmdir implements CommandInterface
 
                 //Check if you've righ to act on directory
                 if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $parentPath, CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)), 1)) {
+
                     $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
                     $type = CommandAsset::checkBoth($terminal_mac, $param, $parentId, $db);
 
                     if (strpos($param, '/') !== false) {
-                        $param = explode("/", $param);
+                        $param = explode("/", $param)[count(explode("/", $param)) - 1];
 
-                        $param = end($param);
                     }
-
                     if ($type == 1) {
                         self::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
                     } else if ($type == 2) {
-                        $sender->send('message|<br>' . $param . ' is a file, please use rmdir.');
-                    } else {
-                        $sender->send('message|<br>' . $param . ' didnt exist.');
+                        $sender->send('message|<br>' . $param . ' is a file, please use rm.');
                     }
+                    
                 } else {
                     $sender->send("message|<br> You don't have rights to remove directory here " . $parentName . ".");
                 }
-
             }
         }
     }
