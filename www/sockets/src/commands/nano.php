@@ -84,14 +84,6 @@ class nano implements CommandInterface
                     do {
 
                         $absolute_path = CommandAsset::getAbsolute($data->position, $data->data->nano->pending[0]);
-                        $parentId = CommandAsset::getParentId($db, $terminal_mac, $absolute_path);
-                        $elementName = explode("/", $absolute_path)[count(explode("/", $absolute_path)) - 1];
-                        //check if we've right to write the file
-                        if (!CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $absolute_path, CommandAsset::getChmod($db, $terminal_mac, $elementName, $parentId), 2)) {
-                            $data->private_input = false;
-                            $data->controller = null;
-                            return $sender->send("message|<br><span>You can't write this file</span>");
-                        }
                         $file = CommandAsset::getFile($db, $absolute_path, $terminal_mac);
 
                         $file->name = $absolute_path;
