@@ -70,6 +70,13 @@ class chmod implements CommandInterface
 
         // Change simple parameters into array for further treatement
         $Files = explode(" ", $parameters);
+        // Remove potential bug on the Files explode array
+        for ($i = 0; $i < count($pathParameters); $i++) {
+            array_shift($Files);
+        }
+
+        CommandAsset::concatenateParameters($Files, $quotedParameters, $pathParameters);
+        var_dump($Files);
 
         for ($i = 0; $i < count($options); $i++) {
             unset($Files[$i]);
@@ -77,6 +84,8 @@ class chmod implements CommandInterface
 
         $askedChmod = $Files[count($options)];
         unset($Files[count($options)]);
+        var_dump($Files);
+        var_dump($askedChmod);
 
         if (is_numeric($askedChmod)) {
             if (!empty($Files)) {
@@ -93,7 +102,7 @@ class chmod implements CommandInterface
                         $sender->send("message|<br>You can't change rights on a directory or a file you don't possess.");
                     }
                 }
-                if(!empty($allowedFiles)){
+                if (!empty($allowedFiles)) {
                     return self::stageChangeChmod($db, $data, $sender, $terminal_mac, $Files, $askedChmod);
                 }
             }
