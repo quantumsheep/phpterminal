@@ -75,6 +75,7 @@ class cd implements CommandInterface
 
         // Get multiple elements for parameters treatment
         $absolutePath = CommandAsset::getAbsolute($data->position, $path[0]);
+        var_dump($absolutePath);
         $DirName = explode("/", $absolutePath)[count(explode("/", $absolutePath)) - 1];
         $ParentId = CommandAsset::getParentId($db, $terminal_mac, $absolutePath);
 
