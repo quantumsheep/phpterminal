@@ -47,7 +47,6 @@ class nano implements CommandInterface
         } else if ($cmd == "save") {
             @list($path, $content) = explode('|', $parameters, 2);
 
-            var_dump($parameters);
 
             CommandAsset::createOrUpdateFile($db, $data, $sender, $path, $terminal_mac, $content);
         } else {
