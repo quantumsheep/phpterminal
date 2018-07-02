@@ -52,7 +52,7 @@ class ssh implements CommandInterface
                 if ($data->data->ssh->data->controller != null || in_array($cmd, \Alph\Services\DefinedCommands::get())) {
                     CommandHandler::callCommand($db, $clients, $data->data->ssh->data, $sender, $sender_session, $sess_id, $cmd, $parameters, $data->data->ssh->lineReturn);
                 } else {
-                    $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span>");
+                    $sender->send("message|<br><span>-bash: " . $cmd . ": command not found</span><br>");
                 }
 
                 if (!$data->data->ssh->data->private_input) {
