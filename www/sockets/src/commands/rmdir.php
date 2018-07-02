@@ -76,9 +76,14 @@ class rmdir implements CommandInterface
 
         foreach ($paramArray as $param) {
             if ($param != "" || !empty($param)) {
-                //Get parent information for further treatment
-                $parentPath = CommandAsset::getParentPath($param);
-                $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
+                //Get parent information for further treatment4
+                $paramFullPath = CommandAsset::getAbsolute($data->position, $param);
+                $paramName = $param;
+                $parentPath = CommandAsset::getParentPath($paramFullPath);
+                $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) -1];
+                var_dump($paramFullPath);
+                var_dump($parentPath);
+                var_dump($parentName);
 
                 //Check if you've righ to act on directory
                 if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $parentPath, CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)), 1)) {
@@ -87,11 +92,11 @@ class rmdir implements CommandInterface
                     $type = CommandAsset::checkBoth($terminal_mac, $param, $parentId, $db);
 
                     if (strpos($param, '/') !== false) {
-                        $param = explode("/", $param)[count(explode("/", $param)) - 1];
+                        $paramName = explode("/", $param)[count(explode("/", $param)) - 1];
 
                     }
                     if ($type == 1) {
-                        self::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
+                        self::deleteDir($db, $data, $sender, $terminal_mac, $paramName, $parentId, $param);
                     } else if ($type == 2) {
 
                         $sender->send('message|<br>' . $param . ' is a file, please use rm.');
@@ -107,26 +112,31 @@ class rmdir implements CommandInterface
         }
     }
 
-    public static function deleteDir(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId)
+    public static function deleteDir(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $dirname, int $parentId, string $dirFullPath)
     {
-        $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal = :terminal AND parent = :parent AND name = :name");
+        if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $dirFullPath, CommandAsset::getChmod($db, $terminal_mac, $dirname, $parentId), 2)) {
+            $stmp = $db->prepare("DELETE FROM terminal_directory WHERE terminal = :terminal AND parent = :parent AND name = :name");
 
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $dirname);
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":parent", $parentId);
+            $stmp->bindParam(":name", $dirname);
 
-        $stmp->execute();
+            $stmp->execute();
 
-        $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name");
+            $stmp = $db->prepare("SELECT name FROM terminal_directory WHERE terminal= :terminal AND parent= :parent AND name= :name");
 
-        //If the file or the dir exist, delete the file
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $dirname);
+            //If the file or the dir exist, delete the file
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":parent", $parentId);
+            $stmp->bindParam(":name", $dirname);
 
-        $stmp->execute();
-        if ($stmp->fetch()['name']) {
-            $sender->send("message|<br> Directory not empty.");
-        };
+            $stmp->execute();
+            if ($stmp->fetch()['name']) {
+                $sender->send("message|<br> Directory not empty.");
+            }
+        } else {
+            return $sender->send("message|<br> You don't have rights to remove " . $dirname . ".");
+        }
+
     }
 }
