@@ -92,6 +92,9 @@ class chmod implements CommandInterface
 
     public static function stageChangeChmod(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, $fullPathFiles, int $askedChmod)
     {
+        if (!self::verifyChmod($askedChmod)) {
+            return $sender->send("message|<br>Chmod: invalid value :" . $askedChmod);
+        }
         foreach ($fullPathFiles as $fullPathFile) {
             // get Full Path of Parent directory
             $parentId = CommandAsset::getParentId($db, $terminal_mac, $fullPathFile);
@@ -136,5 +139,23 @@ class chmod implements CommandInterface
         $stmp->bindParam(":owner", $data->user->idterminal_user);
 
         $stmp->execute();
+    }
+
+    /**
+     * Check if $chmod is valide
+     */
+    public static function verifyChmod(string $chmod)
+    {
+        if($chmod > 777){
+            return false;
+        }
+        for ($i = 0; $i < 3; $i++) {
+            $right = $chmod % 10;
+            if ($right > 7 || $right < 0) {
+                return false;
+            }
+            $chmod = floor($chmod / 10);
+        }
+        return true;
     }
 }
