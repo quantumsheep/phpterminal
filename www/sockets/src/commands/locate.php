@@ -41,7 +41,7 @@ class locate implements CommandInterface
             return $sender->send("message|<br> multiple argument entered. Locate only support one argument");
         }
 
-        $localisations = self::locateFile($db, $fullNames, $terminal_mac);
+        $localisations = self::locateFile($db, $fullNames, $terminal_mac, $data);
 
         if (!empty($localisations)) {
             foreach ($localisations as $localisation) {
@@ -57,12 +57,20 @@ class locate implements CommandInterface
      * return array full of paths leading to file
      */
 
-    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac)
+    public static function locateFile(\PDO $db, array $fileName, string $terminal_mac, SenderData &$data)
     {
-
+        $filesIdsAllowed = [];
         $fileIds = self::getIdfromName($db, $fileName[0], $terminal_mac);
 
-        return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
+        $fullPaths = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
+        foreach ($fullPaths as $file) {
+            $parentId = CommandAsset::getParentId($db, $terminal_mac, $file);
+            if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $file, CommandAsset::getChmod($db, $terminal_mac, $fileName[0], $parentId), 4)) {
+                $filesIdsAllowed[] = $file;
+            }
+        }
+            return $filesIdsAllowed;
+        
     }
 
     /**
