@@ -93,9 +93,13 @@ class rmdir implements CommandInterface
                     if ($type == 1) {
                         self::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
                     } else if ($type == 2) {
+
                         $sender->send('message|<br>' . $param . ' is a file, please use rm.');
+                    } else {
+
+                        $sender->send("message|<br>" . $param . " doesn't exists.");
                     }
-                    
+
                 } else {
                     $sender->send("message|<br> You don't have rights to remove directory here " . $parentName . ".");
                 }
