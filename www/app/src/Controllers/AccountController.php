@@ -76,7 +76,7 @@ class AccountController
 
             if (empty(AccountManager::checkAccountLogin($_SESSION["account"]->email, $_POST["oldPassword"]))) {
 
-                $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_SESSION["account"]->username . 2, $_SESSION["account"]->email .'r', $_POST["password"], $_POST["newPasswordVerif"]);
+                $_SESSION["errors"] = AccountManager::checkAccountRegister($db, $_SESSION["account"]->username . 2, $_SESSION["account"]->email . 'r', $_POST["password"], $_POST["newPasswordVerif"]);
 
                 if (empty($_SESSION["errors"])) {
                     $account->password = \password_hash($_POST["password"], PASSWORD_BCRYPT);
@@ -86,7 +86,7 @@ class AccountController
                 }
             }
         }
-        
+
         header("Location: /account");
     }
 

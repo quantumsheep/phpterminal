@@ -63,8 +63,6 @@ class rmdir implements CommandInterface
                         $quoted = end($quoted);
                     }
 
-                    var_dump($parentId);
-                    var_dump($quoted);
                     self::deleteDir($db, $data, $sender, $terminal_mac, $quoted, $parentId);
                 } else if ($type == 2) {
                     $sender->send('message|<br>' . $quoted . ' is a file, please use rm.');
@@ -80,10 +78,7 @@ class rmdir implements CommandInterface
                 $paramFullPath = CommandAsset::getAbsolute($data->position, $param);
                 $paramName = $param;
                 $parentPath = CommandAsset::getParentPath($paramFullPath);
-                $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) -1];
-                var_dump($paramFullPath);
-                var_dump($parentPath);
-                var_dump($parentName);
+                $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
 
                 //Check if you've righ to act on directory
                 if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $parentPath, CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)), 1)) {

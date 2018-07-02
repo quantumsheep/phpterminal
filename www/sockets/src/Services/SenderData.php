@@ -4,7 +4,8 @@ namespace Alph\Services;
 use Alph\Models\Terminal_UserModel;
 use Alph\Models\ViewTerminal_InfoModel;
 
-class SenderData {
+class SenderData
+{
     /**
      * @var Terminal_UserModel
      */
@@ -44,7 +45,8 @@ class SenderData {
 
     public $private_input = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->user = new Terminal_UserModel;
     }
 }

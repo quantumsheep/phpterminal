@@ -20,7 +20,7 @@ class DefinedCommands
             "chmod",
             "locate",
             "adduser",
-            "ssh"
+            "ssh",
         ];
     }
 }

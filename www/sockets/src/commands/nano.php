@@ -47,7 +47,6 @@ class nano implements CommandInterface
         } else if ($cmd == "save") {
             @list($path, $content) = explode('|', $parameters, 2);
 
-
             CommandAsset::createOrUpdateFile($db, $data, $sender, $path, $terminal_mac, $content);
         } else {
             if (isset($data->data->nano) && !empty($data->data->nano->pending)) {
@@ -64,7 +63,6 @@ class nano implements CommandInterface
             } else {
                 $data->controller = "\\Alph\\Commands\\nano::call";
                 $data->private_input = true;
-                
 
                 if ($parameters) {
                     $data->data->nano = new Model();

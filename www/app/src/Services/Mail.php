@@ -41,8 +41,8 @@ class Mail
             'ssl' => [
                 'verify_peer' => false,
                 'verify_peer_name' => false,
-                'allow_self_signed' => true
-            ]
+                'allow_self_signed' => true,
+            ],
         ];
 
         // Select the mailaddress and mailpassword from database

@@ -534,9 +534,9 @@ class CommandAsset
         }
     }
 
-    /**    
-    * Check if a user is Root
-    */
+    /**
+     * Check if a user is Root
+     */
     public static function isRoot(\PDO $db, string $terminal_mac, int $owner)
     {
         $stmp = $db->prepare("SELECT username FROM terminal_user WHERE idterminal_user=:owner AND terminal=:terminal");
@@ -553,7 +553,7 @@ class CommandAsset
         return false;
     }
     //GLOBAL USAGES FUNCTIONS -- END
-    
+
     //TOUCH USAGES FUNCTIONS -- START
     /**
      * Create or update files

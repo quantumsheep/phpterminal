@@ -59,7 +59,7 @@ class CommandHandler implements MessageComponentInterface
                 // Check if the idaccount is present in the sender's session
                 if (!empty($this->data[$conn->resourceId]->session["account"])) {
                     $stmp = $this->db->prepare("SELECT terminalmac, networkmac, privateipv4, publicipv4, sshport FROM TERMINAL_INFO WHERE terminalmac = :terminal_mac");
-                    
+
                     $terminal = str_replace(['.', ':'], '-', strtoupper($parsed_cookies[0]["terminal"]));
                     $stmp->bindParam(':terminal_mac', $terminal);
 

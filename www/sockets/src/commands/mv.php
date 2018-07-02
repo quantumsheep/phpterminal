@@ -64,7 +64,6 @@ class mv implements CommandInterface
 
         CommandAsset::concatenateParameters($fullElements, $quotedParameters, $pathParameters);
 
-        var_dump($fullElements);
         //Check if element provided is more than 1
         if (count($fullElements) < 2) {
             return $sender->send("message|<br>mv: target operand missing" . (count($fullElements) == 1 ? " after " . $fullElements[0] . "." : "."));
@@ -89,8 +88,7 @@ class mv implements CommandInterface
                 $targetId = CommandAsset::getIdDirectory($db, $terminal_mac, $targetFullPath);
 
                 foreach ($cleanedParameters as $parameter) {
-                    var_dump($targetFullPath);
-                    var_dump($parameter);
+
                     if ($targetId != null) {
                         self::updatePosition($db, $terminal_mac, $parameter, $targetId, $targetFullPath, $sender, $data);
                     } else {
@@ -279,8 +277,6 @@ class mv implements CommandInterface
      */
     public static function changeDirectoryParentId(\PDO $db, int $idDirectory, string $newParentId, string $terminal_mac)
     {
-        var_dump($idDirectory);
-        var_dump($newParentId);
         $stmp = $db->prepare("UPDATE terminal_directory SET parent= :newParent WHERE iddir= :idDirectory AND terminal= :terminal ");
 
         $stmp->bindParam(":terminal", $terminal_mac);
