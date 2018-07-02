@@ -136,7 +136,7 @@ class help implements CommandInterface
             $last_topic = $topics[count($topics) - 1];
 
             // Send an error message for topic not found
-            $sender->send("message|-bash: help: no help topics match '" . $last_topic . "'. Try 'help help' or 'man -k " . $last_topic . "' or 'info " . $last_topic . "'.");
+            $sender->send("message|<br>-bash: help: no help topics match '" . $last_topic . "'. Try 'help help' or 'man -k " . $last_topic . "' or 'info " . $last_topic . "'.");
         }
     }
 }

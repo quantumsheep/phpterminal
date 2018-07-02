@@ -63,9 +63,6 @@ class chmod implements CommandInterface
             $sender->send("message|<br>Operand missing <br>please enter chmod --help for more information");
             return;
         }
-        if (!CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user || CommandAsset::getElementOwner())) {
-
-        }
 
         $quotedParameters = CommandAsset::getQuotedParameters($parameters, $data->position);
         $options = CommandAsset::getOptions($parameters);
