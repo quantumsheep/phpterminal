@@ -140,24 +140,18 @@ class ls implements CommandInterface
             foreach ($files as $file) {
                 if ($file->name[0] !== '.') {
                     $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $currentPath);
-                    if ($chmod == 777) {
-                        $str = $str . '<tr><td class="pr-2">frwxrwxrwx</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
-                    } else {
-                        $str = $str . '<tr><td class="pr-2">frw-r--r--</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span>' . $file->name . '</span></td></tr>';
-                    }
+                    $stringRights = self::lsGetRights($chmod, 2);
+                    $str = $str . '<tr><td class="pr-2">' . $stringRights . '</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
+
                 }
             }
 
             foreach ($dirs as $dir) {
                 if ($dir->name[0] !== '.') {
                     $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $currentPath);
-                    if ($chmod == 777) {
-                        $str = $str . '<tr><td class="pr-2">drwxrwxrwx</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
-                    } else if ($chmod == 644) {
-                        $str = $str . '<tr><td class="pr-2">drw-r--r--</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#6871C4;">' . $dir->name . '</span></td></tr>';
-                    } else {
-                        $str = $str . '<tr><td class="pr-2">drw-r--r--</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span>' . $dir->name . '</span></td></tr>';
-                    }
+                    $stringRights = self::lsGetRights($chmod, 1);
+                    $str = $str . '<tr><td class="pr-2">'. $stringRights. '</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
+
                 }
             }
 
@@ -201,22 +195,16 @@ class ls implements CommandInterface
 
             foreach ($files as $file) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $file->name, $currentPath);
-                if ($chmod == 777) {
-                    $str = $str . '<tr><td class="pr-2">frwxrwxrwx</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
-                } else {
-                    $str = $str . '<tr><td class="pr-2">frw-r--r--</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span>' . $file->name . '</span></td></tr>';
-                }
+                $stringRights = self::lsGetRights($chmod, 2);
+                $str = $str . '<tr><td class="pr-2">' . $stringRights . '</td><td class="pr-2">' . $file->username . '</td><td class="pr-2">' . $file->data . '</td><td class="pr-2">' . $file->editeddate . '</td><td class="pr-2"><span style="color:#e6ce00;">' . $file->name . '</span></td></tr>';
+
             }
 
             foreach ($dirs as $dir) {
                 $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $currentPath);
-                if ($chmod == 777) {
-                    $str = $str . '<tr><td class="pr-2">drwxrwxrwx</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
-                } else if ($chmod == 644) {
-                    $str = $str . '<tr><td class="pr-2">drw-r--r--</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#6871C4;">' . $dir->name . '</span></td></tr>';
-                } else {
-                    $str = $str . '<tr><td class="pr-2">drw-r--r--</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span>' . $dir->name . '</span></td></tr>';
-                }
+                $stringRights = self::lsGetRights($chmod, 1);
+                $str = $str . '<tr><td class="pr-2">' . $stringRights . '</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
+
             }
 
             if ($files !== null || $dir !== null) {
@@ -252,5 +240,44 @@ class ls implements CommandInterface
             $dirs[] = Terminal_FileModel::map($row);
         }
         return $dirs;
+    }
+
+    public static function lsGetRights($chmod, $type)
+    {
+
+        $rightsString = "";
+        $reversedRights = "";
+        if ($type == 1) {
+            $rightsString .= "d";
+        } else {
+            $rightsString .= "f";
+        }
+
+        for ($i = 0; $i < 3; $i++) {
+            $rights = $chmod % 10;
+            if ($rights == 0) {
+                $reversedRights .= "---";
+            } else if ($rights == 1) {
+                $reversedRights .= "x--";
+            } else if ($rights == 2) {
+                $reversedRights .= "-r-";
+            } else if ($rights == 3) {
+                $reversedRights .= "xr-";
+            } else if ($rights == 4) {
+                $reversedRights .= "--w";
+            } else if ($rights == 5) {
+                $reversedRights .= "x-w";
+            } else if ($rights == 6) {
+                $reversedRights .= "-rw";
+            } else if ($rights == 7) {
+                $reversedRights .= "xwr";
+            }
+            $rights = floor($rights / 10);
+            var_dump($rights);
+        }
+        $rightsString .= strrev($reversedRights);
+        var_dump($reversedRights);
+
+        return $rightsString;
     }
 }
