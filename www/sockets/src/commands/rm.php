@@ -84,7 +84,9 @@ class rm implements CommandInterface
         foreach ($paramArray as $param) {
             if ($param != "" || !empty($param)) {
                 //Get parent information for further treatment
-                $parentPath = CommandAsset::getParentPath($param);
+                $paramFullPath = CommandAsset::getAbsolute($data->position, $param);
+                $paramName = $param;
+                $parentPath = CommandAsset::getParentPath($paramFullPath);
                 $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
 
                 //Check if you've righ to act on directory
@@ -100,7 +102,7 @@ class rm implements CommandInterface
                     }
 
                     if ($type == 2) {
-                        self::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
+                        self::deleteFile($db, $data, $sender, $terminal_mac, $paramName, $parentId, $param);
                     } else if ($type == 1) {
                         $sender->send('message|<br>' . $param . ' is a directory, please use rmdir.');
                     } else {
@@ -113,15 +115,18 @@ class rm implements CommandInterface
         }
     }
 
-    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
+    public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId, string $fileFullPath)
     {
-        
-        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name");
+        if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $fileFullPath, CommandAsset::getChmod($db, $terminal_mac, $filename, $parentId), 2)) {
+            $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name");
 
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $filename);
+            $stmp->bindParam(":terminal", $terminal_mac);
+            $stmp->bindParam(":parent", $parentId);
+            $stmp->bindParam(":name", $filename);
 
-        return $stmp->execute();
+            return $stmp->execute();
+        } else {
+            return $sender->send("message|<br>You can't remove a file you can't write.");
+        }
     }
 }
