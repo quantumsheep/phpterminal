@@ -69,8 +69,8 @@ class locate implements CommandInterface
                 $filesIdsAllowed[] = $file;
             }
         }
-            return $filesIdsAllowed;
-        
+        return $filesIdsAllowed;
+
     }
 
     /**
