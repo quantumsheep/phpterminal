@@ -17,7 +17,6 @@ class DefinedCommands
             "rm",
             "nano",
             "mv",
-            "test",
             "rmdir",
             "chmod",
             "locate",
