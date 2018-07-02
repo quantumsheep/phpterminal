@@ -613,4 +613,22 @@ class CommandAsset
     }
     //TOUCH USAGES FUNCTIONS -- END
 
+    /**
+     * generate a new File
+     */
+    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
+    {
+        $basicmod = 777;
+        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, `data`, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :content, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
+
+        $stmp->bindParam(":terminal", $terminal_mac);
+        $stmp->bindParam(":parent", $parentId);
+        $stmp->bindParam(":name", $name);
+        $stmp->bindParam(":content", $content);
+        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
+        $stmp->bindParam(":owner", $data->user->idterminal_user);
+
+        return
+        $stmp->execute();
+    }
 }

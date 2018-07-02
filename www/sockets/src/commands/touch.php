@@ -67,7 +67,7 @@ class touch implements CommandInterface
                 if (CommandAsset::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === false && CommandAsset::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === false) {
 
                     // Create file
-                    return self::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
+                    return CommandAsset::createNewFile($db, $data, $terminal_mac, $newFileName, $parentId, $content);
                 } else if (CommandAsset::checkDirectoryExistence($terminal_mac, $newFileName, $parentId, $db) === true || CommandAsset::checkFileExistence($terminal_mac, $newFileName, $parentId, $db) === true) {
                     $sender->send("message|<br>" . $newFileName . " : already exists");
                     return false;
@@ -93,24 +93,5 @@ class touch implements CommandInterface
         foreach ($fullPathNewFiles as $fullPathNewFile) {
             self::stageCreateNewFile($db, $data, $sender, $terminal_mac, $fullPathNewFile);
         }
-    }
-
-    /**
-     * generate a new File
-     */
-    public static function createNewFile(\PDO $db, SenderData &$data, string $terminal_mac, string $name, int $parentId, string $content = ""): bool
-    {
-        $basicmod = 777;
-        $stmp = $db->prepare("INSERT INTO TERMINAL_FILE(terminal, parent, name, `data`, chmod, owner, `group`, createddate, editeddate) VALUES(:terminal, :parent, :name, :content, :chmod, :owner, (SELECT gid FROM terminal_user WHERE idterminal_user = :owner), NOW(),NOW());");
-
-        $stmp->bindParam(":terminal", $terminal_mac);
-        $stmp->bindParam(":parent", $parentId);
-        $stmp->bindParam(":name", $name);
-        $stmp->bindParam(":content", $content);
-        $stmp->bindParam(":chmod", $basicmod, \PDO::PARAM_INT);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
-
-        return
-        $stmp->execute();
     }
 }
