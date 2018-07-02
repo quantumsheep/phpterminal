@@ -65,12 +65,12 @@ class locate implements CommandInterface
         $fullPaths = self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
         foreach ($fullPaths as $file) {
             $parentId = CommandAsset::getParentId($db, $terminal_mac, $file);
-            if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $file, CommandAsset::getChmod($db, $terminal_mac, $fileName[0], $parentId),4)) {
+            if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $file, CommandAsset::getChmod($db, $terminal_mac, $fileName[0], $parentId), 4)) {
                 $filesIdsAllowed[] = $file;
             }
         }
-            return $filesIdsAllowed;
-        
+        return $filesIdsAllowed;
+
     }
 
     /**
