@@ -422,8 +422,6 @@ class CommandAsset
         } else {
             return;
         }
-        var_dump($elementChmod);
-        var_dump($rightsTo);
 
         if ($chmodNeeded == 1) {
             return $rightsTo % 2 == 1;
