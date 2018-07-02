@@ -146,7 +146,7 @@ class chmod implements CommandInterface
      */
     public static function verifyChmod(string $chmod)
     {
-        if($chmod > 777){
+        if ($chmod > 777) {
             return false;
         }
         for ($i = 0; $i < 3; $i++) {
