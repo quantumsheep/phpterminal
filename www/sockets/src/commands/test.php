@@ -20,7 +20,7 @@ class test implements CommandInterface
     public static function call(\PDO $db, \SplObjectStorage $clients, SenderData &$data, ConnectionInterface $sender, string $sess_id, array $sender_session, string $terminal_mac, string $cmd, $parameters, bool &$lineReturn)
     {
         //var_dump(CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $parameters, CommandAsset::getChmod($db,$terminal_mac, $parameters, CommandAsset::getParentId($db, $terminal_mac, $parameters)),2));
-        var_dump(CommandAsset::isRoot($db, $terminal_mac, $data->user->idterminal_user));
+        var_dump(CommandAsset::getChmod($db, $terminal_mac, explode("/", $parameters)[count(explode("/", $parameters)) - 1], CommandAsset::getParentId($db, $terminal_mac, $parameters)));
 
     }
 }
