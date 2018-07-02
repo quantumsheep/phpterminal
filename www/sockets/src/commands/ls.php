@@ -59,10 +59,20 @@ class ls implements CommandInterface
 
             if (!empty($paramArray)) {
                 foreach ($paramArray as $path) {
-                    $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . $path), $db);
+
+                    if ($path[0] == "/") {
+                        $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $path), $db);
+                    } else {
+                        $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . '/' . $path), $db);
+                    }
 
                     if ($fileType == 1) {
-                        $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
+                        if ($path[0] == "/") {
+                            $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($path));
+                        } else {
+                            $currentPath = CommandAsset::getIdDirectory($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path));
+                        }
+
                         $files = self::getFiles($db, $terminal_mac, $currentPath);
                         $dirs = self::getDirectories($db, $terminal_mac, $currentPath);
 
