@@ -110,21 +110,31 @@ class rm implements CommandInterface
 
         foreach ($paramArray as $param) {
             if ($param != "" || !empty($param)) {
-                $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
-                $type = CommandAsset::checkBoth($terminal_mac, $param, $parentId, $db);
+                //Get parent information for further treatment
+                $parentPath = CommandAsset::getParentPath($param);
+                $parentName = explode("/", $parentPath)[count(explode("/", $parentPath)) - 1];
 
-                if (strpos($param, '/') !== false) {
-                    $param = explode("/", $param);
+                //Check if you've righ to act on directory
+                if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $parentPath, CommandAsset::getChmod($db, $terminal_mac, $parentName, CommandAsset::getParentId($db, $terminal_mac, $parentPath)), 1)) {
 
-                    $param = end($param);
-                }
+                    $parentId = CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $param));
+                    $type = CommandAsset::checkBoth($terminal_mac, $param, $parentId, $db);
 
-                if ($type == 2) {
-                    self::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
-                } else if ($type == 1) {
-                    $sender->send('message|<br>' . $param . ' is a directory, please use rmdir.');
+                    if (strpos($param, '/') !== false) {
+                        $param = explode("/", $param);
+
+                        $param = end($param);
+                    }
+
+                    if ($type == 2) {
+                        self::deleteFile($db, $data, $sender, $terminal_mac, $param, $parentId);
+                    } else if ($type == 1) {
+                        $sender->send('message|<br>' . $param . ' is a directory, please use rmdir.');
+                    } else {
+                        $sender->send('message|<br>' . $param . ' didnt exist.');
+                    }
                 } else {
-                    $sender->send('message|<br>' . $param . ' didnt exist.');
+                    $sender->send("message|<br>You can't remove a file from here " . $parentPath);
                 }
             }
         }
