@@ -8,28 +8,12 @@ use Ratchet\ConnectionInterface;
 
 class cd implements CommandInterface
 {
-    const USAGE = "cd [-L|[-P [-e]] [-@]] [dir]";
+    const USAGE = "cd [dir]";
 
     const SHORT_DESCRIPTION = "Change the shell working directory.";
-    const FULL_DESCRIPTION = "Change the current directory to DIR.  The default DIR is the value of the HOME shell variable.
-    <br>
-    The variable CDPATH defines the search path for the directory containing
-    DIR.  Alternative directory names in CDPATH are separated by a colon (:).
-    A null directory name is the same as the current directory.  If DIR begins
-    with a slash (/), then CDPATH is not used.
-    <br>
-    If the directory is not found, and the shell option `cdable_vars' is set,
-    the word is assumed to be  a variable name.  If that variable has a value,
-    its value is used for DIR.";
+    const FULL_DESCRIPTION = "Change the current directory to DIR.  The default DIR is the value of the HOME shell variable.";
 
-    const OPTIONS = [
-        "-L" => "force symbolic links to be followed: resolve symbolic links in DIR after processing instances of `..'",
-        "-P" => "use the physical directory structure without following symbolic links: resolve symbolic links in DIR before processing instances of `..'",
-        "-e" => "if the -P option is supplied, and the current working directory cannot be determined successfully, exit with a non-zero status",
-        "-@" => "on systems that support it, present a file with extended attributes as a directory containing the file attributes",
-    ];
-
-    const EXIT_STATUS = "Returns 0 if the directory is changed, and if \$PWD is set successfully when -P is used; non-zero otherwise.";
+    const EXIT_STATUS = "Returns 0 if the directory is changed.";
 
     /**
      * Call the command
@@ -83,7 +67,7 @@ class cd implements CommandInterface
         if ($ParentId != null) {
             //check if directory is accessible
             if (CommandAsset::checkRightsTo($db, $terminal_mac, $data->user->idterminal_user, $data->user->gid, $absolutePath, CommandAsset::getChmod($db, $terminal_mac, $DirName, $ParentId), 1)) {
-                
+
                 $stmp = $db->prepare("SELECT IdDirectoryFromPath(?, ?) as idDirectory;");
                 $stmp->execute([$absolutePath, $terminal_mac]);
                 if ($stmp->rowCount() === 1) {

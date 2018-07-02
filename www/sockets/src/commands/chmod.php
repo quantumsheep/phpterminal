@@ -14,37 +14,19 @@ class chmod implements CommandInterface
     /**
      * Command's usage
      */
-    const USAGE = "";
+    const USAGE = "chmod [MODE] [FILE].";
 
     /**
      * Command's short description
      */
-    const SHORT_DESCRIPTION = "";
+    const SHORT_DESCRIPTION = "Change the mode of each FILE to MODE.";
 
     /**
      * Command's full description
      */
-    const FULL_DESCRIPTION = "";
-
-    /**
-     * Command's options
-     */
-    const OPTIONS = [
-        "" => "",
-        "" => "",
-    ];
-
-    /**
-     * Command's arguments
-     */
-    const ARGUMENTS = [
-        "PATTERN" => "",
-    ];
-
-    /**
-     * Command's exit status
-     */
-    const EXIT_STATUS = "";
+    const FULL_DESCRIPTION = "GNU coreutils online help: <http://www.gnu.org/software/coreutils/>
+    Full documentation at: <http://www.gnu.org/software/coreutils/chmod>
+    or available locally via: info '(coreutils) chmod invocation'";
 
     /**
      * Call the command
