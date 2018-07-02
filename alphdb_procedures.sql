@@ -330,4 +330,5 @@ VIEW `TERMINAL_INFO` AS
         ((`privateip`.`terminal` = `terminal`.`mac`)
             AND (`network`.`mac` = `terminal`.`localnetwork`)
             AND (`port`.`ip` = `privateip`.`ip`)
-            AND (`port`.`ipport` = 22));
+            AND (`port`.`ipport` = 22))
+    GROUP BY terminalmac;
