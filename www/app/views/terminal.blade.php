@@ -33,6 +33,18 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div>Network IP : {{$model->terminal->publicipv4}}</div>
+                <div>SSH port : {{$model->terminal->sshport}}</div>
+            </div>
+            <div class="col-sm-6">
+                <div>Terminal MAC : {{$model->terminal->terminalmac}}</div>
+                <div>Private IP : {{$model->terminal->privateipv4}}</div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
