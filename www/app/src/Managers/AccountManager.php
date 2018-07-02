@@ -364,6 +364,16 @@ class AccountManager
         $stmp->execute();
     }
 
+    public static function isConnected()
+    {
+        return isset($_SESSION["account"]) && !empty($_SESSION["account"]->idaccount);
+    }
+
+    public static function isAdmin()
+    {
+        return isset($_SESSION["account"]) && $_SESSION["account"]->hyperpower;
+    }
+
     /**
      * Logout an account
      */
