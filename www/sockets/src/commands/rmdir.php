@@ -67,7 +67,7 @@ class rmdir implements CommandInterface
                     var_dump($quoted);
                     self::deleteDir($db, $data, $sender, $terminal_mac, $quoted, $parentId);
                 } else if ($type == 2) {
-                    $sender->send('message|<br>' . $quoted . ' is a file, please use rmdir.');
+                    $sender->send('message|<br>' . $quoted . ' is a file, please use rm.');
                 } else {
                     $sender->send('message|<br>' . $quoted . ' didnt exist.');
                 }
@@ -88,7 +88,7 @@ class rmdir implements CommandInterface
                 if ($type == 1) {
                     self::deleteDir($db, $data, $sender, $terminal_mac, $param, $parentId);
                 } else if ($type == 2) {
-                    $sender->send('message|<br>' . $param . ' is a file, please use rmdir.');
+                    $sender->send('message|<br>' . $param . ' is a file, please use rm.');
                 } else {
                     $sender->send('message|<br>' . $param . ' didnt exist.');
                 }
