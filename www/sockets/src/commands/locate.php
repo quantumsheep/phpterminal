@@ -8,14 +8,10 @@ use Ratchet\ConnectionInterface;
 
 class locate implements CommandInterface
 {
-    const USAGE = "mkdir [OPTION]... DIRECTORY...";
+    const USAGE = "locate [FILE]";
 
-    const SHORT_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist.";
-    const FULL_DESCRIPTION = "Create the DIRECTORY(ies), if they do not already exist. If paths are provided, do NOT create directory if the path provided is wrong.";
-
-    const OPTIONS = [
-        "-p" => "Create directory from paths provided in case of the directories doesn't exist",
-    ];
+    const SHORT_DESCRIPTION = "Locate a specified [FILE].";
+    const FULL_DESCRIPTION = "Locate a specified [FILE].";
 
     const EXIT_STATUS = "Returns exit status of command or success if command is null.";
 
@@ -39,16 +35,16 @@ class locate implements CommandInterface
 
         //controle quoteParameters and concanate it all
         $fullNames = CommandAsset::getDirFileName($parameters, $data->position);
-        
+
         // check if there's only one argument
-        if(isset($fullNames[1])){
+        if (isset($fullNames[1])) {
             return $sender->send("message|<br> multiple argument entered. Locate only support one argument");
         }
-      
+
         $localisations = self::locateFile($db, $fullNames, $terminal_mac);
-        
-        if(!empty($localisations)){
-            foreach($localisations as $localisation){
+
+        if (!empty($localisations)) {
+            foreach ($localisations as $localisation) {
                 $sender->send("message|<br>" . $localisation);
             }
             return;
@@ -56,8 +52,6 @@ class locate implements CommandInterface
             return $sender->send("message|<br>Can't locate file passed.");
         }
     }
-
-
 
     /**
      * return array full of paths leading to file
@@ -70,7 +64,6 @@ class locate implements CommandInterface
 
         return self::getFullPathFromIdFile($db, $fileIds, $terminal_mac);
     }
-
 
     /**
      * return IDs from $name

@@ -11,7 +11,7 @@ class rmdir implements CommandInterface
     /**
      * Command's usage
      */
-    const USAGE = "rmdir [OPTION]... DIRECTORY...";
+    const USAGE = "rmdir DIRECTORY...";
 
     /**
      * Command's short description

@@ -8,19 +8,9 @@ use Ratchet\ConnectionInterface;
 
 class adduser implements CommandInterface
 {
-    const USAGE = "adduser [--home DIR] [--shell SHELL] [--no-create-home] [--uid ID]
-    [--firstuid ID] [--lastuid ID] [--gecos GECOS] [--ingroup GROUP | --gid ID]
-    [--disabled-password] [--disabled-login] [--add_extra_groups] USER";
+    const USAGE = "adduser USER";
 
-    const OPTIONS = [
-        "--quiet | -q" => "don't give process information to stdout",
-        "--force-badname" => "allow usernames which do not match the NAME_REGEX configuration variable",
-        "--help | -h" => "usage message",
-        "--version | -v" => "version number and copyright",
-        "--conf | -c FILE" => "use FILE as configuration file",
-    ];
-
-    const EXIT_STATUS = "Returns 0 if the directory is changed, and if \$PWD is set successfully when -P is used; non-zero otherwise.";
+    const EXIT_STATUS = "Returns 0 if the directory is changed, and if \$PWD is set successfully.";
 
     /**
      * Call the command
