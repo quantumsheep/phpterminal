@@ -35,7 +35,7 @@ header {
     margin-bottom: 16px;
 }
 
-div, img {
+img {
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

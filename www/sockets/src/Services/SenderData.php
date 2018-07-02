@@ -2,7 +2,7 @@
 namespace Alph\Services;
 
 use Alph\Models\Terminal_UserModel;
-use Alph\Models\TerminalModel;
+use Alph\Models\ViewTerminal_InfoModel;
 
 class SenderData {
     /**
@@ -11,7 +11,7 @@ class SenderData {
     public $user;
 
     /**
-     * @var TerminalModel
+     * @var ViewTerminal_InfoModel
      */
     public $terminal;
 
