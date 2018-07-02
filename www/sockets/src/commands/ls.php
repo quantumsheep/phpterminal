@@ -150,7 +150,7 @@ class ls implements CommandInterface
                 if ($dir->name[0] !== '.') {
                     $chmod = CommandAsset::getChmod($db, $terminal_mac, $dir->name, $currentPath);
                     $stringRights = self::lsGetRights($chmod, 1);
-                    $str = $str . '<tr><td class="pr-2">'. $stringRights. '</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
+                    $str = $str . '<tr><td class="pr-2">' . $stringRights . '</td><td class="pr-2">' . $dir->username . '</td><td class="pr-2">' . $dir->data . '</td><td class="pr-2">' . $dir->editeddate . '</td><td class="pr-2"><span style="color:#343862; background-color:#449544;">' . $dir->name . '</span></td></tr>';
 
                 }
             }
@@ -272,11 +272,9 @@ class ls implements CommandInterface
             } else if ($rights == 7) {
                 $reversedRights .= "xwr";
             }
-            $rights = floor($rights / 10);
-            var_dump($rights);
+            $chmod = floor($chmod / 10);
         }
         $rightsString .= strrev($reversedRights);
-        var_dump($reversedRights);
 
         return $rightsString;
     }

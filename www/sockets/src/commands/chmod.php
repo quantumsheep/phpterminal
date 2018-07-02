@@ -58,7 +58,6 @@ class chmod implements CommandInterface
         }
 
         CommandAsset::concatenateParameters($Files, $quotedParameters, $pathParameters);
-        var_dump($Files);
 
         for ($i = 0; $i < count($options); $i++) {
             unset($Files[$i]);
@@ -66,8 +65,6 @@ class chmod implements CommandInterface
 
         $askedChmod = $Files[count($options)];
         unset($Files[count($options)]);
-        var_dump($Files);
-        var_dump($askedChmod);
 
         if (is_numeric($askedChmod)) {
             if (!empty($Files)) {
@@ -120,7 +117,6 @@ class chmod implements CommandInterface
      */
     public static function changeChmod(\PDO $db, SenderData &$data, string $terminal_mac, string $FileName, int $askedChmod, int $parentId)
     {
-
         $stmp = $db->prepare("UPDATE terminal_file SET chmod= :chmod WHERE terminal= :terminal AND parent= :parent AND name= :name AND owner= :owner");
 
         $stmp->bindParam(":chmod", $askedChmod);
