@@ -132,12 +132,11 @@ class rm implements CommandInterface
 
     public static function deleteFile(\PDO $db, SenderData &$data, ConnectionInterface $sender, string $terminal_mac, string $filename, int $parentId)
     {
-        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name AND owner = :owner");
+        $stmp = $db->prepare("DELETE FROM terminal_file WHERE terminal = :terminal AND parent = :parent AND name = :name");
 
         $stmp->bindParam(":terminal", $terminal_mac);
         $stmp->bindParam(":parent", $parentId);
         $stmp->bindParam(":name", $filename);
-        $stmp->bindParam(":owner", $data->user->idterminal_user);
 
         return $stmp->execute();
     }
