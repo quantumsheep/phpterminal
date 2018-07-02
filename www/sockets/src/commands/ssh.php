@@ -69,7 +69,7 @@ class ssh implements CommandInterface
         }
 
         if (empty($parameters)) {
-            return help::call(...\func_get_args());
+            return help::call($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, "ssh", $lineReturn);
         }
 
         $options = [
@@ -108,7 +108,7 @@ class ssh implements CommandInterface
         }
 
         if (empty($options["user"]) && empty($options["host"])) {
-            return help::call(...\func_get_args());
+            return help::call($db, $clients, $data, $sender, $sess_id, $sender_session, $terminal_mac, $cmd, "ssh", $lineReturn);
         }
 
         $stmp = $db->prepare("SELECT terminalmac, networkmac, privateipv4, publicipv4, sshport FROM TERMINAL_INFO WHERE terminalmac = (SELECT terminal FROM PRIVATEIP, (SELECT mac FROM NETWORK WHERE ipv4 = :ipv4) as net WHERE ip = (SELECT ip FROM PORT WHERE network = net.mac AND port = :port AND ipport = 22) AND PRIVATEIP.network = net.mac)");
