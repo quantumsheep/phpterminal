@@ -11,11 +11,22 @@ use Ratchet\ConnectionInterface;
 
 class ssh implements CommandInterface
 {
-    const USAGE = "ssh user@host";
+    const USAGE = "ssh [user@host] -p [PORT]";
 
-    const OPTIONS = [
-        "-p" => "Select a specific port",
-    ];
+    /**
+     * Command's short description
+     */
+    const SHORT_DESCRIPTION = "Connect to a host at the specified port.";
+
+    /**
+     * Command's full description
+     */
+    const FULL_DESCRIPTION = "Connect to a host at the specified port.";
+
+    /**
+     * Command's exit status
+     */
+    const EXIT_STATUS = "Returns exit status of command or success if command is null.";
 
     /**
      * Call the command

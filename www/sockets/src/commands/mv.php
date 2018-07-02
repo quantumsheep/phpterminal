@@ -14,31 +14,17 @@ class mv implements CommandInterface
     /**
      * Command's usage
      */
-    const USAGE = "mv [OPTION]... [-T] SOURCE DEST
-    or:  mv [OPTION]... SOURCE... DIRECTORY
-    or:  mv [OPTION]... -t DIRECTORY SOURCE...";
+    const USAGE = "mv [SOURCE] DEST";
 
     /**
      * Command's short description
      */
-    const SHORT_DESCRIPTION = "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
-
-    Mandatory arguments to long options are mandatory for short options too.";
+    const SHORT_DESCRIPTION = "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.";
 
     /**
      * Command's full description
      */
     const FULL_DESCRIPTION = "Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.";
-
-    /**
-     * Command's options
-     */
-    const OPTIONS = [
-        "-b" => "make a backup of each existing destination file, like --backup but does not accept an argument",
-        "-f, --force" => "do not prompt before overwriting",
-        "-i, --interactive" => "prompt before overwrite",
-        "-n, --no-clobber" => "do not overwrite an existing file",
-    ];
 
     /**
      * Command's exit status

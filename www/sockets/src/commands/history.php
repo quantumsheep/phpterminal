@@ -7,7 +7,7 @@ use Ratchet\ConnectionInterface;
 
 class history implements CommandInterface
 {
-    const USAGE = "history [-c] [-d offset] [n] or history -anrw [filename] or history -p arg [arg...]";
+    const USAGE = "history [-c] [-d offset]";
 
     const SHORT_DESCRIPTION = "Display or manipulate the history list.";
 
