@@ -435,7 +435,7 @@ class CommandAsset
             return ($rightsTo == 3 || $rightsTo == 5 || $rightsTo == 7);
 
         } else if ($chmodNeeded == 4) {
-            return ($rightsTo * 2) <= 8;
+            return ($rightsTo * 2) >= 8;
 
         } else if ($chmodNeeded == 5) {
             return ($rightsTo == 5 || $rightsTo == 7);
