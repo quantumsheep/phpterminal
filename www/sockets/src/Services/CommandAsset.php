@@ -13,7 +13,7 @@ class CommandAsset
     /**
      * Get name from parameters and return an array filled with
      */
-    public static function getDirFileName(array &$parameters, string $position)
+    public static function getDirFileName(string &$parameters, string $position)
     {
         $quotedParametersName = [];
         $finalDirNames = [];
