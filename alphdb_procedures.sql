@@ -314,7 +314,7 @@ CREATE
     ALGORITHM = UNDEFINED 
     DEFINER = `root`@`localhost` 
     SQL SECURITY DEFINER
-VIEW `TERMINAL_INFO` AS
+VIEW `terminal_info` AS
     SELECT 
         `terminal`.`mac` AS `terminalmac`,
         `network`.`mac` AS `networkmac`,
@@ -323,12 +323,11 @@ VIEW `TERMINAL_INFO` AS
         `port`.`port` AS `sshport`
     FROM
         (((`terminal`
-        JOIN `privateip`)
         JOIN `network`)
+        JOIN `privateip`)
         JOIN `port`)
     WHERE
         ((`privateip`.`terminal` = `terminal`.`mac`)
             AND (`network`.`mac` = `terminal`.`localnetwork`)
             AND (`port`.`ip` = `privateip`.`ip`)
-            AND (`port`.`ipport` = 22))
-    GROUP BY terminalmac;
+            AND (`port`.`network` = `network`.`mac`));
