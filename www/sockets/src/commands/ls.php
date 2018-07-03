@@ -63,7 +63,7 @@ class ls implements CommandInterface
                     if ($path[0] == "/") {
                         $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $path), $db);
                     } else {
-                        $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, $data->position . '/' . $path), $db);
+                        $fileType = CommandAsset::checkBoth($terminal_mac, $path, CommandAsset::getParentId($db, $terminal_mac, CommandAsset::getAbsolute($data->position, $path)), $db);
                     }
 
                     if ($fileType == 1) {
